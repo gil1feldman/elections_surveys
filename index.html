@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעקב נתוני סקרים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Assistant:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  :root{
+    --paper:#FAF8F3;
+    --paper-raised:#FFFFFF;
+    --ink:#1B2440;
+    --ink-soft:#5A6079;
+    --gold:#C9972C;
+    --gold-soft:#F1DFB2;
+    --coalition:#2456A6;
+    --opposition:#A9AFBC;
+    --alert:#C1483B;
+    --good:#1F8A57;
+    --line:#E4E1D8;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Assistant',sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--gold-soft);}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 80px;}
+
+  /* ---------- Header ---------- */
+  header.top{
+    display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
+    gap:16px;margin-bottom:26px;padding-bottom:20px;border-bottom:2px solid var(--ink);
+  }
+  header.top h1{
+    font-family:'Frank Ruhl Libre',serif;
+    font-weight:900;
+    font-size:clamp(28px,4vw,42px);
+    margin:0 0 4px;
+    letter-spacing:-0.5px;
+  }
+  header.top .updated{
+    font-size:13px;color:var(--ink-soft);text-align:left;
+  }
+
+  /* ---------- Outlet pills ---------- */
+  .pillbar{
+    display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;
+  }
+  .pill{
+    border:1.5px solid var(--line);background:var(--paper-raised);
+    color:var(--ink);padding:8px 16px;border-radius:999px;
+    font-family:'Assistant',sans-serif;font-weight:600;font-size:14.5px;
+    cursor:pointer;transition:all .15s ease;
+  }
+  .pill:hover{border-color:var(--ink);}
+  .pill.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+  .context-line{
+    font-size:14.5px;color:var(--ink-soft);margin:-14px 0 26px;
+  }
+  .context-line b{color:var(--ink);font-weight:700;}
+
+  /* ---------- Hero: gauge + meta ---------- */
+  .hero{
+    display:grid;grid-template-columns:1.1fr 0.9fr;gap:0;
+    background:var(--paper-raised);border-radius:var(--radius);
+    border:1.5px solid var(--line);overflow:hidden;margin-bottom:34px;
+    box-shadow:0 1px 0 rgba(27,36,64,0.03);
+  }
+  @media (max-width:760px){ .hero{grid-template-columns:1fr;} }
+
+  .gauge-panel{
+    padding:30px 30px 10px;display:flex;flex-direction:column;align-items:center;
+    border-left:1.5px solid var(--line);
+  }
+  @media (max-width:760px){ .gauge-panel{border-left:none;border-bottom:1.5px solid var(--line);} }
+
+  .gauge-panel .eyebrow{
+    align-self:flex-start;
+    font-size:13px;font-weight:700;color:var(--gold);
+    text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;
+  }
+  .gauge-panel h2{
+    align-self:flex-start;
+    font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:22px;margin:0 0 10px;
+  }
+  .gauge-svg{width:100%;max-width:380px;}
+  .gauge-number{
+    font-family:'Frank Ruhl Libre',serif;font-weight:900;
+    font-size:56px;line-height:1;margin-top:-56px;
+  }
+  .gauge-caption{font-size:15px;color:var(--ink-soft);margin-top:6px;text-align:center;}
+  .gauge-status{
+    margin-top:14px;padding:6px 16px;border-radius:999px;font-weight:700;font-size:14.5px;
+  }
+  .gauge-status.pass{background:#E4F3EA;color:var(--good);}
+  .gauge-status.fail{background:#F8E7E4;color:var(--alert);}
+
+  .meta-panel{padding:30px;display:flex;flex-direction:column;gap:18px;}
+  .meta-panel .eyebrow{
+    font-size:13px;font-weight:700;color:var(--gold);
+    text-transform:uppercase;letter-spacing:0.06em;
+  }
+  .meta-panel h2{
+    font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:22px;margin:2px 0 4px;
+  }
+  .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;margin-top:6px;}
+  .meta-item .label{font-size:12.5px;color:var(--ink-soft);margin-bottom:3px;}
+  .meta-item .value{font-size:17px;font-weight:700;}
+  .coalition-def{
+    font-size:13.5px;color:var(--ink-soft);border-top:1px dashed var(--line);
+    padding-top:14px;line-height:1.55;
+  }
+  .coalition-def b{color:var(--ink);}
+
+  /* ---------- Section headers ---------- */
+  .section-head{margin:44px 0 16px;}
+  .section-head .eyebrow{
+    font-size:13px;font-weight:700;color:var(--gold);
+    text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;
+  }
+  .section-head h2{
+    font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:24px;margin:2px 0 6px;
+  }
+  .section-head p{font-size:14.5px;color:var(--ink-soft);margin:0;max-width:640px;line-height:1.5;}
+
+  /* ---------- Party grid ---------- */
+  .group-label{
+    font-size:14px;font-weight:700;color:var(--ink);margin:22px 0 10px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .group-label .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);}
+  .group-label.opp .dot{background:var(--opposition);}
+
+  .party-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px;
+  }
+  .party-card{
+    background:var(--paper-raised);border:1.5px solid var(--line);border-radius:14px;
+    padding:16px 16px 14px;position:relative;overflow:hidden;
+  }
+  .party-card .stripe{
+    position:absolute;top:0;right:0;left:0;height:5px;
+  }
+  .party-card .pname{
+    font-weight:700;font-size:14.5px;margin:6px 0 10px;
+    display:flex;align-items:center;justify-content:space-between;gap:6px;
+  }
+  .party-card .coal-tag{
+    font-size:10.5px;font-weight:700;color:var(--gold);border:1px solid var(--gold);
+    padding:1px 7px;border-radius:999px;white-space:nowrap;
+  }
+  .party-card .latest{
+    font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:34px;line-height:1;
+  }
+  .party-card .latest small{font-family:'Assistant',sans-serif;font-weight:600;font-size:13px;color:var(--ink-soft);}
+  .party-card .baseline{font-size:12.5px;color:var(--ink-soft);margin-top:8px;}
+  .party-card .delta{
+    display:inline-flex;align-items:center;gap:3px;font-weight:700;font-size:13px;margin-top:6px;
+  }
+  .delta.up{color:var(--good);}
+  .delta.down{color:var(--alert);}
+  .delta.flat{color:var(--ink-soft);}
+
+  /* ---------- Chart section ---------- */
+  .chart-card{
+    background:var(--paper-raised);border:1.5px solid var(--line);border-radius:var(--radius);
+    padding:24px;
+  }
+  .chart-wrap{position:relative;height:420px;}
+  .chart-hint{font-size:13px;color:var(--ink-soft);margin-top:10px;}
+
+  /* ---------- Footer ---------- */
+  footer{
+    margin-top:60px;padding-top:20px;border-top:1.5px solid var(--line);
+    font-size:13px;color:var(--ink-soft);line-height:1.6;
+  }
+
+  /* ---------- Loading / error ---------- */
+  .status-msg{
+    padding:60px 20px;text-align:center;color:var(--ink-soft);font-size:16px;
+  }
+  .status-msg .spinner{
+    width:34px;height:34px;border-radius:50%;
+    border:3px solid var(--line);border-top-color:var(--gold);
+    margin:0 auto 16px;animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .retry-btn{
+    margin-top:14px;padding:8px 20px;border-radius:999px;border:1.5px solid var(--ink);
+    background:var(--ink);color:var(--paper);font-weight:700;cursor:pointer;font-size:14px;
+  }
+
+  #dashboard{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>מעקב נתוני סקרים</h1>
+    </div>
+    <div class="updated" id="updatedLine"></div>
+  </header>
+
+  <div id="loading" class="status-msg">
+    <div class="spinner"></div>
+    טוען נתוני סקרים...
+  </div>
+
+  <div id="errorBox" class="status-msg" style="display:none;">
+    לא הצלחנו לטעון את נתוני הסקרים כרגע.<br>
+    <button class="retry-btn" onclick="loadData()">נסה שוב</button>
+  </div>
+
+  <div id="dashboard">
+
+    <div class="pillbar" id="pillbar"></div>
+    <div class="context-line" id="contextLine"></div>
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="gauge-panel">
+        <div class="eyebrow">קואליציה נוכחית</div>
+        <h2>ש״ס · הציונות הדתית · עוצמה יהודית · הליכוד · יהדות התורה</h2>
+        <svg class="gauge-svg" viewBox="0 0 400 230" id="gaugeSvg"></svg>
+        <div class="gauge-caption" id="gaugeCaption"></div>
+        <div class="gauge-status" id="gaugeStatus"></div>
+      </div>
+      <div class="meta-panel">
+        <div>
+          <div class="eyebrow">הסקר האחרון</div>
+          <h2 id="latestOutletTitle"></h2>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item"><div class="label">תאריך</div><div class="value" id="metaDate"></div></div>
+          <div class="meta-item"><div class="label">גודל מדגם</div><div class="value" id="metaSample"></div></div>
+          <div class="meta-item"><div class="label">כלי תקשורת</div><div class="value" id="metaOutlet"></div></div>
+          <div class="meta-item"><div class="label">עורך הסקר</div><div class="value" id="metaPollster"></div></div>
+        </div>
+        <div class="coalition-def">
+          נדרשים <b>61 מנדטים</b> להקמת ממשלה. הנתונים מוצגים מול <b>ממוצע 10 הסקרים הקודמים</b> של אותו כלי תקשורת, כדי לנטרל הבדלים בין סוקרים שונים.
+        </div>
+      </div>
+    </div>
+
+    <!-- PARTY LEVEL -->
+    <div class="section-head">
+      <div class="eyebrow">ניתוח ברמת מפלגה</div>
+      <h2>הסקר האחרון מול המגמה</h2>
+      <p id="partySectionDesc"></p>
+    </div>
+
+    <div class="group-label"><span class="dot"></span> מפלגות הקואליציה</div>
+    <div class="party-grid" id="coalitionGrid"></div>
+
+    <div class="group-label opp"><span class="dot"></span> שאר המפלגות</div>
+    <div class="party-grid" id="oppositionGrid"></div>
+
+    <!-- TREND CHART -->
+    <div class="section-head">
+      <div class="eyebrow">מגמה לאורך זמן</div>
+      <h2>כל הסקרים המוצגים</h2>
+      <p>אפשר ללחוץ על שם מפלגה במקרא כדי להציג או להסתיר אותה בגרף.</p>
+    </div>
+    <div class="chart-card">
+      <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+      <div class="chart-hint">הקו העבה בגוון הזהב מציג את סך מנדטי הקואליציה בכל סקר.</div>
+    </div>
+
+    <footer>
+      הנתונים נטענים ישירות מגיליון הסקרים ומתעדכנים אוטומטית בכל טעינה של הדף.
+      "ממוצע 10 הסקרים האחרונים" מחושב תמיד מתוך סקרים של אותו כלי תקשורת שערך את הסקר האחרון המוצג, ואינו כולל את הסקר האחרון עצמו.
+      סקרים שבהם מפלגה מסוימת לא נכללה נספרים עבורה כ-0 מנדטים.
+    </footer>
+  </div>
+
+</div>
+
+<script>
+const SHEET_ID = "1Z6vUK86i2YH680wfhEpnkXuMM7swof6Z1XOIRRVy6UI";
+const CSV_URLS = [
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQK1m56FbAYwrjVs7MC5Ne994q6xX9erBYY20OW96ajLwE5IBhKwyoB6yDmYAUHgro8YZvHvcLMmd_/pub?gid=0&single=true&output=csv"
+];
+
+const COALITION = ["ש״ס","הציונות הדתית","עוצמה יהודית","הליכוד","יהדות התורה"];
+const THRESHOLD = 61;
+const TOTAL_SEATS = 120;
+const BASELINE_WINDOW = 10;
+
+const PARTY_COLORS = {
+  "הליכוד":"#2456A6",
+  "ש״ס":"#0E7C66",
+  "יהדות התורה":"#232B45",
+  "הציונות הדתית":"#D9822B",
+  "עוצמה יהודית":"#B8860B",
+  "כחול לבן":"#3B6FA0",
+  "יש עתיד":"#3AAFB9",
+  "חדש תע״ל":"#7FA6C4",
+  "ישראל ביתנו":"#5C6BC0",
+  "הדמוקרטים":"#C1483B",
+  "רע״מ":"#2E8B57",
+  "בל״ד":"#33443E",
+  "ביחד (בנט ולפיד)":"#8E6BAF",
+  "ישר!":"#D9A76D",
+  "בית ציוני-המילואימניקים":"#8A93A6",
+  "רשימה ערבית מאוחדת":"#2F8F6E",
+  "מפלגה בראשות גלעד ארדן ויולי אדלשטיין":"#9CA3AF"
+};
+function colorFor(name){
+  if(PARTY_COLORS[name]) return PARTY_COLORS[name];
+  let h=0; for(let i=0;i<name.length;i++) h = (h*31 + name.charCodeAt(i)) % 360;
+  return `hsl(${h},45%,42%)`;
+}
+function isCoalition(name){ return COALITION.includes(name); }
+
+function cleanName(s){ return (s||"").replace(/\u200f/g,"").trim(); }
+function parseDDMMYYYY(s){
+  const parts = (s||"").trim().split("/");
+  if(parts.length!==3) return null;
+  const [d,m,y] = parts.map(x=>parseInt(x,10));
+  if(!d||!m||!y) return null;
+  return new Date(y, m-1, d);
+}
+function fmtDate(dt){
+  if(!dt) return "—";
+  return dt.toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+
+let allSurveys = [];
+let chartInstance = null;
+const HEADER_ORDER = ["מספרהסקר","תאריך","משיבים","כליתקשורת","עורךמשאלים","מפלגה","מנדטים"];
+
+// Loads sheet data via Google's gviz endpoint using a <script> tag instead of
+// fetch() — this avoids the browser's CORS block that happens when a local
+// (file://) HTML page tries to fetch() a cross-origin URL directly.
+function loadViaScriptTag(){
+  return new Promise((resolve, reject)=>{
+    window.google = window.google || {};
+    window.google.visualization = window.google.visualization || {};
+    window.google.visualization.Query = window.google.visualization.Query || {};
+
+    let settled = false;
+    window.google.visualization.Query.setResponse = function(response){
+      settled = true;
+      script.remove();
+      try{
+        if(!response || !response.table){ reject(new Error("bad gviz response")); return; }
+        const rows = response.table.rows.map(r=>{
+          const obj = {};
+          HEADER_ORDER.forEach((key, i)=>{
+            const cell = r.c ? r.c[i] : null;
+            let val = "";
+            if(cell){
+              val = (cell.f !== undefined && cell.f !== null) ? cell.f : cell.v;
+            }
+            obj[key] = val;
+          });
+          return obj;
+        });
+        resolve(rows);
+      }catch(err){ reject(err); }
+    };
+
+    const script = document.createElement('script');
+    script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0&headers=1`;
+    script.onerror = ()=>{ if(!settled) reject(new Error("gviz script failed to load")); };
+    document.body.appendChild(script);
+    setTimeout(()=>{ if(!settled) reject(new Error("gviz timeout")); }, 12000);
+  });
+}
+
+// Fallback: plain CSV fetch — works when the page is served over http(s)
+// (not opened as a local file), where CORS on Google's endpoints is allowed.
+async function loadViaFetch(){
+  for(const url of CSV_URLS){
+    try{
+      const res = await fetch(url);
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      const t = await res.text();
+      if(t && t.trim().length > 0 && !t.trim().startsWith("<")){
+        const parsed = Papa.parse(t, {header:true, skipEmptyLines:true});
+        if(parsed.data && parsed.data.length) return parsed.data;
+      }
+    }catch(err){ /* try next */ }
+  }
+  return null;
+}
+
+async function loadData(){
+  document.getElementById('loading').style.display='block';
+  document.getElementById('errorBox').style.display='none';
+  document.getElementById('dashboard').style.display='none';
+
+  let rows = null;
+  rows = await loadViaFetch();
+  if(!rows || rows.length===0){
+    try{
+      rows = await loadViaScriptTag();
+    }catch(err){
+      console.warn("gviz script-tag load also failed:", err);
+    }
+  }
+
+  if(!rows || rows.length===0){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('errorBox').style.display='block';
+    return;
+  }
+
+  try{
+    buildSurveys(rows);
+    initDashboard();
+    document.getElementById('loading').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+  }catch(err){
+    console.error(err);
+    document.getElementById('loading').style.display='none';
+    document.getElementById('errorBox').style.display='block';
+  }
+}
+
+function buildSurveys(rows){
+  const map = new Map();
+  rows.forEach(r=>{
+    const num = (r["מספרהסקר"]||"").toString().trim();
+    const dateStr = (r["תאריך"]||"").toString().trim();
+    const dateObj = parseDDMMYYYY(dateStr);
+    const respondents = parseInt(r["משיבים"],10) || null;
+    const outlet = cleanName(r["כליתקשורת"]);
+    const pollster = cleanName(r["עורךמשאלים"]);
+    const party = cleanName(r["מפלגה"]);
+    const mandates = parseInt(r["מנדטים"],10);
+    if(!dateObj || !party || isNaN(mandates)) return;
+    const key = num+"|"+dateStr+"|"+outlet+"|"+pollster;
+    if(!map.has(key)){
+      map.set(key, {num, dateStr, dateObj, respondents, outlet, pollster, parties:{}});
+    }
+    map.get(key).parties[party] = mandates;
+  });
+  allSurveys = Array.from(map.values()).sort((a,b)=> a.dateObj - b.dateObj || (parseInt(a.num)||0)-(parseInt(b.num)||0));
+}
+
+function coalitionTotal(survey){
+  return COALITION.reduce((sum,p)=> sum + (survey.parties[p]||0), 0);
+}
+
+function getOutlets(){
+  const counts = new Map();
+  allSurveys.forEach(s=>{ counts.set(s.outlet, (counts.get(s.outlet)||0)+1); });
+  return Array.from(counts.entries()).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+}
+
+let currentOutlet = "הכל";
+
+function initDashboard(){
+  document.getElementById('updatedLine').textContent = "עודכן: " + new Date().toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric'});
+
+  const outlets = getOutlets();
+  const pillbar = document.getElementById('pillbar');
+  pillbar.innerHTML = "";
+  const allPill = document.createElement('button');
+  allPill.className = "pill active";
+  allPill.textContent = "כל הסקרים";
+  allPill.onclick = ()=>selectOutlet("הכל", allPill);
+  pillbar.appendChild(allPill);
+  outlets.forEach(o=>{
+    const btn = document.createElement('button');
+    btn.className = "pill";
+    btn.textContent = o;
+    btn.onclick = ()=>selectOutlet(o, btn);
+    pillbar.appendChild(btn);
+  });
+
+  render("הכל");
+}
+
+function selectOutlet(outlet, btnEl){
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  btnEl.classList.add('active');
+  render(outlet);
+}
+
+function render(outlet){
+  currentOutlet = outlet;
+  const filtered = outlet==="הכל" ? allSurveys : allSurveys.filter(s=>s.outlet===outlet);
+  if(filtered.length===0) return;
+
+  const latest = filtered[filtered.length-1];
+  const baselineOutlet = latest.outlet;
+  const baselinePool = allSurveys
+    .filter(s => s.outlet===baselineOutlet && s.dateObj < latest.dateObj)
+    .sort((a,b)=> b.dateObj - a.dateObj)
+    .slice(0, BASELINE_WINDOW);
+
+  document.getElementById('contextLine').innerHTML =
+    outlet==="הכל"
+      ? `מוצגת תמונה כוללת מכל כלי התקשורת. ההשוואה למגמה מבוססת על <b>${baselineOutlet}</b> — כלי התקשורת שערך את הסקר האחרון.`
+      : `מוצגים רק סקרים של <b>${outlet}</b> (${filtered.length} סקרים).`;
+
+  // ---- meta panel ----
+  document.getElementById('latestOutletTitle').textContent = latest.outlet;
+  document.getElementById('metaDate').textContent = fmtDate(latest.dateObj);
+  document.getElementById('metaSample').textContent = latest.respondents ? latest.respondents.toLocaleString('he-IL') : "—";
+  document.getElementById('metaOutlet').textContent = latest.outlet;
+  document.getElementById('metaPollster').textContent = latest.pollster || "—";
+
+  // ---- gauge ----
+  const coalSeats = coalitionTotal(latest);
+  drawGauge(coalSeats);
+  const diff = coalSeats - THRESHOLD;
+  const statusEl = document.getElementById('gaugeStatus');
+  if(coalSeats >= THRESHOLD){
+    statusEl.className = "gauge-status pass";
+    statusEl.textContent = `רוב קואליציוני — ${diff} מנדטים מעל הדרוש`;
+  }else{
+    statusEl.className = "gauge-status fail";
+    statusEl.textContent = `אין רוב — חסרים ${Math.abs(diff)} מנדטים ל-61`;
+  }
+  document.getElementById('gaugeCaption').textContent =
+    `מתוך ${TOTAL_SEATS} מנדטים בכנסת, לפי סקר ${latest.outlet} מ-${fmtDate(latest.dateObj)}`;
+
+  // ---- party grids ----
+  const partiesSeen = new Set();
+  filtered.slice(-30).forEach(s=> Object.keys(s.parties).forEach(p=>partiesSeen.add(p)));
+  Object.keys(latest.parties).forEach(p=>partiesSeen.add(p));
+
+  const rows = Array.from(partiesSeen).map(party=>{
+    const latestVal = latest.parties[party]||0;
+    const baseVals = baselinePool.map(s=> s.parties[party]||0);
+    const baseAvg = baseVals.length ? baseVals.reduce((a,b)=>a+b,0)/baseVals.length : null;
+    return {party, latestVal, baseAvg};
+  }).sort((a,b)=> b.latestVal - a.latestVal);
+
+  const coalRows = rows.filter(r=>isCoalition(r.party));
+  const oppRows = rows.filter(r=>!isCoalition(r.party) && r.latestVal>0);
+
+  document.getElementById('partySectionDesc').textContent =
+    `הסקר האחרון של ${baselineOutlet} (${fmtDate(latest.dateObj)}) מול ממוצע ${baselinePool.length} הסקרים הקודמים של אותו כלי תקשורת.`;
+
+  renderPartyGrid('coalitionGrid', coalRows);
+  renderPartyGrid('oppositionGrid', oppRows);
+
+  // ---- trend chart ----
+  renderChart(filtered);
+}
+
+function renderPartyGrid(elId, rows){
+  const el = document.getElementById(elId);
+  el.innerHTML = "";
+  if(rows.length===0){
+    el.innerHTML = `<div style="color:var(--ink-soft);font-size:14px;">אין נתונים זמינים</div>`;
+    return;
+  }
+  rows.forEach(r=>{
+    const color = colorFor(r.party);
+    const card = document.createElement('div');
+    card.className = "party-card";
+
+    let deltaHtml = "";
+    if(r.baseAvg!==null){
+      const d = r.latestVal - r.baseAvg;
+      const rounded = Math.round(d*10)/10;
+      let cls = "flat", arrow="●", txt="ללא שינוי";
+      if(rounded > 0.4){ cls="up"; arrow="▲"; txt=`+${rounded.toFixed(1)}`; }
+      else if(rounded < -0.4){ cls="down"; arrow="▼"; txt=`${rounded.toFixed(1)}`; }
+      deltaHtml = `<div class="delta ${cls}">${arrow} ${txt}</div>`;
+    }
+
+    card.innerHTML = `
+      <div class="stripe" style="background:${color}"></div>
+      <div class="pname">${r.party} ${isCoalition(r.party) ? '<span class="coal-tag">קואליציה</span>' : ''}</div>
+      <div class="latest">${r.latestVal}<small> מנדטים</small></div>
+      <div class="baseline">ממוצע 10 סקרים: ${r.baseAvg!==null ? r.baseAvg.toFixed(1) : '—'}</div>
+      ${deltaHtml}
+    `;
+    el.appendChild(card);
+  });
+}
+
+function drawGauge(coalSeats){
+  const svg = document.getElementById('gaugeSvg');
+  const cx=200, cy=190, r=150, strokeW=26;
+
+  function polar(cx,cy,r,angleDeg){
+    const rad = angleDeg * Math.PI/180;
+    return { x: cx + r*Math.cos(rad), y: cy - r*Math.sin(rad) };
+  }
+  function arcPath(p0,p1){
+    const a0 = 180 - p0*180;
+    const a1 = 180 - p1*180;
+    const start = polar(cx,cy,r,a0);
+    const end = polar(cx,cy,r,a1);
+    const largeArc = (a0-a1) > 180 ? 1 : 0;
+    return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 1 ${end.x} ${end.y}`;
+  }
+
+  const coalFrac = Math.min(coalSeats/TOTAL_SEATS, 1);
+  const passed = coalSeats >= THRESHOLD;
+  const fillColor = passed ? "var(--good)" : "var(--alert)";
+  const thresholdFrac = THRESHOLD/TOTAL_SEATS;
+  const thAngle = 180 - thresholdFrac*180;
+  const thInner = polar(cx,cy,r-strokeW/2-6,thAngle);
+  const thOuter = polar(cx,cy,r+strokeW/2+6,thAngle);
+  const thLabel = polar(cx,cy,r+strokeW/2+22,thAngle);
+
+  svg.innerHTML = `
+    <path d="${arcPath(0,1)}" fill="none" stroke="var(--line)" stroke-width="${strokeW}" stroke-linecap="round"/>
+    <path d="${arcPath(0,coalFrac)}" fill="none" stroke="${fillColor}" stroke-width="${strokeW}" stroke-linecap="round"/>
+    <line x1="${thInner.x}" y1="${thInner.y}" x2="${thOuter.x}" y2="${thOuter.y}" stroke="var(--ink)" stroke-width="2.5"/>
+    <text x="${thLabel.x}" y="${thLabel.y}" text-anchor="middle" font-family="Assistant" font-weight="700" font-size="13" fill="var(--ink)">61</text>
+    <text x="${cx - r - 8}" y="${cy+16}" text-anchor="start" font-family="Assistant" font-weight="600" font-size="12" fill="var(--ink-soft)">0</text>
+    <text x="${cx + r + 8}" y="${cy+16}" text-anchor="end" font-family="Assistant" font-weight="600" font-size="12" fill="var(--ink-soft)">120</text>
+    <text x="${cx}" y="${cy-14}" text-anchor="middle" font-family="Frank Ruhl Libre" font-weight="900" font-size="54" fill="var(--ink)">${coalSeats}</text>
+  `;
+}
+
+function renderChart(filtered){
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  const labels = filtered.map(s=> fmtDate(s.dateObj));
+
+  const allParties = new Set();
+  filtered.forEach(s=> Object.keys(s.parties).forEach(p=>allParties.add(p)));
+  const defaultVisible = new Set([...COALITION,"יש עתיד","כחול לבן"]);
+
+  const datasets = Array.from(allParties).map(party=>{
+    return {
+      label: party,
+      data: filtered.map(s=> s.parties[party] ?? null),
+      borderColor: colorFor(party),
+      backgroundColor: colorFor(party),
+      borderWidth: 2,
+      pointRadius: 2,
+      tension: 0.25,
+      spanGaps: true,
+      hidden: !defaultVisible.has(party)
+    };
+  });
+
+  datasets.push({
+    label: "סך הקואליציה",
+    data: filtered.map(s=> coalitionTotal(s)),
+    borderColor: "#C9972C",
+    backgroundColor: "#C9972C",
+    borderWidth: 4,
+    borderDash: [6,3],
+    pointRadius: 0,
+    tension: 0.25,
+    hidden: false
+  });
+
+  if(chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive:true,
+      maintainAspectRatio:false,
+      interaction:{mode:'nearest', intersect:false},
+      plugins:{
+        legend:{
+          position:'bottom',
+          rtl:true,
+          labels:{ font:{family:'Assistant', weight:600, size:12}, boxWidth:12, usePointStyle:true }
+        },
+        tooltip:{ rtl:true, titleAlign:'right', bodyAlign:'right' }
+      },
+      scales:{
+        x:{ ticks:{ font:{family:'Assistant', size:11}, maxRotation:60, minRotation:0 }, grid:{ display:false } },
+        y:{ beginAtZero:true, ticks:{ font:{family:'Assistant', size:11} }, grid:{ color:'#EEEBE2' } }
+      }
+    }
+  });
+}
+
+loadData();
+</script>
+</body>
+</html>
