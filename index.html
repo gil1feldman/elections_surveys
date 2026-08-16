@@ -5,29 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מעקב נתוני סקרים</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Assistant:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Assistant:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root{
-    --paper:#FAF8F3;
+    --paper:#F2F4F8;
     --paper-raised:#FFFFFF;
     --ink:#1B2440;
-    --ink-soft:#5A6079;
-    --gold:#C9972C;
-    --gold-soft:#F1DFB2;
+    --ink-soft:#5A6479;
+    --gold:#1E5AA8;
+    --gold-soft:#D9E6F5;
     --coalition:#2456A6;
     --opposition:#A9AFBC;
     --alert:#C1483B;
     --good:#1F8A57;
-    --line:#E4E1D8;
+    --line:#DDE2EA;
     --radius:18px;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background:var(--paper);
+    background-color:var(--paper);
+    background-image:radial-gradient(var(--line) 1px, transparent 1px);
+    background-size:22px 22px;
     color:var(--ink);
     font-family:'Assistant',sans-serif;
     min-height:100vh;
@@ -40,17 +43,19 @@
   /* ---------- Header ---------- */
   header.top{
     display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
-    gap:12px;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid var(--ink);
+    gap:12px;margin-bottom:10px;padding:0 0 10px;
+    border-bottom:3px solid var(--ink);
+    box-shadow:0 3px 0 -1px var(--gold);
   }
   header.top h1{
     font-family:'Frank Ruhl Libre',serif;
     font-weight:900;
-    font-size:clamp(18px,2.4vw,23px);
+    font-size:clamp(19px,2.6vw,25px);
     margin:0;
-    letter-spacing:-0.5px;
+    letter-spacing:-0.3px;
   }
   header.top .updated{
-    font-size:11.5px;color:var(--ink-soft);text-align:left;
+    font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);text-align:left;
   }
   header.top .header-right{
     display:flex;align-items:center;gap:12px;flex-wrap:wrap;
@@ -61,82 +66,106 @@
     display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-bottom:6px;
   }
   .filter-group{display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
-  .filter-group .glabel{font-size:11.5px;font-weight:700;color:var(--ink-soft);margin-left:2px;}
+  .filter-group .glabel{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--ink-soft);margin-left:2px;text-transform:uppercase;letter-spacing:0.04em;}
 
   .pillbar{
-    display:flex;flex-wrap:wrap;gap:6px;
+    display:flex;flex-wrap:wrap;gap:18px;
   }
   .pill{
-    border:1.5px solid var(--line);background:var(--paper-raised);
-    color:var(--ink);padding:4px 12px;border-radius:999px;
-    font-family:'Assistant',sans-serif;font-weight:600;font-size:12.5px;
+    border:none;border-bottom:2px solid transparent;background:transparent;
+    color:var(--ink-soft);padding:4px 1px 6px;border-radius:0;
+    font-family:var(--mono);font-weight:600;font-size:11px;letter-spacing:0.02em;
     cursor:pointer;transition:all .15s ease;
   }
-  .pill:hover{border-color:var(--ink);}
-  .pill.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .pill:hover{color:var(--ink);}
+  .pill.active{color:var(--ink);border-bottom-color:var(--gold);font-weight:700;}
 
   .context-line{
     font-size:12px;color:var(--ink-soft);margin:0 0 8px;
   }
   .context-line b{color:var(--ink);font-weight:700;}
 
-  /* ---------- Gauge card (compact) ---------- */
-  .top-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;align-items:flex-start;}
-  .gauge-card{
-    display:inline-flex;flex-direction:column;align-items:center;
-    background:var(--paper-raised);border-radius:var(--radius);
-    border:1.5px solid var(--line);overflow:hidden;
-    box-shadow:0 1px 0 rgba(27,36,64,0.03);
-    padding:10px 26px 12px;max-width:300px;
+  /* ---------- Chyron: broadcast headline strip (signature element) ---------- */
+  .chyron{
+    background:var(--paper-raised);color:var(--ink);border:1.5px solid var(--line);
+    display:flex;align-items:center;gap:12px;
+    padding:9px 16px;margin-bottom:14px;border-radius:8px;
+    border-right:5px solid var(--gold);
+  }
+  .chyron-tag{
+    font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:0.1em;
+    background:var(--alert);color:#fff;padding:3px 9px;border-radius:4px;flex:none;text-transform:uppercase;
+  }
+  .chyron-text{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.01em;line-height:1.4;color:var(--ink-soft);}
+  .chyron-text b{color:var(--gold);font-weight:700;}
+
+  /* ---------- Gauge panel ---------- */
+  .top-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;align-items:stretch;}
+  .gauge-panel-dark{
+    flex:1.15;min-width:280px;position:relative;overflow:hidden;
+    display:flex;flex-direction:column;align-items:center;
+    background:var(--paper-raised);color:var(--ink);border-radius:12px;
+    border:1.5px solid var(--line);
+    padding:16px 30px 16px;
+  }
+  .gauge-panel-dark::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:4px;
+    background:linear-gradient(90deg, var(--gold) 0%, var(--gold) 51%, transparent 51%);
   }
   .gauge-sentence{
-    font-size:12.5px;color:var(--ink);text-align:center;line-height:1.4;margin:6px 0 4px;
+    font-size:12.5px;color:var(--ink-soft);text-align:center;line-height:1.4;margin:8px 0 4px;
   }
   .gauge-sentence b{
     font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:15px;color:var(--gold);
   }
   
-  /* Update: Using Canvas instead of SVG */
-  .gauge-canvas{width:100%;height:auto;display:block;margin:0 auto;}
+  /* Update: Using Canvas instead of SVG — sized relative to its panel, not a fixed px cap,
+     so it grows/shrinks along with the panel width set by its sibling chips */
+  .gauge-canvas{width:min(92%, 400px);height:auto;display:block;margin:0 auto;}
   
-  .gauge-caption{font-size:10.5px;color:var(--ink-soft);margin-top:-6px;text-align:center;}
+  .gauge-caption{font-family:var(--mono);font-size:10px;color:var(--ink-soft);margin-top:-6px;text-align:center;}
   .gauge-status{
-    margin-top:2px;padding:3px 14px;border-radius:999px;font-weight:700;font-size:11.5px;
+    margin-top:4px;padding:4px 16px;border-radius:6px;font-weight:700;font-size:11.5px;
   }
-  .gauge-status.pass{background:#E4F3EA;color:var(--good);}
-  .gauge-status.fail{background:#F8E7E4;color:var(--alert);}
+  .gauge-status.pass{background:var(--good);color:#fff;}
+  .gauge-status.fail{background:var(--alert);color:#fff;}
 
   .survey-meta-row{
     display:flex;gap:14px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);
-    font-size:11.5px;color:var(--ink-soft);
+    font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);
   }
   .survey-meta-row.top{
     margin-top:0;padding-top:0;border-top:none;
-    padding-bottom:8px;border-bottom:1px dashed var(--line);width:100%;justify-content:center;
+    padding-bottom:8px;border-bottom:1px solid var(--line);width:100%;justify-content:center;
+    color:var(--ink-soft);
   }
   .survey-meta-row b{color:var(--ink);font-weight:700;}
+  .survey-meta-row.top b{color:var(--ink);}
+
+  /* ---------- Side chips: flat, no card chrome (trend + streak) ---------- */
+  .side-chips{flex:1;min-width:230px;display:flex;flex-direction:column;gap:10px;}
 
   /* ---------- Trend + movers card (fills space beside the gauge) ---------- */
   .trend-card{
-    flex:1;min-width:230px;
-    background:var(--paper-raised);border:1.5px solid var(--line);border-radius:var(--radius);
-    padding:14px 20px;display:flex;flex-direction:column;justify-content:space-between;gap:6px;
+    flex:1;min-width:0;
+    background:var(--paper-raised);border:none;border-right:3px solid var(--ink);border-radius:6px;
+    padding:11px 16px;display:flex;flex-direction:column;justify-content:center;gap:4px;
   }
   .trend-card .eyebrow{
-    font-size:10.5px;font-weight:700;color:var(--gold);
-    text-transform:uppercase;letter-spacing:0.06em;
+    font-family:var(--mono);font-size:10px;font-weight:700;color:var(--gold);
+    text-transform:uppercase;letter-spacing:0.08em;
   }
   .trend-big{
-    font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:32px;
-    display:flex;align-items:center;gap:10px;margin-top:6px;
+    font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:26px;
+    display:flex;align-items:center;gap:10px;margin-top:4px;
   }
   .trend-big.up{color:var(--good);}
   .trend-big.down{color:var(--alert);}
   .trend-big.flat{color:var(--ink-soft);}
-  .trend-sub{font-size:12px;color:var(--ink-soft);margin-top:2px;}
-  .movers{display:flex;gap:20px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);}
+  .trend-sub{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .movers{display:flex;gap:20px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);}
   .movers-col{flex:1;min-width:0;}
-  .movers-col-title{font-size:10.5px;font-weight:700;color:var(--ink-soft);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em;}
+  .movers-col-title{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--ink-soft);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em;}
   .movers-col-title.up{color:var(--good);}
   .movers-col-title.down{color:var(--alert);}
   .movers-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:12px;padding:2px 0;}
@@ -148,18 +177,20 @@
 
   /* ---------- Streak card (consecutive surveys without a majority) ---------- */
   .streak-card{
-    flex:1;min-width:220px;
-    background:var(--paper-raised);border:1.5px solid var(--line);border-radius:var(--radius);
-    padding:14px 20px;display:flex;flex-direction:column;justify-content:space-between;gap:6px;
+    flex:1;min-width:0;
+    background:var(--paper-raised);border:none;border-right:3px solid var(--ink-soft);border-radius:6px;
+    padding:11px 16px;display:flex;flex-direction:column;justify-content:center;gap:4px;
   }
+  .streak-card.state-bad{border-right-color:var(--alert);}
+  .streak-card.state-good{border-right-color:var(--good);}
   .streak-card .eyebrow{
-    font-size:10.5px;font-weight:700;color:var(--gold);
-    text-transform:uppercase;letter-spacing:0.06em;
+    font-family:var(--mono);font-size:10px;font-weight:700;color:var(--gold);
+    text-transform:uppercase;letter-spacing:0.08em;
   }
   .streak-stats{display:flex;align-items:stretch;gap:16px;margin-top:8px;}
   .stat-block{flex:1;display:flex;flex-direction:column;justify-content:center;}
   .stat-block.secondary{border-right:1px dashed var(--line);padding-right:16px;}
-  .stat-label{font-size:13px;font-weight:700;color:var(--ink);}
+  .stat-label{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--ink);letter-spacing:0.01em;}
   .streak-number{
     font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:40px;line-height:1;margin-top:4px;
   }
@@ -170,34 +201,34 @@
   }
   .streak-sub{font-size:11.5px;color:var(--ink-soft);margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);line-height:1.4;}
   .streak-sub.emphasis{
-    font-size:15px;font-weight:800;color:var(--alert);background:#F8E7E4;
-    padding:10px 12px;border-radius:10px;border-top:none;margin-top:10px;line-height:1.5;
+    font-size:14px;font-weight:800;color:#fff;background:var(--alert);
+    padding:10px 12px;border-radius:8px;border-top:none;margin-top:10px;line-height:1.5;
   }
 
   /* ---------- Section headers ---------- */
-  .section-head{margin:12px 0 6px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .section-head{margin:16px 0 6px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap;}
   .section-head .eyebrow{
-    font-size:10.5px;font-weight:700;color:var(--gold);
-    text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0;
+    font-family:var(--mono);font-size:10px;font-weight:700;color:var(--gold);
+    text-transform:uppercase;letter-spacing:0.08em;margin-bottom:1px;
   }
   .section-head h2{
-    font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:14.5px;margin:1px 0 2px;
+    font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:15px;margin:1px 0 2px;
   }
   .section-head p{font-size:12px;color:var(--ink-soft);margin:0;max-width:640px;line-height:1.35;}
 
   /* ---------- Full breakdown table ---------- */
   .breakdown-card{
-    background:var(--paper-raised);border:1.5px solid var(--line);border-radius:var(--radius);
+    background:var(--paper-raised);border:1.5px solid var(--line);border-radius:12px;
     padding:10px 14px;margin-bottom:6px;
   }
   table.breakdown{width:100%;border-collapse:collapse;font-size:12.5px;}
   table.breakdown th{
-    text-align:right;font-size:10.5px;color:var(--ink-soft);font-weight:700;
-    padding:5px 8px;border-bottom:1.5px solid var(--line);text-transform:uppercase;letter-spacing:0.04em;
+    text-align:right;font-family:var(--mono);font-size:9.5px;color:var(--ink-soft);font-weight:600;
+    padding:5px 8px;border-bottom:1.5px solid var(--ink);text-transform:uppercase;letter-spacing:0.04em;
   }
   table.breakdown td{padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:middle;}
   table.breakdown tr:last-child td{border-bottom:none;}
-  table.breakdown tr.coal-row{background:#FBF6E9;}
+  table.breakdown tr.coal-row{background:#EAF1FA;}
   table.breakdown td.pname-cell{display:flex;align-items:center;gap:6px;font-weight:700;}
   table.breakdown .pdot{width:9px;height:9px;border-radius:50%;flex:none;}
   table.breakdown td.num{font-weight:800;font-family:'Frank Ruhl Libre',serif;font-size:15px;}
@@ -207,8 +238,8 @@
   .delta.down{color:var(--alert);}
   .delta.flat{color:var(--ink-soft);}
   .breakdown-card .coal-tag{
-    font-size:8.5px;font-weight:700;color:var(--gold);border:1px solid var(--gold);
-    padding:0px 5px;border-radius:999px;white-space:nowrap;
+    font-family:var(--mono);font-size:8px;font-weight:700;color:var(--gold);border:1px solid var(--gold);
+    padding:0px 5px;border-radius:4px;white-space:nowrap;
   }
 
   /* ---------- House effect table ---------- */
@@ -227,41 +258,40 @@
   table.house-effect td.he-ref{color:var(--ink-soft);font-weight:700;border-left:1.5px dashed var(--line);}
 
   /* ---------- Credit line ---------- */
-  .credit-line{margin-top:6px;font-size:10.5px;color:var(--ink-soft);}
+  .credit-line{margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--ink-soft);}
   .credit-line a{color:var(--gold);font-weight:700;text-decoration:none;}
   .credit-line a:hover{text-decoration:underline;}
 
   /* ---------- Chart section ---------- */
   .chart-card{
-    background:var(--paper-raised);border:1.5px solid var(--line);border-radius:var(--radius);
+    background:var(--paper-raised);border:1.5px solid var(--line);border-radius:12px;
     padding:12px 14px;
   }
   .chart-controls{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--line);}
   .chart-pill{
     border:1.5px solid var(--line);background:var(--paper-raised);
-    color:var(--ink);padding:3px 11px 3px 8px;border-radius:999px;
-    font-family:'Assistant',sans-serif;font-weight:600;font-size:11.5px;
+    color:var(--ink);padding:3px 10px 3px 7px;border-radius:6px;
+    font-family:var(--mono);font-weight:600;font-size:10.5px;letter-spacing:0.01em;
     cursor:pointer;transition:all .15s ease;display:inline-flex;align-items:center;gap:5px;
   }
-  .chart-pill .cdot{width:8px;height:8px;border-radius:50%;flex:none;}
+  .chart-pill .cdot{width:7px;height:7px;border-radius:50%;flex:none;}
   .chart-pill:hover{border-color:var(--ink);}
   .chart-pill.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
   .chart-pill.coalition-pill{border-color:var(--gold);color:var(--gold);font-weight:700;}
   .chart-pill.coalition-pill.active{background:var(--gold);color:#fff;border-color:var(--gold);}
   .chart-wrap{position:relative;height:210px;}
-  .chart-hint{font-size:11px;color:var(--ink-soft);margin-top:6px;}
 
   /* ---------- Spotlight table ---------- */
   .spotlight-card{
-    background:var(--paper-raised);border:1.5px solid var(--line);border-radius:var(--radius);
+    background:var(--paper-raised);border:1.5px solid var(--line);border-radius:12px;
     padding:12px 14px;
   }
   .spotlight-table-wrap{max-height:260px;overflow-y:auto;margin-top:8px;}
   table.spotlight{width:100%;border-collapse:collapse;font-size:12.5px;}
   table.spotlight th{
     position:sticky;top:0;background:var(--paper-raised);
-    text-align:right;font-size:10.5px;color:var(--ink-soft);font-weight:700;
-    padding:5px 8px;border-bottom:1.5px solid var(--line);text-transform:uppercase;letter-spacing:0.04em;
+    text-align:right;font-family:var(--mono);font-size:9.5px;color:var(--ink-soft);font-weight:600;
+    padding:5px 8px;border-bottom:1.5px solid var(--ink);text-transform:uppercase;letter-spacing:0.04em;
   }
   table.spotlight td{padding:5px 8px;border-bottom:1px solid var(--line);}
   table.spotlight tr:last-child td{border-bottom:none;}
@@ -290,12 +320,12 @@
 
   /* ---------- Summary / share button ---------- */
   .summary-btn{
-    display:inline-flex;align-items:center;gap:6px;
-    border:1.5px solid var(--gold);background:var(--gold);color:#fff;
-    padding:6px 16px;border-radius:999px;font-family:'Assistant',sans-serif;
-    font-weight:700;font-size:12.5px;cursor:pointer;transition:all .15s ease;
+    display:inline-flex;align-items:center;gap:7px;
+    border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);
+    padding:7px 16px;border-radius:6px;font-family:var(--mono);
+    font-weight:600;font-size:11.5px;letter-spacing:0.02em;cursor:pointer;transition:all .15s ease;
   }
-  .summary-btn:hover{background:#B3841F;border-color:#B3841F;}
+  .summary-btn:hover{background:var(--gold);border-color:var(--gold);color:#fff;}
   .summary-btn:disabled{opacity:0.6;cursor:default;}
 
   .modal-overlay{
@@ -323,26 +353,34 @@
     padding:44px;box-sizing:border-box;
   }
   .st-page-title{
-    font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:30px;text-align:center;margin-bottom:20px;
+    font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:30px;text-align:center;margin-bottom:4px;
+  }
+  .st-page-tag{
+    font-family:var(--mono);font-size:12px;font-weight:700;color:var(--gold);
+    text-align:center;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:20px;
   }
 
   /* generic card shell reused by the 3 top mini-cards */
   .st-mini-card{
-    background:#FFFFFF;border:2px solid #E2E6EC;border-radius:22px;
+    background:#FFFFFF;border:2px solid #E2E6EC;border-top:6px solid var(--gold);border-radius:14px;
     padding:20px 22px;box-shadow:0 6px 16px rgba(27,36,64,0.05);
   }
+  .st-mini-card.st-trend-mini{border-top-color:var(--ink);}
+  .st-mini-card.st-streak-mini{border-top-color:var(--ink-soft);}
+  .st-mini-card.st-streak-mini.state-bad{border-top-color:var(--alert);}
+  .st-mini-card.st-streak-mini.state-good{border-top-color:var(--good);}
   .st-top-cards{display:flex;gap:18px;margin-bottom:20px;align-items:stretch;}
   .st-top-cards > .st-mini-card{flex:1;min-width:0;}
 
   .st-mini-eyebrow{
-    font-size:15px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em;
+    font-family:var(--mono);font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.06em;
     text-align:center;margin-bottom:8px;
   }
 
   /* gauge mini-card */
   .st-gauge-mini{display:flex;flex-direction:column;align-items:center;}
   .st-gauge-meta{
-    display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:14px;color:var(--ink-soft);
+    display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);
     padding-bottom:10px;border-bottom:1.5px dashed var(--line);width:100%;margin-bottom:8px;
   }
   .st-gauge-meta b{color:var(--ink);font-weight:800;}
@@ -353,8 +391,8 @@
   .st-gauge-mini .st-status-pill{
     margin-top:6px;padding:6px 18px;border-radius:999px;font-weight:800;font-size:14.5px;
   }
-  .st-status-pill.pass{background:#E4F3EA;color:#156B42;}
-  .st-status-pill.fail{background:#F8E7E4;color:#A4352A;}
+  .st-status-pill.pass{background:#156B42;color:#fff;}
+  .st-status-pill.fail{background:#A4352A;color:#fff;}
 
   /* trend mini-card */
   .st-trend-big{
@@ -367,7 +405,7 @@
   .st-trend-sub{font-size:13px;color:var(--ink-soft);text-align:center;margin-top:6px;}
   .st-movers{display:flex;gap:14px;margin-top:14px;padding-top:12px;border-top:1.5px dashed var(--line);}
   .st-movers-col{flex:1;min-width:0;}
-  .st-movers-title{font-size:12.5px;font-weight:800;margin-bottom:6px;}
+  .st-movers-title{font-family:var(--mono);font-size:12px;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;}
   .st-movers-title.up{color:#156B42;}
   .st-movers-title.down{color:#A4352A;}
   .st-movers-row{display:flex;justify-content:space-between;gap:6px;font-size:13px;padding:2px 0;}
@@ -381,15 +419,15 @@
   .st-streak-stats{display:flex;gap:14px;margin-top:8px;}
   .st-streak-stats .stat-block{flex:1;text-align:center;}
   .st-streak-stats .stat-block.secondary{border-right:1.5px dashed var(--line);padding-right:14px;}
-  .st-stat-label{font-size:13px;font-weight:700;color:var(--ink);}
+  .st-stat-label{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink);}
   .st-streak-number{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:34px;margin-top:4px;}
   .st-streak-number.bad{color:#A4352A;}
   .st-streak-number.good{color:#156B42;}
   .st-streak-lastmajority{font-family:'Frank Ruhl Libre',serif;font-weight:800;font-size:16px;margin-top:8px;}
   .st-streak-sub{font-size:12.5px;color:var(--ink-soft);margin-top:12px;padding-top:10px;border-top:1.5px dashed var(--line);line-height:1.4;text-align:center;}
   .st-streak-sub.emphasis{
-    font-size:13.5px;font-weight:800;color:#A4352A;background:#F8E7E4;border-top:none;
-    padding:8px 10px;border-radius:10px;margin-top:10px;
+    font-size:13.5px;font-weight:800;color:#fff;background:#A4352A;border-top:none;
+    padding:8px 10px;border-radius:8px;margin-top:10px;
   }
 
   /* party cards grid */
@@ -397,26 +435,26 @@
     display:grid;grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));gap:12px;margin-bottom:8px;
   }
   .st-party-card{
-    background:#FFFFFF;border:2px solid #E2E6EC;border-radius:16px;padding:14px 14px 12px;position:relative;overflow:hidden;
+    background:#FFFFFF;border:2px solid #E2E6EC;border-radius:12px;padding:14px 14px 12px;position:relative;overflow:hidden;
   }
-  .st-party-card .stripe{position:absolute;top:0;right:0;left:0;height:6px;}
-  .st-party-card.coal{background:#FFFCF5;border-color:#F1DFB2;}
+  .st-party-card .stripe{position:absolute;top:0;right:0;left:0;height:5px;}
+  .st-party-card.coal{background:#F5F9FD;border-color:#C9D8ED;}
   .st-party-name{
     font-weight:800;font-size:15px;margin:6px 0 6px;display:flex;align-items:center;justify-content:space-between;gap:4px;
   }
   .st-party-name .coal-tag{
-    font-size:10px;font-weight:800;color:var(--gold);border:1px solid var(--gold);padding:1px 6px;border-radius:999px;white-space:nowrap;
+    font-family:var(--mono);font-size:9px;font-weight:700;color:var(--gold);border:1px solid var(--gold);padding:1px 5px;border-radius:4px;white-space:nowrap;
   }
   .st-party-num{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:30px;line-height:1;}
-  .st-party-num small{font-family:'Assistant',sans-serif;font-weight:700;font-size:13px;color:var(--ink-soft);}
-  .st-party-avg{font-size:12px;color:var(--ink-soft);margin-top:4px;}
+  .st-party-num small{font-family:var(--mono);font-weight:600;font-size:11.5px;color:var(--ink-soft);}
+  .st-party-avg{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:4px;}
   .st-party-delta{display:inline-flex;align-items:center;gap:3px;font-weight:800;font-size:13px;margin-top:4px;}
   .st-party-delta.up{color:#156B42;}
   .st-party-delta.down{color:#A4352A;}
   .st-party-delta.flat{color:var(--ink-soft);}
 
   .st-footer-plain{
-    text-align:center;font-size:13px;color:var(--ink-soft);margin-top:16px;padding-top:14px;border-top:1.5px solid var(--line);
+    text-align:center;font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:16px;padding-top:14px;border-top:1.5px solid var(--line);
   }
 
   #dashboard{display:none;}
@@ -431,7 +469,10 @@
     </div>
     <div class="header-right">
       <div class="updated" id="updatedLine"></div>
-      <button class="summary-btn" id="summaryBtn" onclick="prepareSummary()">🖼 הכן סיכום לפרסום</button>
+      <button class="summary-btn" id="summaryBtn" onclick="prepareSummary()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>
+        הכן סיכום לפרסום
+      </button>
     </div>
   </header>
 
@@ -460,37 +501,45 @@
     <div class="context-line" id="contextLine"></div>
 
     <!-- GAUGE (הוחלף ל-Canvas) -->
+    <!-- CHYRON: broadcast-style headline strip, restated on every render -->
+    <div class="chyron" id="chyronBar">
+      <span class="chyron-tag" id="chyronTag">מבזק</span>
+      <span class="chyron-text" id="chyronText"></span>
+    </div>
+
     <div class="top-row">
-      <div class="gauge-card">
+      <div class="gauge-panel-dark">
         <div class="survey-meta-row top">
           <span><b id="metaOutlet"></b></span>
           <span>מדגם <b id="metaSample"></b></span>
           <span><b id="metaDate"></b></span>
         </div>
         <div class="gauge-sentence" id="gaugeSentence"></div>
-        <canvas class="gauge-canvas" id="gaugeCanvas" style="max-width:220px;"></canvas>
+        <canvas class="gauge-canvas" id="gaugeCanvas"></canvas>
         <div class="gauge-caption" id="gaugeCaption"></div>
         <div class="gauge-status" id="gaugeStatus"></div>
       </div>
-      <div class="trend-card">
-        <div class="eyebrow">מגמה מהסקר הקודם</div>
-        <div class="trend-big" id="trendBig"></div>
-        <div class="trend-sub" id="trendSub"></div>
-        <div class="movers" id="moversBox"></div>
-      </div>
-      <div class="streak-card">
-        <div class="eyebrow">מצב הרוב הקואליציוני</div>
-        <div class="streak-stats">
-          <div class="stat-block">
-            <div class="stat-label">רצף ללא רוב</div>
-            <div class="streak-number" id="streakNumber"></div>
-          </div>
-          <div class="stat-block secondary">
-            <div class="stat-label">רוב אחרון בתאריך</div>
-            <div class="streak-lastmajority" id="streakLastMajority"></div>
-          </div>
+      <div class="side-chips">
+        <div class="trend-card">
+          <div class="eyebrow">מגמה מהסקר הקודם</div>
+          <div class="trend-big" id="trendBig"></div>
+          <div class="trend-sub" id="trendSub"></div>
+          <div class="movers" id="moversBox"></div>
         </div>
-        <div class="streak-sub" id="streakSub"></div>
+        <div class="streak-card" id="streakCard">
+          <div class="eyebrow">מצב הרוב הקואליציוני</div>
+          <div class="streak-stats">
+            <div class="stat-block">
+              <div class="stat-label">רצף ללא רוב</div>
+              <div class="streak-number" id="streakNumber"></div>
+            </div>
+            <div class="stat-block secondary">
+              <div class="stat-label">רוב אחרון בתאריך</div>
+              <div class="streak-lastmajority" id="streakLastMajority"></div>
+            </div>
+          </div>
+          <div class="streak-sub" id="streakSub"></div>
+        </div>
       </div>
     </div>
 
@@ -581,6 +630,7 @@
 <!-- Off-screen template rendered into the share image -->
 <div id="shareTemplate">
   <div class="st-page-title" id="stPageTitle"></div>
+  <div class="st-page-tag">מעקב נתוני סקרים</div>
 
   <div class="st-top-cards">
     <div class="st-mini-card st-gauge-mini">
@@ -591,14 +641,14 @@
       <div class="st-status-pill" id="stStatus"></div>
     </div>
 
-    <div class="st-mini-card">
+    <div class="st-mini-card st-trend-mini">
       <div class="st-mini-eyebrow">מגמה מהסקר הקודם</div>
       <div class="st-trend-big" id="stTrendBig"></div>
       <div class="st-trend-sub" id="stTrendSub"></div>
       <div class="st-movers" id="stMoversBox"></div>
     </div>
 
-    <div class="st-mini-card">
+    <div class="st-mini-card st-streak-mini" id="stStreakMini">
       <div class="st-mini-eyebrow">מצב הרוב הקואליציוני</div>
       <div class="st-streak-stats">
         <div class="stat-block">
@@ -1085,6 +1135,20 @@ function render(){
   // ---- consecutive-surveys-without-majority streak (respects outlet filter, ignores date range) ----
   const streakInfo = renderStreakCard();
 
+  // ---- chyron headline ----
+  const chyronTag = document.getElementById('chyronTag');
+  const chyronText = document.getElementById('chyronText');
+  chyronTag.textContent = coalSeats >= THRESHOLD ? "יש רוב" : "אין רוב";
+  chyronTag.style.background = coalSeats >= THRESHOLD ? "var(--good)" : "var(--alert)";
+  let chyronMsg = `לקואליציה <b>${coalSeats} מנדטים</b> בסקר ${latest.outlet} מ-${fmtDate(latest.dateObj)}`;
+  if(coalTrend && coalTrend.diff !== 0){
+    chyronMsg += ` · ${coalTrend.arrow} ${coalTrend.txt} מהסקר הקודם`;
+  }
+  if(!streakInfo.empty && streakInfo.streak > 0){
+    chyronMsg += ` · <b>${streakInfo.streak}</b> סקרים ברצף ללא רוב`;
+  }
+  chyronText.innerHTML = chyronMsg;
+
   lastState = { latest, coalSeats, statusText, statusClass, captionText, coalTrend, prevSurvey, moverRows, rows, streakInfo };
 }
 
@@ -1133,10 +1197,12 @@ function computeStreakInfo(){
 
 function renderStreakCard(){
   const info = computeStreakInfo();
+  const cardEl = document.getElementById('streakCard');
   const numEl = document.getElementById('streakNumber');
   const subEl = document.getElementById('streakSub');
   const lastMajEl = document.getElementById('streakLastMajority');
 
+  cardEl.className = "streak-card" + (info.numClass==="bad" ? " state-bad" : info.numClass==="good" ? " state-good" : "");
   numEl.className = "streak-number" + (info.numClass ? " " + info.numClass : "");
   numEl.textContent = info.numText;
   lastMajEl.textContent = info.lastMajText;
@@ -1215,31 +1281,45 @@ function renderBreakdownTable(rows){
 }
 
 // ----- The bulletproof Canvas implementation for the gauge -----
-function drawGaugeCanvas(canvasId, coalSeats){
+function drawGaugeCanvas(canvasId, coalSeats, theme){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
+  const isDark = theme === 'dark';
   
-  // Set up high resolution internal drawing space mapping to CSS pixels
+  // Set up high resolution internal drawing space mapping to CSS pixels.
+  // topPad gives headroom above the arc so the "61" threshold label (which
+  // sits just above the very top of the semicircle) doesn't get clipped.
   const w = 400;
-  const h = 210;
+  const topPad = 16;
+  const h = 210 + topPad;
   canvas.width = w * 2;
   canvas.height = h * 2;
   
   const ctx = canvas.getContext('2d');
   ctx.scale(2, 2);
   
-  const cx = 200, cy = 165, r = 130, strokeW = 22;
+  const cx = 200, cy = 165 + topPad, r = 130, strokeW = 22;
+
+  function ptAt(radius, angle){
+    return { x: cx + radius*Math.cos(angle), y: cy + radius*Math.sin(angle) };
+  }
 
   const coalFrac = Math.min(coalSeats / TOTAL_SEATS, 1);
   const passed = coalSeats >= THRESHOLD;
   const fillColor = passed ? "#1F8A57" : "#C1483B";
+  const trackColor = isDark ? "rgba(255,255,255,0.16)" : "#E4E1D8";
+  const tickColor = isDark ? "rgba(255,255,255,0.9)" : "#FFFFFF";
+  const flagColor = isDark ? "#FFFFFF" : "#1B2440";
+  const label61Color = isDark ? "#8FB8E8" : "#1B2440";
+  const endpointColor = isDark ? "rgba(255,255,255,0.55)" : "#5A6079";
+  const neutralNumberColor = isDark ? "#B8BCC9" : "#6B7280";
   
   // Background arc (from PI to 0, which is left to right top half in canvas)
   ctx.beginPath();
   ctx.arc(cx, cy, r, Math.PI, 0, false);
   ctx.lineWidth = strokeW;
-  ctx.strokeStyle = "#E4E1D8";
-  ctx.lineCap = "round";
+  ctx.strokeStyle = trackColor;
+  ctx.lineCap = "butt";
   ctx.stroke();
   
   // Foreground arc
@@ -1248,36 +1328,66 @@ function drawGaugeCanvas(canvasId, coalSeats){
     ctx.arc(cx, cy, r, Math.PI, Math.PI + (coalFrac * Math.PI), false);
     ctx.lineWidth = strokeW;
     ctx.strokeStyle = fillColor;
-    ctx.lineCap = "round";
+    ctx.lineCap = "butt";
+    ctx.stroke();
+  }
+
+  // Broadcast-board tick marks every 10 seats
+  for(let seat=0; seat<=TOTAL_SEATS; seat+=10){
+    const isMajor = seat % 20 === 0;
+    const angle = Math.PI + (seat/TOTAL_SEATS)*Math.PI;
+    const inner = ptAt(r - strokeW/2 - (isMajor?3:1), angle);
+    const outer = ptAt(r + strokeW/2 + (isMajor?3:1), angle);
+    ctx.beginPath();
+    ctx.moveTo(inner.x, inner.y);
+    ctx.lineTo(outer.x, outer.y);
+    ctx.lineWidth = isMajor ? 2 : 1;
+    ctx.strokeStyle = tickColor;
     ctx.stroke();
   }
   
-  // Threshold line (61 mandates)
+  // Threshold flag (61 mandates)
   const thresholdFrac = THRESHOLD / TOTAL_SEATS;
   const thAngle = Math.PI + (thresholdFrac * Math.PI);
-  const thInner = { x: cx + (r - strokeW/2 - 5) * Math.cos(thAngle), y: cy + (r - strokeW/2 - 5) * Math.sin(thAngle) };
-  const thOuter = { x: cx + (r + strokeW/2 + 5) * Math.cos(thAngle), y: cy + (r + strokeW/2 + 5) * Math.sin(thAngle) };
-  const thLabel = { x: cx + (r + strokeW/2 + 22) * Math.cos(thAngle), y: cy + (r + strokeW/2 + 22) * Math.sin(thAngle) };
+  const thInner = ptAt(r - strokeW/2 - 6, thAngle);
+  const thOuter = ptAt(r + strokeW/2 + 6, thAngle);
+  const thLabel = ptAt(r + strokeW/2 + 21, thAngle);
   
   ctx.beginPath();
   ctx.moveTo(thInner.x, thInner.y);
   ctx.lineTo(thOuter.x, thOuter.y);
-  ctx.lineWidth = 2.5;
-  ctx.strokeStyle = "#1B2440";
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = flagColor;
   ctx.stroke();
+  // small flag pennant at the outer end
+  ctx.beginPath();
+  ctx.moveTo(thOuter.x, thOuter.y);
+  ctx.lineTo(thOuter.x + 6, thOuter.y - 4);
+  ctx.lineTo(thOuter.x, thOuter.y - 8);
+  ctx.closePath();
+  ctx.fillStyle = flagColor;
+  ctx.fill();
   
-  // "61" label
-  ctx.fillStyle = "#1B2440";
-  ctx.font = "700 13px Assistant, sans-serif";
+  // "61" label (monospace — data readout, not prose)
+  ctx.fillStyle = label61Color;
+  ctx.font = "600 12px 'IBM Plex Mono', monospace";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText("61", thLabel.x, thLabel.y);
+
+  // "0" / "120" endpoint labels
+  ctx.font = "600 11px 'IBM Plex Mono', monospace";
+  ctx.fillStyle = endpointColor;
+  ctx.textAlign = "start";
+  ctx.fillText("0", cx - r - 6, cy + 15);
+  ctx.textAlign = "end";
+  ctx.fillText("120", cx + r + 6, cy + 15);
   
   // Center large number — red if below 61, green if above, gray if exactly 61
   let numberColor;
   if(coalSeats < THRESHOLD) numberColor = "#C1483B";
   else if(coalSeats > THRESHOLD) numberColor = "#1F8A57";
-  else numberColor = "#6B7280";
+  else numberColor = neutralNumberColor;
   ctx.fillStyle = numberColor;
   ctx.font = "900 48px 'Frank Ruhl Libre', serif";
   ctx.textAlign = "center";
@@ -1457,6 +1567,8 @@ async function prepareSummary(){
     }
 
     // streak mini-card
+    const stStreakMini = document.getElementById('stStreakMini');
+    stStreakMini.className = "st-mini-card st-streak-mini" + (streakInfo.numClass==="bad" ? " state-bad" : streakInfo.numClass==="good" ? " state-good" : "");
     const stStreakNum = document.getElementById('stStreakNumber');
     stStreakNum.className = "st-streak-number" + (streakInfo.numClass ? " " + streakInfo.numClass : "");
     stStreakNum.textContent = streakInfo.numText;
@@ -1483,7 +1595,7 @@ async function prepareSummary(){
     });
 
     const target = document.getElementById('shareTemplate');
-    const canvas = await html2canvas(target, { scale:2, backgroundColor:'#FAF8F3', useCORS:true });
+    const canvas = await html2canvas(target, { scale:2, backgroundColor:'#F2F4F8', useCORS:true });
     summaryDataUrl = canvas.toDataURL('image/png');
 
     document.getElementById('summaryImg').src = summaryDataUrl;
