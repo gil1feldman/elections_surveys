@@ -89,10 +89,11 @@
     box-shadow:0 1px 0 rgba(27,36,64,0.03);
     padding:10px 26px 12px;max-width:300px;
   }
-  .gauge-card .eyebrow{
-    align-self:center;
-    font-size:10.5px;font-weight:700;color:var(--gold);
-    text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0;
+  .gauge-sentence{
+    font-size:12.5px;color:var(--ink);text-align:center;line-height:1.4;margin:6px 0 4px;
+  }
+  .gauge-sentence b{
+    font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:15px;color:var(--gold);
   }
   
   /* Update: Using Canvas instead of SVG */
@@ -108,6 +109,10 @@
   .survey-meta-row{
     display:flex;gap:14px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);
     font-size:11.5px;color:var(--ink-soft);
+  }
+  .survey-meta-row.top{
+    margin-top:0;padding-top:0;border-top:none;
+    padding-bottom:8px;border-bottom:1px dashed var(--line);width:100%;justify-content:center;
   }
   .survey-meta-row b{color:var(--ink);font-weight:700;}
 
@@ -292,93 +297,106 @@
 
   /* ---------- Off-screen template (PREMIUM DESIGN) ---------- */
   #shareTemplate{
-    position:fixed;left:-9999px;top:0;width:1200px;
-    background:#E8ECEF;
+    position:fixed;left:-9999px;top:0;width:1080px;
+    background:var(--paper);
     font-family:'Assistant',sans-serif;color:var(--ink);
-    padding:60px;box-sizing:border-box;
+    padding:44px;box-sizing:border-box;
   }
-  .st-card {
-    background:#FFFFFF;
-    border-radius:40px;
-    box-shadow:0 30px 60px rgba(27,36,64,0.12);
-    overflow:hidden;
-    border:1px solid rgba(0,0,0,0.04);
+  .st-page-title{
+    font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:30px;text-align:center;margin-bottom:20px;
   }
-  .st-top-banner {
-    background:linear-gradient(135deg, #1B2440 0%, #2A365B 100%);
-    color:#FFFFFF;
-    padding:50px 60px;
-    text-align:center;
-    border-bottom:8px solid var(--gold);
-  }
-  .st-top-banner .st-header {
-    font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:66px;margin:0 0 12px 0;line-height:1.1;
-  }
-  .st-top-banner .st-sub {
-    font-size:30px;font-weight:600;color:#D5D9E5;margin:0;
-  }
-  .st-content { padding:50px 70px 70px 70px; }
-  
-  .st-gaugewrap {
-    background:linear-gradient(180deg, #FFFFFF 0%, #F8F9FA 100%);
-    border:2px solid #E2E6EC;
-    border-top:6px solid var(--gold);
-    border-radius:30px;
-    padding:40px;
-    display:flex;flex-direction:column;align-items:center;
-    margin-bottom:50px;
-    box-shadow:0 12px 24px rgba(0,0,0,0.03);
-  }
-  .st-gauge-title {
-    font-family:'Frank Ruhl Libre',serif;font-size:38px;font-weight:800;color:var(--ink);margin-bottom:24px;
-  }
-  .st-gauge-caption {font-size:24px;color:var(--ink-soft);margin-top:16px;}
-  
-  .st-status {
-    margin-top:28px;padding:14px 44px;border-radius:999px;font-weight:800;font-size:30px;
-    box-shadow:0 8px 16px rgba(0,0,0,0.06);
-  }
-  .st-status.pass {background:#E4F3EA;color:#156B42;border:1px solid #C4E6D3;}
-  .st-status.fail {background:#F8E7E4;color:#A4352A;border:1px solid #F1C9C3;}
-  .st-trend{margin-top:18px;font-size:24px;font-weight:800;display:flex;align-items:center;gap:8px;}
-  .st-trend.up{color:#156B42;}
-  .st-trend.down{color:#A4352A;}
-  .st-trend.flat{color:var(--ink-soft);}
 
-  #shareTemplate table {width:100%;border-collapse:separate;border-spacing:0 16px;font-size:28px;}
-  #shareTemplate th {
-    text-align:right;font-size:22px;color:var(--ink-soft);font-weight:700;
-    padding:0 24px 12px;text-transform:uppercase;letter-spacing:0.04em;border:none;
+  /* generic card shell reused by the 3 top mini-cards */
+  .st-mini-card{
+    background:#FFFFFF;border:2px solid #E2E6EC;border-radius:22px;
+    padding:20px 22px;box-shadow:0 6px 16px rgba(27,36,64,0.05);
   }
-  #shareTemplate td {
-    padding:20px 24px;background:#FFFFFF;border-top:1px solid #E2E6EC;border-bottom:1px solid #E2E6EC;
-    box-shadow:0 4px 12px rgba(0,0,0,0.02);
+  .st-top-cards{display:flex;gap:18px;margin-bottom:20px;align-items:stretch;}
+  .st-top-cards > .st-mini-card{flex:1;min-width:0;}
+
+  .st-mini-eyebrow{
+    font-size:15px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em;
+    text-align:center;margin-bottom:8px;
   }
-  #shareTemplate td:first-child {border-right:1px solid #E2E6EC;border-radius:0 20px 20px 0;}
-  #shareTemplate td:last-child {border-left:1px solid #E2E6EC;border-radius:20px 0 0 20px;}
-  #shareTemplate tr.coal-row td {
-    background:#FFFCF5;border-color:#F1DFB2;box-shadow:0 4px 16px rgba(201,151,44,0.06);
+
+  /* gauge mini-card */
+  .st-gauge-mini{display:flex;flex-direction:column;align-items:center;}
+  .st-gauge-meta{
+    display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:14px;color:var(--ink-soft);
+    padding-bottom:10px;border-bottom:1.5px dashed var(--line);width:100%;margin-bottom:8px;
   }
-  
-  #shareTemplate td.pname-cell {display:flex;align-items:center;gap:14px;font-weight:700;}
-  #shareTemplate .pdot {
-    width:18px;height:18px;border-radius:50%;flex:none;
-    box-shadow:0 0 0 4px rgba(0,0,0,0.05);
+  .st-gauge-meta b{color:var(--ink);font-weight:800;}
+  .st-gauge-sentence{font-size:15px;text-align:center;line-height:1.4;margin-bottom:8px;}
+  .st-gauge-sentence b{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:18px;color:var(--gold);}
+  .st-gauge-mini canvas{width:100%;max-width:230px;display:block;margin:0 auto;}
+  .st-gauge-mini .st-gauge-caption{font-size:13px;color:var(--ink-soft);margin-top:-4px;text-align:center;}
+  .st-gauge-mini .st-status-pill{
+    margin-top:6px;padding:6px 18px;border-radius:999px;font-weight:800;font-size:14.5px;
   }
-  #shareTemplate td.num {font-weight:900;font-family:'Frank Ruhl Libre',serif;font-size:38px;}
-  
-  /* Trend Badges */
-  .st-trend-badge {
-    display:inline-flex;align-items:center;justify-content:center;gap:6px;
-    padding:6px 18px;border-radius:999px;font-size:22px;font-weight:800;font-family:'Assistant',sans-serif;
+  .st-status-pill.pass{background:#E4F3EA;color:#156B42;}
+  .st-status-pill.fail{background:#F8E7E4;color:#A4352A;}
+
+  /* trend mini-card */
+  .st-trend-big{
+    font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:26px;
+    display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;
   }
-  .st-trend-badge.up {background:#E4F3EA;color:#156B42;border:1px solid #C4E6D3;}
-  .st-trend-badge.down {background:#F8E7E4;color:#A4352A;border:1px solid #F1C9C3;}
-  .st-trend-badge.flat {background:#F1F3F5;color:var(--ink-soft);border:1px solid #E2E6EC;}
-  
-  .st-footer {
-    background:#F8F9FA;padding:26px;text-align:center;font-size:22px;color:var(--ink-soft);
-    font-weight:600;border-top:1px solid #E2E6EC;
+  .st-trend-big.up{color:#156B42;}
+  .st-trend-big.down{color:#A4352A;}
+  .st-trend-big.flat{color:var(--ink-soft);}
+  .st-trend-sub{font-size:13px;color:var(--ink-soft);text-align:center;margin-top:6px;}
+  .st-movers{display:flex;gap:14px;margin-top:14px;padding-top:12px;border-top:1.5px dashed var(--line);}
+  .st-movers-col{flex:1;min-width:0;}
+  .st-movers-title{font-size:12.5px;font-weight:800;margin-bottom:6px;}
+  .st-movers-title.up{color:#156B42;}
+  .st-movers-title.down{color:#A4352A;}
+  .st-movers-row{display:flex;justify-content:space-between;gap:6px;font-size:13px;padding:2px 0;}
+  .st-movers-row .mn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .st-movers-row .mv{font-family:'Frank Ruhl Libre',serif;font-weight:800;flex:none;}
+  .st-movers-row.up .mv{color:#156B42;}
+  .st-movers-row.down .mv{color:#A4352A;}
+  .st-movers-empty{font-size:12px;color:var(--ink-soft);}
+
+  /* streak mini-card */
+  .st-streak-stats{display:flex;gap:14px;margin-top:8px;}
+  .st-streak-stats .stat-block{flex:1;text-align:center;}
+  .st-streak-stats .stat-block.secondary{border-right:1.5px dashed var(--line);padding-right:14px;}
+  .st-stat-label{font-size:13px;font-weight:700;color:var(--ink);}
+  .st-streak-number{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:34px;margin-top:4px;}
+  .st-streak-number.bad{color:#A4352A;}
+  .st-streak-number.good{color:#156B42;}
+  .st-streak-lastmajority{font-family:'Frank Ruhl Libre',serif;font-weight:800;font-size:16px;margin-top:8px;}
+  .st-streak-sub{font-size:12.5px;color:var(--ink-soft);margin-top:12px;padding-top:10px;border-top:1.5px dashed var(--line);line-height:1.4;text-align:center;}
+  .st-streak-sub.emphasis{
+    font-size:13.5px;font-weight:800;color:#A4352A;background:#F8E7E4;border-top:none;
+    padding:8px 10px;border-radius:10px;margin-top:10px;
+  }
+
+  /* party cards grid */
+  .st-party-grid{
+    display:grid;grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));gap:12px;margin-bottom:8px;
+  }
+  .st-party-card{
+    background:#FFFFFF;border:2px solid #E2E6EC;border-radius:16px;padding:14px 14px 12px;position:relative;overflow:hidden;
+  }
+  .st-party-card .stripe{position:absolute;top:0;right:0;left:0;height:6px;}
+  .st-party-card.coal{background:#FFFCF5;border-color:#F1DFB2;}
+  .st-party-name{
+    font-weight:800;font-size:15px;margin:6px 0 6px;display:flex;align-items:center;justify-content:space-between;gap:4px;
+  }
+  .st-party-name .coal-tag{
+    font-size:10px;font-weight:800;color:var(--gold);border:1px solid var(--gold);padding:1px 6px;border-radius:999px;white-space:nowrap;
+  }
+  .st-party-num{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:30px;line-height:1;}
+  .st-party-num small{font-family:'Assistant',sans-serif;font-weight:700;font-size:13px;color:var(--ink-soft);}
+  .st-party-avg{font-size:12px;color:var(--ink-soft);margin-top:4px;}
+  .st-party-delta{display:inline-flex;align-items:center;gap:3px;font-weight:800;font-size:13px;margin-top:4px;}
+  .st-party-delta.up{color:#156B42;}
+  .st-party-delta.down{color:#A4352A;}
+  .st-party-delta.flat{color:var(--ink-soft);}
+
+  .st-footer-plain{
+    text-align:center;font-size:13px;color:var(--ink-soft);margin-top:16px;padding-top:14px;border-top:1.5px solid var(--line);
   }
 
   #dashboard{display:none;}
@@ -393,7 +411,7 @@
     </div>
     <div class="header-right">
       <div class="updated" id="updatedLine"></div>
-      <button class="summary-btn" id="summaryBtn" onclick="prepareSummary()">🖼 הכן סיכום מרשים</button>
+      <button class="summary-btn" id="summaryBtn" onclick="prepareSummary()">🖼 הכן סיכום לפרסום</button>
     </div>
   </header>
 
@@ -424,15 +442,15 @@
     <!-- GAUGE (הוחלף ל-Canvas) -->
     <div class="top-row">
       <div class="gauge-card">
-        <div class="eyebrow">קואליציה נוכחית</div>
-        <canvas class="gauge-canvas" id="gaugeCanvas" style="max-width:220px;"></canvas>
-        <div class="gauge-caption" id="gaugeCaption"></div>
-        <div class="gauge-status" id="gaugeStatus"></div>
-        <div class="survey-meta-row">
+        <div class="survey-meta-row top">
           <span><b id="metaOutlet"></b></span>
           <span>מדגם <b id="metaSample"></b></span>
           <span><b id="metaDate"></b></span>
         </div>
+        <div class="gauge-sentence" id="gaugeSentence"></div>
+        <canvas class="gauge-canvas" id="gaugeCanvas" style="max-width:220px;"></canvas>
+        <div class="gauge-caption" id="gaugeCaption"></div>
+        <div class="gauge-status" id="gaugeStatus"></div>
       </div>
       <div class="trend-card">
         <div class="eyebrow">מגמה מהסקר הקודם</div>
@@ -460,14 +478,14 @@
     <div class="section-head">
       <div>
         <div class="eyebrow">פירוט מלא</div>
-        <h2>הסקר האחרון מול ממוצע 10 הסקרים הקודמים</h2>
+        <h2>הסקר האחרון מול ממוצע 5 הסקרים הקודמים</h2>
         <p id="partySectionDesc"></p>
       </div>
     </div>
     <div class="breakdown-card">
       <table class="breakdown">
         <thead>
-          <tr><th>מפלגה</th><th>הסקר האחרון</th><th>ממוצע 10 סקרים</th><th>שינוי</th></tr>
+          <tr><th>מפלגה</th><th>הסקר האחרון</th><th>ממוצע 5 סקרים</th><th>שינוי</th></tr>
         </thead>
         <tbody id="breakdownBody"></tbody>
       </table>
@@ -507,7 +525,7 @@
 
     <footer>
       הנתונים נטענים ישירות מגיליון הסקרים ומתעדכנים אוטומטית בכל טעינה של הדף.
-      "ממוצע 10 הסקרים האחרונים" מחושב תמיד מתוך סקרים של אותו כלי תקשורת שערך את הסקר האחרון המוצג, ואינו כולל את הסקר האחרון עצמו.
+      "ממוצע 5 הסקרים האחרונים" מחושב תמיד מתוך סקרים של אותו כלי תקשורת שערך את הסקר האחרון המוצג, ואינו כולל את הסקר האחרון עצמו.
       סקרים שבהם מפלגה מסוימת לא נכללה נספרים עבורה כ-0 מנדטים.
     </footer>
   </div>
@@ -527,29 +545,43 @@
 
 <!-- Off-screen template rendered into the share image -->
 <div id="shareTemplate">
-  <div class="st-card">
-    <div class="st-top-banner">
-      <div class="st-header" id="stHeader"></div>
-      <div class="st-sub" id="stSub"></div>
+  <div class="st-page-title" id="stPageTitle"></div>
+
+  <div class="st-top-cards">
+    <div class="st-mini-card st-gauge-mini">
+      <div class="st-gauge-meta" id="stGaugeMeta"></div>
+      <div class="st-gauge-sentence" id="stGaugeSentence"></div>
+      <canvas id="stGaugeCanvas"></canvas>
+      <div class="st-gauge-caption" id="stGaugeCaption"></div>
+      <div class="st-status-pill" id="stStatus"></div>
     </div>
-    <div class="st-content">
-      <div class="st-gaugewrap">
-        <div class="st-gauge-title">סך המנדטים של הקואליציה</div>
-        <!-- GAUGE (הוחלף ל-Canvas) -->
-        <canvas class="gauge-canvas" id="stGaugeCanvas" style="max-width:440px;"></canvas>
-        <div class="st-status" id="stStatus"></div>
-        <div class="st-trend" id="stTrend"></div>
-        <div class="st-gauge-caption" id="stGaugeCaption"></div>
+
+    <div class="st-mini-card">
+      <div class="st-mini-eyebrow">מגמה מהסקר הקודם</div>
+      <div class="st-trend-big" id="stTrendBig"></div>
+      <div class="st-trend-sub" id="stTrendSub"></div>
+      <div class="st-movers" id="stMoversBox"></div>
+    </div>
+
+    <div class="st-mini-card">
+      <div class="st-mini-eyebrow">מצב הרוב הקואליציוני</div>
+      <div class="st-streak-stats">
+        <div class="stat-block">
+          <div class="st-stat-label">רצף ללא רוב</div>
+          <div class="st-streak-number" id="stStreakNumber"></div>
+        </div>
+        <div class="stat-block secondary">
+          <div class="st-stat-label">רוב אחרון בתאריך</div>
+          <div class="st-streak-lastmajority" id="stStreakLastMajority"></div>
+        </div>
       </div>
-      <table>
-        <thead>
-          <tr><th>מפלגה</th><th>הסקר האחרון</th><th>ממוצע 10 סקרים</th></tr>
-        </thead>
-        <tbody id="stBody"></tbody>
-      </table>
+      <div class="st-streak-sub" id="stStreakSub"></div>
     </div>
-    <div class="st-footer">מעקב נתוני סקרים · מבוסס על נתוני סקרים פומביים מעודכנים</div>
   </div>
+
+  <div class="st-party-grid" id="stPartyGrid"></div>
+
+  <div class="st-footer-plain">מעקב נתוני סקרים · מבוסס על נתוני סקרים פומביים מעודכנים</div>
 </div>
 
 <script>
@@ -561,31 +593,35 @@ const CSV_URLS = [
 const COALITION = ["ש״ס","הציונות הדתית","עוצמה יהודית","הליכוד","יהדות התורה"];
 const THRESHOLD = 61;
 const TOTAL_SEATS = 120;
-const BASELINE_WINDOW = 10;
+const BASELINE_WINDOW = 5;
 
+// Coalition parties get warm gold/amber tones; opposition parties get cool
+// tones (blue/teal/green/purple) — so hue family alone signals bloc membership.
 const PARTY_COLORS = {
-  "הליכוד":"#2456A6",
-  "ש״ס":"#0E7C66",
-  "יהדות התורה":"#232B45",
+  "הליכוד":"#C9972C",
+  "ש״ס":"#B8860B",
+  "יהדות התורה":"#8B6914",
   "הציונות הדתית":"#D9822B",
-  "עוצמה יהודית":"#B8860B",
+  "עוצמה יהודית":"#A9791F",
   "כחול לבן":"#3B6FA0",
   "יש עתיד":"#3AAFB9",
   "חדש תע״ל":"#7FA6C4",
   "ישראל ביתנו":"#5C6BC0",
-  "הדמוקרטים":"#C1483B",
+  "הדמוקרטים":"#9C4F6B",
   "רע״מ":"#2E8B57",
   "בל״ד":"#33443E",
   "ביחד (בנט ולפיד)":"#8E6BAF",
-  "ישר!":"#D9A76D",
+  "ישר!":"#5A8FA6",
   "בית ציוני-המילואימניקים":"#8A93A6",
   "רשימה ערבית מאוחדת":"#2F8F6E",
   "מפלגה בראשות גלעד ארדן ויולי אדלשטיין":"#9CA3AF"
 };
 function colorFor(name){
   if(PARTY_COLORS[name]) return PARTY_COLORS[name];
-  let h=0; for(let i=0;i<name.length;i++) h = (h*31 + name.charCodeAt(i)) % 360;
-  return `hsl(${h},45%,42%)`;
+  // fallback for any unlisted party: always a cool hue (opposition never gets
+  // a gold/amber tone, since those are reserved for the fixed coalition list)
+  let h=0; for(let i=0;i<name.length;i++) h = (h*31 + name.charCodeAt(i)) % 140;
+  return `hsl(${180+h},45%,42%)`;
 }
 function isCoalition(name){ return COALITION.includes(name); }
 
@@ -848,6 +884,8 @@ function render(){
 
   const coalSeats = coalitionTotal(latest);
   drawGaugeCanvas('gaugeCanvas', coalSeats);
+  document.getElementById('gaugeSentence').innerHTML =
+    `לקואליציה (ש״ס · הציונות הדתית · עוצמה יהודית · הליכוד · יהדות התורה) <b>${coalSeats} מנדטים</b>`;
   
   const diff = coalSeats - THRESHOLD;
   const statusEl = document.getElementById('gaugeStatus');
@@ -901,9 +939,9 @@ function render(){
   renderTrendCard(coalTrend, moverRows, prevSurvey, latest);
 
   // ---- consecutive-surveys-without-majority streak (respects outlet filter, ignores date range) ----
-  renderStreakCard();
+  const streakInfo = renderStreakCard();
 
-  lastState = { latest, coalSeats, statusText, statusClass, captionText, coalTrend, rows };
+  lastState = { latest, coalSeats, statusText, statusClass, captionText, coalTrend, prevSurvey, moverRows, rows, streakInfo };
 }
 
 function trendParts(latestVal, prevVal){
@@ -913,21 +951,13 @@ function trendParts(latestVal, prevVal){
   return {cls:"flat", arrow:"●", txt:"ללא שינוי", diff:0};
 }
 
-function renderStreakCard(){
+function computeStreakInfo(){
   // uses the outlet filter (if any) but ignores the date-range filter, per spec
   const pool = currentOutlet==="הכל" ? allSurveys : allSurveys.filter(s=>s.outlet===currentOutlet);
-  const numEl = document.getElementById('streakNumber');
-  const subEl = document.getElementById('streakSub');
-  const lastMajEl = document.getElementById('streakLastMajority');
   const scopeText = currentOutlet==="הכל" ? "בכל הסקרים (כל כלי התקשורת)" : `בסקרי ${currentOutlet}`;
 
   if(pool.length===0){
-    numEl.className = "streak-number";
-    numEl.textContent = "—";
-    lastMajEl.textContent = "—";
-    subEl.className = "streak-sub";
-    subEl.textContent = "אין נתונים זמינים";
-    return;
+    return {empty:true, numText:"—", numClass:"", lastMajText:"—", subText:"אין נתונים זמינים", emphasis:false};
   }
 
   let streak = 0;
@@ -937,28 +967,67 @@ function renderStreakCard(){
   }
 
   if(streak===0){
-    numEl.className = "streak-number good";
-    numEl.textContent = "0";
-    lastMajEl.textContent = fmtDate(pool[pool.length-1].dateObj);
-    subEl.className = "streak-sub";
-    subEl.textContent = `יש רוב קואליציוני בסקר האחרון ${scopeText}`;
-  }else{
-    numEl.className = "streak-number bad";
-    numEl.textContent = streak;
-    if(streak < pool.length){
-      lastMajEl.textContent = fmtDate(pool[pool.length-1-streak].dateObj);
-      subEl.className = "streak-sub";
-      subEl.textContent = `סקרים ברצף ללא רוב ל-61 מנדטים, ${scopeText}`;
-    }else{
-      lastMajEl.textContent = "—";
-      subEl.className = "streak-sub emphasis";
-      subEl.textContent = `הקואליציה לא הגיעה ל-61 מנדטים באף סקר מאז תחילת המדידה אחרי הקמת הממשלה.`;
-    }
+    return {
+      empty:false, streak:0, numText:"0", numClass:"good",
+      lastMajText: fmtDate(pool[pool.length-1].dateObj),
+      subText: `יש רוב קואליציוני בסקר האחרון ${scopeText}`, emphasis:false
+    };
   }
+  if(streak < pool.length){
+    return {
+      empty:false, streak, numText:String(streak), numClass:"bad",
+      lastMajText: fmtDate(pool[pool.length-1-streak].dateObj),
+      subText: `סקרים ברצף ללא רוב ל-61 מנדטים, ${scopeText}`, emphasis:false
+    };
+  }
+  return {
+    empty:false, streak, numText:String(streak), numClass:"bad",
+    lastMajText: "—",
+    subText: `הקואליציה לא הגיעה ל-61 מנדטים באף סקר מאז תחילת המדידה אחרי הקמת הממשלה.`, emphasis:true
+  };
+}
+
+function renderStreakCard(){
+  const info = computeStreakInfo();
+  const numEl = document.getElementById('streakNumber');
+  const subEl = document.getElementById('streakSub');
+  const lastMajEl = document.getElementById('streakLastMajority');
+
+  numEl.className = "streak-number" + (info.numClass ? " " + info.numClass : "");
+  numEl.textContent = info.numText;
+  lastMajEl.textContent = info.lastMajText;
+  subEl.className = "streak-sub" + (info.emphasis ? " emphasis" : "");
+  subEl.textContent = info.subText;
+
+  return info;
+}
+
+function computeRisersFallers(rows){
+  const withPrev = rows.filter(r=> r.prevVal!==null).map(r=> ({party:r.party, d: r.latestVal - r.prevVal})).filter(r=>r.d!==0);
+  const risers = withPrev.filter(r=>r.d>0).sort((a,b)=>b.d-a.d);
+  const fallers = withPrev.filter(r=>r.d<0).sort((a,b)=>a.d-b.d);
+  return {risers, fallers};
+}
+
+function buildMoversHtml(risers, fallers, rowCls, colCls, titleCls, emptyCls){
+  const rowsHtml = (list, cls) => list.length
+    ? list.map(r=> `<div class="${rowCls} ${cls}"><span class="mn">${r.party}</span><span class="mv">${r.d>0?'+':''}${r.d}</span></div>`).join("")
+    : `<div class="${emptyCls}">אין שינוי</div>`;
+  return `
+    <div class="${colCls}">
+      <div class="${titleCls} up">▲ עלייה</div>
+      ${rowsHtml(risers, "up")}
+    </div>
+    <div class="${colCls}">
+      <div class="${titleCls} down">▼ ירידה</div>
+      ${rowsHtml(fallers, "down")}
+    </div>
+  `;
 }
 
 function renderTrendCard(coalTrend, rows, prevSurvey, latest){
   const bigEl = document.getElementById('trendBig');
+
   const subEl = document.getElementById('trendSub');
   const moversEl = document.getElementById('moversBox');
 
@@ -974,24 +1043,8 @@ function renderTrendCard(coalTrend, rows, prevSurvey, latest){
   bigEl.textContent = `${coalTrend.arrow} ${coalTrend.txt}`;
   subEl.textContent = `סך הקואליציה לעומת הסקר הקודם של ${latest.outlet} (${fmtDate(prevSurvey.dateObj)})`;
 
-  const withPrev = rows.filter(r=> r.prevVal!==null).map(r=> ({party:r.party, d: r.latestVal - r.prevVal})).filter(r=>r.d!==0);
-  const risers = withPrev.filter(r=>r.d>0).sort((a,b)=>b.d-a.d);
-  const fallers = withPrev.filter(r=>r.d<0).sort((a,b)=>a.d-b.d);
-
-  const rowsHtml = (list, cls) => list.length
-    ? list.map(r=> `<div class="movers-row ${cls}"><span class="mname">${r.party}</span><span class="mval">${r.d>0?'+':''}${r.d}</span></div>`).join("")
-    : `<div class="movers-empty">אין שינוי</div>`;
-
-  moversEl.innerHTML = `
-    <div class="movers-col">
-      <div class="movers-col-title up">▲ עלייה</div>
-      ${rowsHtml(risers, "up")}
-    </div>
-    <div class="movers-col">
-      <div class="movers-col-title down">▼ ירידה</div>
-      ${rowsHtml(fallers, "down")}
-    </div>
-  `;
+  const {risers, fallers} = computeRisersFallers(rows);
+  moversEl.innerHTML = buildMoversHtml(risers, fallers, "movers-row", "movers-col", "movers-col-title", "movers-empty");
 }
 
 
@@ -1076,8 +1129,12 @@ function drawGaugeCanvas(canvasId, coalSeats){
   ctx.textBaseline = "middle";
   ctx.fillText("61", thLabel.x, thLabel.y);
   
-  // Center large number
-  ctx.fillStyle = "#1B2440";
+  // Center large number — red if below 61, green if above, gray if exactly 61
+  let numberColor;
+  if(coalSeats < THRESHOLD) numberColor = "#C1483B";
+  else if(coalSeats > THRESHOLD) numberColor = "#1F8A57";
+  else numberColor = "#6B7280";
+  ctx.fillStyle = numberColor;
   ctx.font = "900 48px 'Frank Ruhl Libre', serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
@@ -1226,57 +1283,66 @@ async function prepareSummary(){
   btn.textContent = "מכין תמונה...";
 
   try{
-    const { latest, coalSeats, statusText, statusClass, captionText, coalTrend, rows } = lastState;
+    const { latest, coalSeats, statusText, statusClass, captionText, coalTrend, prevSurvey, moverRows, rows, streakInfo } = lastState;
 
-    document.getElementById('stHeader').textContent = `סקר ${latest.outlet}`;
-    document.getElementById('stSub').textContent = 
-      `${fmtDate(latest.dateObj)}${currentOutlet==="הכל" ? "" : " · " + currentOutlet}`;
+    document.getElementById('stPageTitle').textContent = document.getElementById('pageTitle').textContent;
 
+    // gauge mini-card
+    document.getElementById('stGaugeMeta').innerHTML =
+      `<span><b>${latest.outlet}</b></span><span>מדגם <b>${latest.respondents ? latest.respondents.toLocaleString('he-IL') : '—'}</b></span><span><b>${fmtDate(latest.dateObj)}</b></span>`;
+    document.getElementById('stGaugeSentence').innerHTML =
+      `לקואליציה (ש״ס · הציונות הדתית · עוצמה יהודית · הליכוד · יהדות התורה) <b>${coalSeats} מנדטים</b>`;
     drawGaugeCanvas('stGaugeCanvas', coalSeats);
-    
     document.getElementById('stGaugeCaption').textContent = captionText;
     const stStatus = document.getElementById('stStatus');
-    stStatus.className = "st-status " + statusClass;
+    stStatus.className = "st-status-pill " + statusClass;
     stStatus.textContent = statusText;
 
-    const stTrend = document.getElementById('stTrend');
+    // trend mini-card
+    const stTrendBig = document.getElementById('stTrendBig');
+    const stTrendSub = document.getElementById('stTrendSub');
+    const stMovers = document.getElementById('stMoversBox');
     if(coalTrend){
-      stTrend.className = "st-trend " + coalTrend.cls;
-      stTrend.textContent = `${coalTrend.arrow} ${coalTrend.txt} מהסקר הקודם`;
+      stTrendBig.className = "st-trend-big " + coalTrend.cls;
+      stTrendBig.textContent = `${coalTrend.arrow} ${coalTrend.txt}`;
+      stTrendSub.textContent = `סך הקואליציה לעומת הסקר הקודם של ${latest.outlet} (${fmtDate(prevSurvey.dateObj)})`;
+      const {risers, fallers} = computeRisersFallers(moverRows);
+      stMovers.innerHTML = buildMoversHtml(risers, fallers, "st-movers-row", "st-movers-col", "st-movers-title", "st-movers-empty");
     }else{
-      stTrend.textContent = "";
+      stTrendBig.className = "st-trend-big flat";
+      stTrendBig.textContent = "אין סקר קודם להשוואה";
+      stTrendSub.textContent = "";
+      stMovers.innerHTML = "";
     }
 
-    const stBody = document.getElementById('stBody');
-    stBody.innerHTML = "";
-    
+    // streak mini-card
+    const stStreakNum = document.getElementById('stStreakNumber');
+    stStreakNum.className = "st-streak-number" + (streakInfo.numClass ? " " + streakInfo.numClass : "");
+    stStreakNum.textContent = streakInfo.numText;
+    document.getElementById('stStreakLastMajority').textContent = streakInfo.lastMajText;
+    const stStreakSub = document.getElementById('stStreakSub');
+    stStreakSub.className = "st-streak-sub" + (streakInfo.emphasis ? " emphasis" : "");
+    stStreakSub.textContent = streakInfo.subText;
+
+    // party cards grid
+    const grid = document.getElementById('stPartyGrid');
+    grid.innerHTML = "";
     rows.forEach(r=>{
       const d = deltaParts(r.latestVal, r.baseAvg);
-      const tr = document.createElement('tr');
-      if(isCoalition(r.party)) tr.className = "coal-row";
-      
-      let badgeHtml = '';
-      if (d.cls !== 'flat') {
-         badgeHtml = `<span class="st-trend-badge ${d.cls}">${d.arrow} ${d.diff.toFixed(1)}</span>`;
-      } else if (d.txt !== '—') {
-         badgeHtml = `<span class="st-trend-badge ${d.cls}">ללא שינוי</span>`;
-      }
-      
-      tr.innerHTML = `
-        <td class="pname-cell"><span class="pdot" style="background:${colorFor(r.party)}"></span>${r.party}</td>
-        <td class="num">
-          <div style="display:flex;align-items:center;gap:18px;">
-            <span>${r.latestVal}</span>
-            ${badgeHtml}
-          </div>
-        </td>
-        <td style="color:var(--ink-soft);font-weight:700;">${r.baseAvg!==null ? r.baseAvg.toFixed(1) : '—'}</td>
+      const card = document.createElement('div');
+      card.className = "st-party-card" + (isCoalition(r.party) ? " coal" : "");
+      card.innerHTML = `
+        <div class="stripe" style="background:${colorFor(r.party)}"></div>
+        <div class="st-party-name">${r.party} ${isCoalition(r.party) ? '<span class="coal-tag">קואליציה</span>' : ''}</div>
+        <div class="st-party-num">${r.latestVal}<small> מנדטים</small></div>
+        <div class="st-party-avg">ממוצע 5 סקרים: ${r.baseAvg!==null ? r.baseAvg.toFixed(1) : '—'}</div>
+        <div class="st-party-delta ${d.cls}">${d.arrow} ${d.txt}</div>
       `;
-      stBody.appendChild(tr);
+      grid.appendChild(card);
     });
 
     const target = document.getElementById('shareTemplate');
-    const canvas = await html2canvas(target, { scale:2, backgroundColor:'#E8ECEF', useCORS:true });
+    const canvas = await html2canvas(target, { scale:2, backgroundColor:'#FAF8F3', useCORS:true });
     summaryDataUrl = canvas.toDataURL('image/png');
 
     document.getElementById('summaryImg').src = summaryDataUrl;
@@ -1286,7 +1352,7 @@ async function prepareSummary(){
     alert("לא הצלחנו להכין את התמונה. נסו שוב.");
   }finally{
     btn.disabled = false;
-    btn.textContent = "🖼 הכן סיכום מרשים";
+    btn.textContent = "🖼 הכן סיכום לפרסום";
   }
 }
 
