@@ -211,6 +211,26 @@
     padding:0px 5px;border-radius:999px;white-space:nowrap;
   }
 
+  /* ---------- House effect table ---------- */
+  .house-effect-wrap{overflow-x:auto;}
+  table.house-effect{min-width:100%;}
+  table.house-effect th, table.house-effect td{text-align:center;white-space:nowrap;}
+  table.house-effect th:first-child, table.house-effect td:first-child{text-align:right;white-space:normal;}
+  table.house-effect tr.coal-row td{font-weight:800;}
+  table.house-effect td.he-avg{font-family:'Frank Ruhl Libre',serif;font-weight:800;font-size:14px;}
+  table.house-effect .he-delta{
+    display:block;font-size:10px;font-weight:700;margin-top:1px;
+  }
+  table.house-effect .he-delta.up{color:var(--good);}
+  table.house-effect .he-delta.down{color:var(--alert);}
+  table.house-effect .he-delta.flat{color:var(--ink-soft);}
+  table.house-effect td.he-ref{color:var(--ink-soft);font-weight:700;border-left:1.5px dashed var(--line);}
+
+  /* ---------- Credit line ---------- */
+  .credit-line{margin-top:6px;font-size:10.5px;color:var(--ink-soft);}
+  .credit-line a{color:var(--gold);font-weight:700;text-decoration:none;}
+  .credit-line a:hover{text-decoration:underline;}
+
   /* ---------- Chart section ---------- */
   .chart-card{
     background:var(--paper-raised);border:1.5px solid var(--line);border-radius:var(--radius);
@@ -501,7 +521,21 @@
     <div class="chart-card">
       <div class="chart-controls" id="chartControls"></div>
       <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
-      <div class="chart-hint" id="chartHint"></div>
+    </div>
+
+    <!-- HOUSE EFFECT -->
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">הטיית סוקרים</div>
+        <h2>ממוצע 5 הסקרים האחרונים של כל כלי תקשורת מול הממוצע החוצה-כלים</h2>
+        <p>לכל כלי תקשורת פעיל (לפחות 5 סקרים ב-6 השבועות האחרונים): ממוצע 5 הסקרים האחרונים שלו (בלי קשר לפילטרים למעלה), מול ממוצע משוקלל של כלל כלי התקשורת. הפרש חיובי = כלי התקשורת נותן למפלגה יותר מהממוצע.</p>
+      </div>
+    </div>
+    <div class="breakdown-card house-effect-wrap">
+      <table class="breakdown house-effect" id="houseEffectTable">
+        <thead><tr id="houseEffectHead"></tr></thead>
+        <tbody id="houseEffectBody"></tbody>
+      </table>
     </div>
 
     <!-- PARTY SPOTLIGHT TABLE -->
@@ -527,6 +561,7 @@
       הנתונים נטענים ישירות מגיליון הסקרים ומתעדכנים אוטומטית בכל טעינה של הדף.
       "ממוצע 5 הסקרים האחרונים" מחושב תמיד מתוך סקרים של אותו כלי תקשורת שערך את הסקר האחרון המוצג, ואינו כולל את הסקר האחרון עצמו.
       סקרים שבהם מפלגה מסוימת לא נכללה נספרים עבורה כ-0 מנדטים.
+      <div class="credit-line">פיתוח <a href="https://x.com/feldman_gil" id="creditLink" target="_blank" rel="noopener">גיל פלדמן</a></div>
     </footer>
   </div>
 
@@ -760,6 +795,114 @@ function getOutlets(){
   return Array.from(counts.entries()).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
 }
 
+// "House effect": for each outlet, average its own last 5 surveys per party
+// (and for the coalition total), then compare that to the average across all
+// outlets' own 5-survey averages. Always uses full history — ignores the
+// outlet/date-range filters, since the whole point is cross-outlet comparison.
+// Only outlets that were actually active recently (at least 5 surveys in the
+// last 6 weeks) are comparable "house effects" — a pollster with one survey a
+// quarter shouldn't be averaged in on equal footing with a daily tracker.
+function getActiveOutlets(){
+  if(allSurveys.length===0) return [];
+  const maxDate = allSurveys[allSurveys.length-1].dateObj;
+  const cutoff = new Date(maxDate);
+  cutoff.setDate(cutoff.getDate()-42);
+  const counts = new Map();
+  allSurveys.forEach(s=>{
+    if(s.dateObj >= cutoff) counts.set(s.outlet, (counts.get(s.outlet)||0)+1);
+  });
+  return Array.from(counts.entries()).filter(([o,c])=>c>=5).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+}
+
+function computeHouseEffects(){
+  const outlets = getActiveOutlets();
+  const outletData = {};
+  outlets.forEach(outlet=>{
+    const pool = allSurveys.filter(s=>s.outlet===outlet).sort((a,b)=>b.dateObj-a.dateObj).slice(0,5);
+    const avgs = {};
+    allPartiesList.forEach(party=>{
+      const vals = pool.map(s=> s.parties[party]||0);
+      avgs[party] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+    });
+    const coalVals = pool.map(s=> coalitionTotal(s));
+    const coalAvg = coalVals.length ? coalVals.reduce((a,b)=>a+b,0)/coalVals.length : null;
+    outletData[outlet] = {avgs, coalAvg, n: pool.length};
+  });
+
+  // Weighted by each outlet's own survey count (n, capped at 5) — an outlet
+  // whose 5-survey average is only based on 2 surveys counts for less than
+  // one based on a full 5.
+  const crossAvg = {};
+  allPartiesList.forEach(party=>{
+    let wsum = 0, wtotal = 0;
+    outlets.forEach(o=>{
+      const d = outletData[o];
+      if(d.avgs[party]!==null && d.n>0){ wsum += d.avgs[party]*d.n; wtotal += d.n; }
+    });
+    crossAvg[party] = wtotal>0 ? wsum/wtotal : null;
+  });
+  let cwsum = 0, cwtotal = 0;
+  outlets.forEach(o=>{
+    const d = outletData[o];
+    if(d.coalAvg!==null && d.n>0){ cwsum += d.coalAvg*d.n; cwtotal += d.n; }
+  });
+  const crossCoalAvg = cwtotal>0 ? cwsum/cwtotal : null;
+
+  return {outlets, outletData, crossAvg, crossCoalAvg};
+}
+
+function heDeltaHtml(avg, ref){
+  if(avg===null) return `<span class="he-delta flat">—</span>`;
+  if(ref===null) return "";
+  const d = Math.round((avg-ref)*10)/10;
+  if(d > 0.05) return `<span class="he-delta up">+${d.toFixed(1)}</span>`;
+  if(d < -0.05) return `<span class="he-delta down">${d.toFixed(1)}</span>`;
+  return `<span class="he-delta flat">0</span>`;
+}
+
+function renderHouseEffect(){
+  const {outlets, outletData, crossAvg, crossCoalAvg} = computeHouseEffects();
+  const headRow = document.getElementById('houseEffectHead');
+  const body = document.getElementById('houseEffectBody');
+
+  if(outlets.length < 2){
+    headRow.innerHTML = "";
+    body.innerHTML = `<tr><td style="color:var(--ink-soft);">צריך לפחות שני כלי תקשורת פעילים (לפחות 5 סקרים ב-6 השבועות האחרונים) כדי להשוות.</td></tr>`;
+    return;
+  }
+
+  headRow.innerHTML = `<th>מפלגה</th><th>ממוצע חוצה-כלים</th>` + outlets.map(o=>`<th>${o}</th>`).join("");
+
+  body.innerHTML = "";
+  const coalTr = document.createElement('tr');
+  coalTr.className = "coal-row";
+  coalTr.innerHTML = `
+    <td class="pname-cell">★ סך הקואליציה</td>
+    <td class="he-ref">${crossCoalAvg!==null ? crossCoalAvg.toFixed(1) : '—'}</td>
+    ${outlets.map(o=>{
+      const d = outletData[o];
+      return `<td class="he-avg">${d.coalAvg!==null ? d.coalAvg.toFixed(1) : '—'}${heDeltaHtml(d.coalAvg, crossCoalAvg)}</td>`;
+    }).join("")}
+  `;
+  body.appendChild(coalTr);
+
+  const partyList = allPartiesList.filter(p=> (crossAvg[p]||0) > 0 || isCoalition(p));
+  partyList.forEach(party=>{
+    const tr = document.createElement('tr');
+    if(isCoalition(party)) tr.className = "coal-row";
+    tr.innerHTML = `
+      <td class="pname-cell"><span class="pdot" style="background:${colorFor(party)}"></span>${party}</td>
+      <td class="he-ref">${crossAvg[party]!==null ? crossAvg[party].toFixed(1) : '—'}</td>
+      ${outlets.map(o=>{
+        const d = outletData[o];
+        const avg = d.avgs[party];
+        return `<td class="he-avg">${avg!==null ? avg.toFixed(1) : '—'}${heDeltaHtml(avg, crossAvg[party])}</td>`;
+      }).join("")}
+    `;
+    body.appendChild(tr);
+  });
+}
+
 let currentOutlet = "הכל";
 let currentRange = "3m";
 let lastState = null;
@@ -821,6 +964,7 @@ function initDashboard(){
   });
 
   renderSpotlightPills();
+  renderHouseEffect();
   render();
 }
 
@@ -1177,7 +1321,6 @@ function renderChartControls(filtered){
 function renderChart(filtered){
   const ctx = document.getElementById('trendChart').getContext('2d');
   const labels = filtered.map(s=> fmtDate(s.dateObj));
-  const hintEl = document.getElementById('chartHint');
 
   let datasets;
   if(selectedChartParties.size === 0){
@@ -1190,7 +1333,6 @@ function renderChart(filtered){
       pointRadius: 2,
       tension: 0.25
     }];
-    hintEl.textContent = "מוצג סך מנדטי הקואליציה. אפשר לבחור מפלגות ספציפיות למעלה במקום.";
   }else{
     datasets = Array.from(selectedChartParties).map(party=>({
       label: party,
@@ -1202,7 +1344,6 @@ function renderChart(filtered){
       tension: 0.25,
       spanGaps: true
     }));
-    hintEl.textContent = "מוצגות המפלגות הנבחרות. לחצו על ★ סך הקואליציה כדי לחזור לתצוגת ברירת המחדל.";
   }
 
   if(chartInstance) chartInstance.destroy();
