@@ -370,6 +370,11 @@
   }
   .summary-btn:hover{background:var(--gold);border-color:var(--gold);color:#fff;}
   .summary-btn:disabled{opacity:0.6;cursor:default;}
+  .summary-btn.small{
+    background:var(--paper-raised);color:var(--ink);border-color:var(--line);
+    padding:5px 12px;font-size:10.5px;flex:none;
+  }
+  .summary-btn.small:hover{background:var(--gold);border-color:var(--gold);color:#fff;}
 
   .modal-overlay{
     position:fixed;inset:0;background:rgba(27,36,64,0.6);
@@ -499,6 +504,36 @@
     text-align:center;font-family:var(--mono);font-size:14px;color:var(--ink-soft);margin-top:22px;padding-top:18px;border-top:1.5px solid var(--line);
   }
 
+  /* ---------- Outlet-compare share image: its own optimally-arranged grid ---------- */
+  #outletShareTemplate{
+    position:fixed;left:-9999px;top:0;width:1200px;
+    background:var(--paper);
+    font-family:'Assistant',sans-serif;color:var(--ink);
+    padding:52px;box-sizing:border-box;
+  }
+  .ost-grid{
+    display:grid;gap:20px;
+  }
+  .ost-card{
+    background:#FFFFFF;border:2px solid #E2E6EC;border-radius:14px;padding:22px 24px;
+  }
+  .ost-card-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:10px;}
+  .ost-card-name{font-weight:800;font-size:22px;color:var(--ink);}
+  .ost-card-date{font-family:var(--mono);font-size:14px;color:var(--ink-soft);}
+  .ost-card-num{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:46px;line-height:1;}
+  .ost-card-num.good{color:var(--good);}
+  .ost-card-num.bad{color:var(--alert);}
+  .ost-card-num.neutral{color:#6B7280;}
+  .ost-card-num small{font-family:var(--mono);font-weight:600;font-size:17px;color:var(--ink-soft);}
+  .ost-card-trend{font-size:17px;font-weight:700;margin-top:8px;}
+  .ost-card-trend.up{color:var(--good);}
+  .ost-card-trend.down{color:var(--alert);}
+  .ost-card-trend.flat{color:var(--ink-soft);}
+  .ost-card-maj{
+    font-family:var(--mono);font-size:15px;color:var(--ink-soft);margin-top:14px;padding-top:14px;border-top:1.5px dashed var(--line);
+  }
+  .ost-card-maj b{color:var(--ink);font-family:'Frank Ruhl Libre',serif;font-weight:800;font-size:19px;}
+
   #dashboard{display:none;}
 </style>
 </head>
@@ -621,6 +656,10 @@
         <h2>מנדטי הקואליציה בסקר האחרון של כל כלי תקשורת</h2>
         <p>מציג תמיד את מנדטי הקואליציה בלבד (לא את שאר המפלגות), לפי כלי התקשורת שנבחרו למעלה — בלי קשר לטווח התאריכים. לכל כלי תקשורת: הסקר האחרון שלו, השינוי מול הסקר הקודם שלו, ומתי לאחרונה היה לקואליציה רוב לפי הסקרים שלו.</p>
       </div>
+      <button class="summary-btn small" id="outletSummaryBtn" onclick="prepareOutletSummary()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>
+        שמור כתמונה
+      </button>
     </div>
     <div class="outlet-compare-grid" id="outletCompareGrid"></div>
 
@@ -725,6 +764,14 @@
     </table>
   </div>
 
+  <div class="st-footer-plain">מעקב נתוני סקרים · מבוסס על נתוני סקרים פומביים מעודכנים</div>
+</div>
+
+<!-- Off-screen template for the outlet-compare image (own optimal grid layout) -->
+<div id="outletShareTemplate">
+  <div class="st-page-title">תמונת מצב בסקרי המנדטים האחרונים</div>
+  <div class="st-page-tag">מעקב נתוני סקרים</div>
+  <div class="ost-grid" id="ostGrid"></div>
   <div class="st-footer-plain">מעקב נתוני סקרים · מבוסס על נתוני סקרים פומביים מעודכנים</div>
 </div>
 
@@ -1274,14 +1321,10 @@ function trendParts(latestVal, prevVal){
 
 // Always all outlets, regardless of the top selectedOutlets/date filters —
 // this section exists specifically to compare every channel side by side.
-function renderOutletCompare(){
-  const container = document.getElementById('outletCompareGrid');
-  if(!container) return;
-  container.innerHTML = "";
-
-  allOutletsList.filter(o=>selectedOutlets.has(o)).forEach(outlet=>{
+function computeOutletCompareRows(){
+  return allOutletsList.filter(o=>selectedOutlets.has(o)).map(outlet=>{
     const pool = allSurveys.filter(s=>s.outlet===outlet).sort((a,b)=> b.dateObj - a.dateObj);
-    if(pool.length===0) return;
+    if(pool.length===0) return null;
     const latest = pool[0];
     const prev = pool[1] || null;
     const coalLatest = coalitionTotal(latest);
@@ -1294,17 +1337,26 @@ function renderOutletCompare(){
     }
 
     const numClass = coalLatest < THRESHOLD ? "bad" : coalLatest > THRESHOLD ? "good" : "neutral";
+    return {outlet, latest, coalLatest, trend, lastMajDate, numClass};
+  }).filter(Boolean);
+}
 
+function renderOutletCompare(){
+  const container = document.getElementById('outletCompareGrid');
+  if(!container) return;
+  container.innerHTML = "";
+
+  computeOutletCompareRows().forEach(r=>{
     const card = document.createElement('div');
     card.className = "outlet-card";
     card.innerHTML = `
       <div class="outlet-card-head">
-        <span class="outlet-card-name">${outlet}</span>
-        <span class="outlet-card-date">${fmtDate(latest.dateObj)}</span>
+        <span class="outlet-card-name">${r.outlet}</span>
+        <span class="outlet-card-date">${fmtDate(r.latest.dateObj)}</span>
       </div>
-      <div class="outlet-card-num ${numClass}">${coalLatest}<small> מנדטים לקואליציה</small></div>
-      <div class="outlet-card-trend ${trend ? trend.cls : 'flat'}">${trend ? `${trend.arrow} ${trend.txt} מהסקר הקודם` : 'אין סקר קודם להשוואה'}</div>
-      <div class="outlet-card-maj">רוב אחרון: <b>${lastMajDate ? fmtDate(lastMajDate) : 'מעולם לא'}</b></div>
+      <div class="outlet-card-num ${r.numClass}">${r.coalLatest}<small> מנדטים לקואליציה</small></div>
+      <div class="outlet-card-trend ${r.trend ? r.trend.cls : 'flat'}">${r.trend ? `${r.trend.arrow} ${r.trend.txt} מהסקר הקודם` : 'אין סקר קודם להשוואה'}</div>
+      <div class="outlet-card-maj">רוב אחרון: <b>${r.lastMajDate ? fmtDate(r.lastMajDate) : 'מעולם לא'}</b></div>
     `;
     container.appendChild(card);
   });
@@ -1677,8 +1729,10 @@ function renderSpotlightTable(){
 
 // ---------- Summary image generation ----------
 let summaryDataUrl = null;
+let summaryFilenamePrefix = "coalition-summary";
 
 async function prepareSummary(){
+  summaryFilenamePrefix = "coalition-summary";
   if(!lastState){ return; }
   const btn = document.getElementById('summaryBtn');
   btn.disabled = true;
@@ -1763,12 +1817,60 @@ function downloadSummary(){
   if(!summaryDataUrl) return;
   const a = document.createElement('a');
   a.href = summaryDataUrl;
-  a.download = "coalition-summary-" + new Date().toISOString().slice(0,10) + ".png";
+  a.download = summaryFilenamePrefix + "-" + new Date().toISOString().slice(0,10) + ".png";
   a.click();
 }
 
 function closeSummaryModal(){
   document.getElementById('summaryModal').classList.remove('open');
+}
+
+async function prepareOutletSummary(){
+  summaryFilenamePrefix = "outlet-compare";
+  const btn = document.getElementById('outletSummaryBtn');
+  btn.disabled = true;
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = "מכין תמונה...";
+
+  try{
+    const rows = computeOutletCompareRows();
+    const grid = document.getElementById('ostGrid');
+    grid.innerHTML = "";
+
+    // Optimal-ish fixed arrangement: few cards get fewer, wider columns;
+    // otherwise settle into a clean 3-column grid instead of the page's
+    // responsive auto-fill (which can leave uneven gaps in a screenshot).
+    const cols = rows.length <= 2 ? Math.max(rows.length,1) : (rows.length===4 ? 2 : 3);
+    grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+    rows.forEach(r=>{
+      const card = document.createElement('div');
+      card.className = "ost-card";
+      card.innerHTML = `
+        <div class="ost-card-head">
+          <span class="ost-card-name">${r.outlet}</span>
+          <span class="ost-card-date">${fmtDate(r.latest.dateObj)}</span>
+        </div>
+        <div class="ost-card-num ${r.numClass}">${r.coalLatest}<small> מנדטים לקואליציה</small></div>
+        <div class="ost-card-trend ${r.trend ? r.trend.cls : 'flat'}">${r.trend ? `${r.trend.arrow} ${r.trend.txt} מהסקר הקודם` : 'אין סקר קודם להשוואה'}</div>
+        <div class="ost-card-maj">רוב אחרון: <b>${r.lastMajDate ? fmtDate(r.lastMajDate) : 'מעולם לא'}</b></div>
+      `;
+      grid.appendChild(card);
+    });
+
+    const target = document.getElementById('outletShareTemplate');
+    const canvas = await html2canvas(target, { scale:3, backgroundColor:'#F2F4F8', useCORS:true });
+    summaryDataUrl = canvas.toDataURL('image/png');
+
+    document.getElementById('summaryImg').src = summaryDataUrl;
+    document.getElementById('summaryModal').classList.add('open');
+  }catch(err){
+    console.error(err);
+    alert("לא הצלחנו להכין את התמונה. נסו שוב.");
+  }finally{
+    btn.disabled = false;
+    btn.innerHTML = origHtml;
+  }
 }
 
 // Ensure fonts are fully loaded before rendering to avoid fallback fonts in canvas
