@@ -80,6 +80,24 @@
   .pill:hover{color:var(--ink);}
   .pill.active{color:var(--ink);border-bottom-color:var(--gold);font-weight:700;}
 
+  /* Multi-select outlet chips — visually distinct from the single-select
+     underline tabs, since several can be active at once */
+  .outlet-pill{
+    border:1.5px solid var(--line);background:var(--paper-raised);
+    color:var(--ink-soft);padding:4px 12px;border-radius:6px;
+    font-family:var(--mono);font-weight:600;font-size:11px;letter-spacing:0.02em;
+    cursor:pointer;transition:all .15s ease;
+  }
+  .outlet-pill:hover{border-color:var(--ink);}
+  .outlet-pill.active{background:var(--gold);color:#fff;border-color:var(--gold);font-weight:700;}
+
+  .outlet-action{
+    border:none;background:transparent;color:var(--gold);
+    padding:4px 4px;font-family:var(--mono);font-weight:600;font-size:10.5px;letter-spacing:0.02em;
+    cursor:pointer;text-decoration:underline;text-underline-offset:2px;
+  }
+  .outlet-action:hover{color:var(--ink);}
+
   .context-line{
     font-size:12px;color:var(--ink-soft);margin:0 0 8px;
   }
@@ -241,6 +259,31 @@
     font-family:var(--mono);font-size:8px;font-weight:700;color:var(--gold);border:1px solid var(--gold);
     padding:0px 5px;border-radius:4px;white-space:nowrap;
   }
+
+  /* ---------- Outlet compare cards ---------- */
+  .outlet-compare-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:6px;
+  }
+  .outlet-card{
+    background:var(--paper-raised);border:1.5px solid var(--line);border-radius:10px;
+    padding:12px 15px;
+  }
+  .outlet-card-head{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-bottom:6px;}
+  .outlet-card-name{font-weight:700;font-size:13px;color:var(--ink);}
+  .outlet-card-date{font-family:var(--mono);font-size:10px;color:var(--ink-soft);}
+  .outlet-card-num{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:28px;line-height:1;}
+  .outlet-card-num.good{color:var(--good);}
+  .outlet-card-num.bad{color:var(--alert);}
+  .outlet-card-num.neutral{color:#6B7280;}
+  .outlet-card-num small{font-family:var(--mono);font-weight:600;font-size:11px;color:var(--ink-soft);}
+  .outlet-card-trend{font-size:11px;font-weight:600;margin-top:4px;}
+  .outlet-card-trend.up{color:var(--good);}
+  .outlet-card-trend.down{color:var(--alert);}
+  .outlet-card-trend.flat{color:var(--ink-soft);}
+  .outlet-card-maj{
+    font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);
+  }
+  .outlet-card-maj b{color:var(--ink);font-family:'Frank Ruhl Libre',serif;font-weight:800;font-size:13px;}
 
   /* ---------- House effect table ---------- */
   .house-effect-wrap{overflow-x:auto;}
@@ -489,12 +532,8 @@
 
     <div class="filterbar">
       <div class="filter-group">
-        <span class="glabel">כלי תקשורת:</span>
+        <span class="glabel">כלי תקשורת (בחירה מרובה):</span>
         <div class="pillbar" id="pillbar"></div>
-      </div>
-      <div class="filter-group">
-        <span class="glabel">טווח תאריכים:</span>
-        <div class="pillbar" id="rangebar"></div>
       </div>
     </div>
     <div class="context-line" id="contextLine"></div>
@@ -565,11 +604,25 @@
         <div class="eyebrow">מגמה לאורך זמן</div>
         <h2>סך הקואליציה או מפלגות נבחרות</h2>
       </div>
+      <div class="filter-group">
+        <span class="glabel">טווח תאריכים:</span>
+        <div class="pillbar" id="rangebar"></div>
+      </div>
     </div>
     <div class="chart-card">
       <div class="chart-controls" id="chartControls"></div>
       <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
     </div>
+
+    <!-- OUTLET COMPARE -->
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">השוואת ערוצים</div>
+        <h2>מנדטי הקואליציה בסקר האחרון של כל כלי תקשורת</h2>
+        <p>מציג תמיד את מנדטי הקואליציה בלבד (לא את שאר המפלגות), לפי כלי התקשורת שנבחרו למעלה — בלי קשר לטווח התאריכים. לכל כלי תקשורת: הסקר האחרון שלו, השינוי מול הסקר הקודם שלו, ומתי לאחרונה היה לקואליציה רוב לפי הסקרים שלו.</p>
+      </div>
+    </div>
+    <div class="outlet-compare-grid" id="outletCompareGrid"></div>
 
     <!-- HOUSE EFFECT -->
     <div class="section-head">
@@ -959,7 +1012,8 @@ function renderHouseEffect(){
   });
 }
 
-let currentOutlet = "הכל";
+let selectedOutlets = new Set();
+let allOutletsList = [];
 let currentRange = "3m";
 let lastState = null;
 
@@ -993,20 +1047,10 @@ function initDashboard(){
   spotlightParty = allPartiesList.includes("ישר!") ? "ישר!" : (allPartiesList[0] || null);
 
   const outlets = getOutlets();
-  const pillbar = document.getElementById('pillbar');
-  pillbar.innerHTML = "";
-  const allPill = document.createElement('button');
-  allPill.className = "pill active";
-  allPill.textContent = "כל הסקרים";
-  allPill.onclick = ()=>selectOutlet("הכל", allPill);
-  pillbar.appendChild(allPill);
-  outlets.forEach(o=>{
-    const btn = document.createElement('button');
-    btn.className = "pill";
-    btn.textContent = o;
-    btn.onclick = ()=>selectOutlet(o, btn);
-    pillbar.appendChild(btn);
-  });
+  allOutletsList = outlets;
+  selectedOutlets = new Set(outlets.filter(o=>!isExcludedByDefault(o)));
+  if(selectedOutlets.size===0) selectedOutlets = new Set(outlets); // safety net — never start empty
+  renderOutletPills();
 
   const rangebar = document.getElementById('rangebar');
   rangebar.innerHTML = "";
@@ -1024,11 +1068,70 @@ function initDashboard(){
   render();
 }
 
-function selectOutlet(outlet, btnEl){
-  currentOutlet = outlet;
-  document.querySelectorAll('#pillbar .pill').forEach(p=>p.classList.remove('active'));
-  btnEl.classList.add('active');
-  render();
+// Default outlet selection excludes ערוץ 14 / i24, and any outlet whose most
+// recent survey is a month or more old — a stale pollster shouldn't be in the
+// default view, though the user can still turn it back on manually.
+function isExcludedByDefault(outlet){
+  if(outlet.includes("i24") || outlet.includes("ערוץ 14")) return true;
+  if(allSurveys.length===0) return false;
+  const maxDate = allSurveys[allSurveys.length-1].dateObj;
+  const cutoff = new Date(maxDate);
+  cutoff.setMonth(cutoff.getMonth()-1);
+  const outletSurveys = allSurveys.filter(s=>s.outlet===outlet);
+  if(outletSurveys.length===0) return true;
+  const outletMaxDate = outletSurveys.reduce((max,s)=> s.dateObj>max ? s.dateObj : max, outletSurveys[0].dateObj);
+  return outletMaxDate < cutoff;
+}
+
+function renderOutletPills(){
+  const pillbar = document.getElementById('pillbar');
+  pillbar.innerHTML = "";
+
+  const allBtn = document.createElement('button');
+  allBtn.className = "outlet-action";
+  allBtn.textContent = "✓ סמן הכל";
+  allBtn.onclick = ()=>{
+    selectedOutlets = new Set(allOutletsList);
+    renderOutletPills();
+    render();
+  };
+  pillbar.appendChild(allBtn);
+
+  const clearBtn = document.createElement('button');
+  clearBtn.className = "outlet-action";
+  clearBtn.textContent = "✗ נקה סימון";
+  clearBtn.onclick = ()=>{
+    // keep the single most-recent outlet selected — an empty selection breaks the page
+    const fallback = allOutletsList.length ? [allOutletsList[0]] : [];
+    selectedOutlets = new Set(fallback);
+    renderOutletPills();
+    render();
+  };
+  pillbar.appendChild(clearBtn);
+
+  allOutletsList.forEach(o=>{
+    const btn = document.createElement('button');
+    const isOn = selectedOutlets.has(o);
+    btn.className = "outlet-pill" + (isOn ? " active" : "");
+    btn.innerHTML = (isOn ? "✓ " : "") + o;
+    btn.onclick = ()=>{
+      if(selectedOutlets.has(o)){
+        if(selectedOutlets.size > 1) selectedOutlets.delete(o); // keep at least one selected
+      }else{
+        selectedOutlets.add(o);
+      }
+      renderOutletPills();
+      render();
+    };
+    pillbar.appendChild(btn);
+  });
+}
+
+function outletScopeLabel(){
+  if(selectedOutlets.size === allOutletsList.length) return "כל כלי התקשורת";
+  const list = Array.from(selectedOutlets);
+  if(list.length <= 3) return list.join(" · ");
+  return `${list.length} כלי תקשורת נבחרים`;
 }
 
 function selectRange(range, btnEl){
@@ -1058,7 +1161,7 @@ function deltaParts(latestVal, baseAvg){
 
 function render(){
   let filtered = dateFiltered(allSurveys);
-  if(currentOutlet !== "הכל") filtered = filtered.filter(s=>s.outlet===currentOutlet);
+  filtered = filtered.filter(s=>selectedOutlets.has(s.outlet));
   if(filtered.length===0) return;
 
   const latest = filtered[filtered.length-1];
@@ -1071,12 +1174,13 @@ function render(){
 
   const rangeLabels = {all:"כל הזמן", "1m":"החודש האחרון", "3m":"3 החודשים האחרונים"};
   document.getElementById('pageTitle').textContent =
-    (currentOutlet==="הכל" ? "כל כלי התקשורת" : currentOutlet) + " · " + rangeLabels[currentRange];
+    outletScopeLabel() + " · " + rangeLabels[currentRange];
 
+  const allSelected = selectedOutlets.size === allOutletsList.length;
   document.getElementById('contextLine').innerHTML =
-    currentOutlet==="הכל"
+    allSelected
       ? `מוצגת תמונה כוללת מכל כלי התקשורת (${filtered.length} סקרים). ההשוואה למגמה מבוססת על <b>${baselineOutlet}</b> — כלי התקשורת שערך את הסקר האחרון.`
-      : `מוצגים רק סקרים של <b>${currentOutlet}</b> (${filtered.length} סקרים).`;
+      : `מוצגים רק סקרים של <b>${outletScopeLabel()}</b> (${filtered.length} סקרים).`;
 
   document.getElementById('metaDate').textContent = fmtDate(latest.dateObj);
   document.getElementById('metaSample').textContent = latest.respondents ? latest.respondents.toLocaleString('he-IL') : "—";
@@ -1141,6 +1245,9 @@ function render(){
   // ---- consecutive-surveys-without-majority streak (respects outlet filter, ignores date range) ----
   const streakInfo = renderStreakCard();
 
+  // ---- outlet compare cards (respects outlet filter, ignores date range) ----
+  renderOutletCompare();
+
   // ---- chyron headline ----
   const chyronTag = document.getElementById('chyronTag');
   const chyronText = document.getElementById('chyronText');
@@ -1165,10 +1272,48 @@ function trendParts(latestVal, prevVal){
   return {cls:"flat", arrow:"●", txt:"ללא שינוי", diff:0};
 }
 
+// Always all outlets, regardless of the top selectedOutlets/date filters —
+// this section exists specifically to compare every channel side by side.
+function renderOutletCompare(){
+  const container = document.getElementById('outletCompareGrid');
+  if(!container) return;
+  container.innerHTML = "";
+
+  allOutletsList.filter(o=>selectedOutlets.has(o)).forEach(outlet=>{
+    const pool = allSurveys.filter(s=>s.outlet===outlet).sort((a,b)=> b.dateObj - a.dateObj);
+    if(pool.length===0) return;
+    const latest = pool[0];
+    const prev = pool[1] || null;
+    const coalLatest = coalitionTotal(latest);
+    const coalPrev = prev ? coalitionTotal(prev) : null;
+    const trend = prev ? trendParts(coalLatest, coalPrev) : null;
+
+    let lastMajDate = null;
+    for(const s of pool){
+      if(coalitionTotal(s) >= THRESHOLD){ lastMajDate = s.dateObj; break; }
+    }
+
+    const numClass = coalLatest < THRESHOLD ? "bad" : coalLatest > THRESHOLD ? "good" : "neutral";
+
+    const card = document.createElement('div');
+    card.className = "outlet-card";
+    card.innerHTML = `
+      <div class="outlet-card-head">
+        <span class="outlet-card-name">${outlet}</span>
+        <span class="outlet-card-date">${fmtDate(latest.dateObj)}</span>
+      </div>
+      <div class="outlet-card-num ${numClass}">${coalLatest}<small> מנדטים לקואליציה</small></div>
+      <div class="outlet-card-trend ${trend ? trend.cls : 'flat'}">${trend ? `${trend.arrow} ${trend.txt} מהסקר הקודם` : 'אין סקר קודם להשוואה'}</div>
+      <div class="outlet-card-maj">רוב אחרון: <b>${lastMajDate ? fmtDate(lastMajDate) : 'מעולם לא'}</b></div>
+    `;
+    container.appendChild(card);
+  });
+}
+
 function computeStreakInfo(){
   // uses the outlet filter (if any) but ignores the date-range filter, per spec
-  const pool = currentOutlet==="הכל" ? allSurveys : allSurveys.filter(s=>s.outlet===currentOutlet);
-  const scopeText = currentOutlet==="הכל" ? "בכל הסקרים (כל כלי התקשורת)" : `בסקרי ${currentOutlet}`;
+  const pool = allSurveys.filter(s=>selectedOutlets.has(s.outlet));
+  const scopeText = selectedOutlets.size===allOutletsList.length ? "בכל הסקרים (כל כלי התקשורת)" : `בסקרי ${outletScopeLabel()}`;
 
   if(pool.length===0){
     return {empty:true, numText:"—", numClass:"", lastMajText:"—", subText:"אין נתונים זמינים", emphasis:false};
