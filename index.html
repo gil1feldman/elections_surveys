@@ -405,11 +405,22 @@
     max-height:92vh;overflow:auto;text-align:center;
   }
   .modal-box img{max-width:100%;border-radius:10px;border:1px solid var(--line);display:block;margin:0 auto 12px;}
-  .modal-actions{display:flex;gap:8px;justify-content:center;}
+  .modal-format-toggle{
+    display:flex;gap:8px;justify-content:center;margin-bottom:12px;
+  }
+  .format-pill{
+    border:1.5px solid var(--line);background:var(--paper-raised);color:var(--ink-soft);
+    padding:6px 16px;border-radius:999px;font-weight:700;font-size:12.5px;cursor:pointer;
+    font-family:'Assistant',sans-serif;transition:all .15s ease;
+  }
+  .format-pill.active{background:var(--gold);color:#fff;border-color:var(--gold);}
+  .format-pill:disabled{opacity:0.6;cursor:default;}
+  .modal-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
   .modal-actions button{
     border-radius:999px;padding:7px 18px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Assistant',sans-serif;
   }
   .modal-actions .download-btn{background:var(--ink);color:var(--paper);border:1.5px solid var(--ink);}
+  .modal-actions .share-btn{background:var(--gold);color:#fff;border:1.5px solid var(--gold);}
   .modal-actions .close-btn{background:var(--paper-raised);color:var(--ink);border:1.5px solid var(--line);}
 
   /* ---------- Off-screen template (PREMIUM DESIGN) ---------- */
@@ -522,6 +533,74 @@
 
   .st-footer-plain{
     text-align:center;font-family:var(--mono);font-size:17px;color:var(--ink-soft);margin-top:26px;padding-top:20px;border-top:1.5px solid var(--line);
+  }
+
+  /* ---------- Vertical "story" (9:16) share image ---------- */
+  #shareTemplateVertical{
+    position:fixed;left:-9999px;top:0;width:1080px;
+    background:var(--paper);
+    font-family:'Assistant',sans-serif;color:var(--ink);
+    padding:70px 60px;box-sizing:border-box;
+  }
+  .sv-logo{height:60px;width:auto;display:block;margin:0 auto 20px;}
+  .sv-title{
+    font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:44px;text-align:center;margin-bottom:40px;
+  }
+  .sv-gauge-wrap{
+    display:flex;flex-direction:column;align-items:center;
+    background:#FFFFFF;border:2px solid #E2E6EC;border-top:8px solid var(--gold);border-radius:20px;
+    padding:40px;margin-bottom:36px;
+  }
+  .sv-gauge-wrap canvas{width:100%;max-width:640px;display:block;margin:0 auto;}
+  .sv-status-pill{
+    margin-top:14px;padding:14px 36px;border-radius:999px;font-weight:800;font-size:28px;
+  }
+  .sv-status-pill.pass{background:#156B42;color:#fff;}
+  .sv-status-pill.fail{background:#A4352A;color:#fff;}
+  .sv-line{
+    text-align:center;font-size:26px;font-weight:700;padding:16px;margin-bottom:16px;
+    background:#FFFFFF;border:2px solid #E2E6EC;border-radius:14px;
+  }
+  .sv-line.up{color:#156B42;}
+  .sv-line.down{color:#A4352A;}
+  .sv-line.flat{color:var(--ink-soft);}
+  .sv-movers{
+    display:flex;gap:16px;margin-bottom:16px;
+    background:#FFFFFF;border:2px solid #E2E6EC;border-radius:14px;padding:22px;
+  }
+  .sv-movers-col{flex:1;min-width:0;}
+  .sv-movers-title{font-family:var(--mono);font-size:16px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.03em;}
+  .sv-movers-title.up{color:#156B42;}
+  .sv-movers-title.down{color:#A4352A;}
+  .sv-movers-row{display:flex;justify-content:space-between;gap:8px;font-size:19px;padding:5px 0;}
+  .sv-movers-row .mn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .sv-movers-row .mv{font-family:'Frank Ruhl Libre',serif;font-weight:800;font-size:20px;flex:none;}
+  .sv-movers-row.up .mv{color:#156B42;}
+  .sv-movers-row.down .mv{color:#A4352A;}
+  .sv-movers-empty{font-size:18px;color:var(--ink-soft);}
+  .sv-party-list{margin-top:0;display:flex;flex-direction:column;gap:12px;}
+  .sv-party-list-header{
+    display:flex;align-items:center;gap:14px;padding:0 22px;margin-top:24px;margin-bottom:10px;
+  }
+  .sv-header-spacer{width:20px;flex:none;}
+  .sv-header-name{flex:1;font-family:var(--mono);font-size:14px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.03em;}
+  .sv-header-num{width:80px;text-align:center;flex:none;font-family:var(--mono);font-size:14px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.02em;}
+  .sv-header-delta{width:180px;text-align:center;flex:none;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.01em;line-height:1.3;}
+  .sv-party-row{
+    display:flex;align-items:center;gap:14px;
+    background:#FFFFFF;border:2px solid #E2E6EC;border-radius:12px;padding:18px 22px;
+  }
+  .sv-party-row.coal{background:#EAF1FA;border-color:#C9D8ED;}
+  .sv-party-dot{width:20px;height:20px;border-radius:50%;flex:none;}
+  .sv-party-name{flex:1;font-weight:800;font-size:24px;}
+  .sv-party-num{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:32px;width:80px;text-align:center;flex:none;}
+  .sv-party-delta{font-weight:800;font-size:20px;flex:none;width:180px;text-align:center;}
+  .sv-party-delta.up{color:#156B42;}
+  .sv-party-delta.down{color:#A4352A;}
+  .sv-party-delta.flat{color:var(--ink-soft);}
+  .sv-footer{
+    text-align:center;font-family:var(--mono);font-size:17px;color:var(--ink-soft);
+    margin-top:36px;padding-top:22px;border-top:1.5px solid var(--line);
   }
 
   /* ---------- Outlet-compare share image: its own optimally-arranged grid ---------- */
@@ -742,8 +821,13 @@
 <!-- Summary image modal -->
 <div class="modal-overlay" id="summaryModal">
   <div class="modal-box">
+    <div class="modal-format-toggle" id="modalFormatToggle">
+      <button class="format-pill active" id="formatPostBtn" onclick="switchShareFormat('post')">פוסט (רוחב)</button>
+      <button class="format-pill" id="formatStoryBtn" onclick="switchShareFormat('story')">סטורי (אורך)</button>
+    </div>
     <img id="summaryImg" alt="תמונת סיכום">
     <div class="modal-actions">
+      <button class="share-btn" id="shareNativeBtn" onclick="shareSummaryImage()" style="display:none;">שיתוף</button>
       <button class="download-btn" onclick="downloadSummary()">הורדת תמונה</button>
       <button class="close-btn" onclick="closeSummaryModal()">סגירה</button>
     </div>
@@ -799,6 +883,31 @@
   </div>
 
   <div class="st-footer-plain">פיתוח: גיל פלדמן · x.com/feldman_gil</div>
+</div>
+
+<!-- Off-screen template for the vertical "story" (9:16) share format -->
+<div id="shareTemplateVertical">
+  <img id="brandLogoShareV" class="sv-logo" alt="המצב הנתון">
+  <div class="sv-title" id="svPageTitle"></div>
+
+  <div class="sv-gauge-wrap">
+    <canvas id="svGaugeCanvas"></canvas>
+    <div class="sv-status-pill" id="svStatus"></div>
+  </div>
+
+  <div class="sv-line" id="svTrendLine"></div>
+  <div class="sv-movers" id="svMoversBox"></div>
+  <div class="sv-line" id="svStreakLine"></div>
+
+  <div class="sv-party-list-header">
+    <span class="sv-header-spacer"></span>
+    <span class="sv-header-name">מפלגה</span>
+    <span class="sv-header-num">מנדטים</span>
+    <span class="sv-header-delta">שינוי ביחס ל-5 הסקרים האחרונים</span>
+  </div>
+  <div class="sv-party-list" id="svPartyList"></div>
+
+  <div class="sv-footer">פיתוח: גיל פלדמן · x.com/feldman_gil</div>
 </div>
 
 <!-- Off-screen template for the outlet-compare image (own optimal grid layout) -->
@@ -1260,8 +1369,8 @@ function render(){
   const allSelected = selectedOutlets.size === allOutletsList.length;
   document.getElementById('contextLine').innerHTML =
     allSelected
-      ? `מוצגת תמונה כוללת מכל כלי התקשורת (${filtered.length} סקרים). ההשוואה למגמה מבוססת על <b>${baselineOutlet}</b> — כלי התקשורת שערך את הסקר האחרון.`
-      : `מוצגים רק סקרים של <b>${outletScopeLabel()}</b> (${filtered.length} סקרים).`;
+      ? `מוצגת תמונה כוללת מכל כלי התקשורת. ההשוואה למגמה מבוססת על <b>${baselineOutlet}</b> — כלי התקשורת שערך את הסקר האחרון.`
+      : `מוצגים רק סקרים של <b>${outletScopeLabel()}</b>.`;
 
   document.getElementById('metaDate').textContent = fmtDate(latest.dateObj);
   document.getElementById('metaOutlet').textContent = latest.outlet;
@@ -1764,87 +1873,169 @@ function renderSpotlightTable(){
 let summaryDataUrl = null;
 let summaryFilenamePrefix = "coalition-summary";
 
+let currentShareFormat = 'post';
+
 async function prepareSummary(){
   summaryFilenamePrefix = "coalition-summary";
   if(!lastState){ return; }
   const btn = document.getElementById('summaryBtn');
   btn.disabled = true;
-  btn.textContent = "מכין תמונה...";
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = "מכין תמונה...";
 
   try{
-    const { latest, coalSeats, statusText, statusClass, captionText, coalTrend, prevSurvey, moverRows, rows, streakInfo } = lastState;
-
-    document.getElementById('brandLogoShare').src = LOGO_DATA_URI;
-    document.getElementById('stPageTitle').textContent = `נתוני הסקרים של ${latest.outlet}`;
-
-    // gauge mini-card
-    document.getElementById('stGaugeMeta').innerHTML =
-      `<span><b>${latest.outlet}</b></span><span><b>${fmtDate(latest.dateObj)}</b></span>`;
-    document.getElementById('stGaugeSentence').innerHTML =
-      `לקואליציה (ש״ס · הציונות הדתית · עוצמה יהודית · הליכוד · יהדות התורה) <b>${coalSeats} מנדטים</b>`;
-    drawGaugeCanvas('stGaugeCanvas', coalSeats);
-    document.getElementById('stGaugeCaption').textContent = captionText;
-    const stStatus = document.getElementById('stStatus');
-    stStatus.className = "st-status-pill " + statusClass;
-    stStatus.textContent = statusText;
-
-    // trend mini-card
-    const stTrendBig = document.getElementById('stTrendBig');
-    const stTrendSub = document.getElementById('stTrendSub');
-    const stMovers = document.getElementById('stMoversBox');
-    if(coalTrend){
-      stTrendBig.className = "st-trend-big " + coalTrend.cls;
-      stTrendBig.textContent = `${coalTrend.arrow} ${coalTrend.txt}`;
-      stTrendSub.textContent = `סך הקואליציה לעומת הסקר הקודם של ${latest.outlet} (${fmtDate(prevSurvey.dateObj)})`;
-      const {risers, fallers} = computeRisersFallers(moverRows);
-      stMovers.innerHTML = buildMoversHtml(risers, fallers, "st-movers-row", "st-movers-col", "st-movers-title", "st-movers-empty");
-    }else{
-      stTrendBig.className = "st-trend-big flat";
-      stTrendBig.textContent = "אין סקר קודם להשוואה";
-      stTrendSub.textContent = "";
-      stMovers.innerHTML = "";
-    }
-
-    // streak mini-card
-    const stStreakMini = document.getElementById('stStreakMini');
-    stStreakMini.className = "st-mini-card st-streak-mini" + (streakInfo.numClass==="bad" ? " state-bad" : streakInfo.numClass==="good" ? " state-good" : "");
-    const stStreakNum = document.getElementById('stStreakNumber');
-    stStreakNum.className = "st-streak-number" + (streakInfo.numClass ? " " + streakInfo.numClass : "");
-    stStreakNum.textContent = streakInfo.numText;
-    document.getElementById('stStreakLastMajority').textContent = streakInfo.lastMajText;
-    const stStreakSub = document.getElementById('stStreakSub');
-    stStreakSub.className = "st-streak-sub" + (streakInfo.emphasis ? " emphasis" : "");
-    stStreakSub.textContent = streakInfo.subText;
-
-    // party breakdown table
-    const tbody = document.getElementById('stPartyBody');
-    tbody.innerHTML = "";
-    rows.forEach(r=>{
-      const d = deltaParts(r.latestVal, r.baseAvg);
-      const tr = document.createElement('tr');
-      if(isCoalition(r.party)) tr.className = "coal-row";
-      tr.innerHTML = `
-        <td class="pname-cell"><span class="pdot" style="background:${colorFor(r.party)}"></span>${r.party} ${isCoalition(r.party) ? '<span class="coal-tag">קואליציה</span>' : ''}</td>
-        <td class="num">${r.latestVal}</td>
-        <td class="avg">${r.baseAvg!==null ? r.baseAvg.toFixed(1) : '—'}</td>
-        <td><span class="delta ${d.cls}">${d.arrow} ${d.txt}</span></td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-    const target = document.getElementById('shareTemplate');
-    const canvas = await html2canvas(target, { scale:3, backgroundColor:'#F2F4F8', useCORS:true });
-    summaryDataUrl = canvas.toDataURL('image/png');
-
-    document.getElementById('summaryImg').src = summaryDataUrl;
-    document.getElementById('summaryModal').classList.add('open');
+    document.getElementById('modalFormatToggle').style.display = 'flex';
+    await renderShareFormat('post');
   }catch(err){
     console.error(err);
     alert("לא הצלחנו להכין את התמונה. נסו שוב.");
   }finally{
     btn.disabled = false;
-    btn.textContent = "🖼 הכן סיכום לפרסום";
+    btn.innerHTML = origHtml;
   }
+}
+
+function populateHorizontalShare(){
+  const { latest, coalSeats, statusText, statusClass, captionText, coalTrend, prevSurvey, moverRows, rows, streakInfo } = lastState;
+
+  document.getElementById('brandLogoShare').src = LOGO_DATA_URI;
+  document.getElementById('stPageTitle').textContent = `נתוני הסקרים של ${latest.outlet}`;
+
+  // gauge mini-card
+  document.getElementById('stGaugeMeta').innerHTML =
+    `<span><b>${latest.outlet}</b></span><span><b>${fmtDate(latest.dateObj)}</b></span>`;
+  document.getElementById('stGaugeSentence').innerHTML =
+    `לקואליציה (ש״ס · הציונות הדתית · עוצמה יהודית · הליכוד · יהדות התורה) <b>${coalSeats} מנדטים</b>`;
+  drawGaugeCanvas('stGaugeCanvas', coalSeats);
+  document.getElementById('stGaugeCaption').textContent = captionText;
+  const stStatus = document.getElementById('stStatus');
+  stStatus.className = "st-status-pill " + statusClass;
+  stStatus.textContent = statusText;
+
+  // trend mini-card
+  const stTrendBig = document.getElementById('stTrendBig');
+  const stTrendSub = document.getElementById('stTrendSub');
+  const stMovers = document.getElementById('stMoversBox');
+  if(coalTrend){
+    stTrendBig.className = "st-trend-big " + coalTrend.cls;
+    stTrendBig.textContent = `${coalTrend.arrow} ${coalTrend.txt}`;
+    stTrendSub.textContent = `סך הקואליציה לעומת הסקר הקודם של ${latest.outlet} (${fmtDate(prevSurvey.dateObj)})`;
+    const {risers, fallers} = computeRisersFallers(moverRows);
+    stMovers.innerHTML = buildMoversHtml(risers, fallers, "st-movers-row", "st-movers-col", "st-movers-title", "st-movers-empty");
+  }else{
+    stTrendBig.className = "st-trend-big flat";
+    stTrendBig.textContent = "אין סקר קודם להשוואה";
+    stTrendSub.textContent = "";
+    stMovers.innerHTML = "";
+  }
+
+  // streak mini-card
+  const stStreakMini = document.getElementById('stStreakMini');
+  stStreakMini.className = "st-mini-card st-streak-mini" + (streakInfo.numClass==="bad" ? " state-bad" : streakInfo.numClass==="good" ? " state-good" : "");
+  const stStreakNum = document.getElementById('stStreakNumber');
+  stStreakNum.className = "st-streak-number" + (streakInfo.numClass ? " " + streakInfo.numClass : "");
+  stStreakNum.textContent = streakInfo.numText;
+  document.getElementById('stStreakLastMajority').textContent = streakInfo.lastMajText;
+  const stStreakSub = document.getElementById('stStreakSub');
+  stStreakSub.className = "st-streak-sub" + (streakInfo.emphasis ? " emphasis" : "");
+  stStreakSub.textContent = streakInfo.subText;
+
+  // party breakdown table
+  const tbody = document.getElementById('stPartyBody');
+  tbody.innerHTML = "";
+  rows.forEach(r=>{
+    const d = deltaParts(r.latestVal, r.baseAvg);
+    const tr = document.createElement('tr');
+    if(isCoalition(r.party)) tr.className = "coal-row";
+    tr.innerHTML = `
+      <td class="pname-cell"><span class="pdot" style="background:${colorFor(r.party)}"></span>${r.party} ${isCoalition(r.party) ? '<span class="coal-tag">קואליציה</span>' : ''}</td>
+      <td class="num">${r.latestVal}</td>
+      <td class="avg">${r.baseAvg!==null ? r.baseAvg.toFixed(1) : '—'}</td>
+      <td><span class="delta ${d.cls}">${d.arrow} ${d.txt}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function populateVerticalShare(){
+  const { latest, coalSeats, statusText, statusClass, coalTrend, moverRows, streakInfo, rows } = lastState;
+
+  document.getElementById('brandLogoShareV').src = LOGO_DATA_URI;
+  document.getElementById('svPageTitle').textContent = `נתוני הסקרים של ${latest.outlet}`;
+  drawGaugeCanvas('svGaugeCanvas', coalSeats);
+
+  const st = document.getElementById('svStatus');
+  st.className = "sv-status-pill " + statusClass;
+  st.textContent = statusText;
+
+  const trendLine = document.getElementById('svTrendLine');
+  const moversBox = document.getElementById('svMoversBox');
+  if(coalTrend){
+    trendLine.className = "sv-line " + coalTrend.cls;
+    trendLine.textContent = `${coalTrend.arrow} ${coalTrend.txt} מהסקר הקודם`;
+    const {risers, fallers} = computeRisersFallers(moverRows);
+    moversBox.innerHTML = buildMoversHtml(risers, fallers, "sv-movers-row", "sv-movers-col", "sv-movers-title", "sv-movers-empty");
+  }else{
+    trendLine.className = "sv-line flat";
+    trendLine.textContent = "אין סקר קודם להשוואה";
+    moversBox.innerHTML = "";
+  }
+
+  const streakLine = document.getElementById('svStreakLine');
+  streakLine.className = "sv-line " + (streakInfo.numClass || "flat");
+  streakLine.textContent = streakInfo.emphasis
+    ? streakInfo.subText
+    : (streakInfo.numText!=="0"
+        ? `${streakInfo.numText} סקרים ברצף ללא רוב · רוב אחרון: ${streakInfo.lastMajText}`
+        : `רוב אחרון: ${streakInfo.lastMajText}`);
+
+  const list = document.getElementById('svPartyList');
+  list.innerHTML = "";
+  rows.forEach(r=>{
+    const d = deltaParts(r.latestVal, r.baseAvg);
+    const row = document.createElement('div');
+    row.className = "sv-party-row" + (isCoalition(r.party) ? " coal" : "");
+    row.innerHTML = `
+      <span class="sv-party-dot" style="background:${colorFor(r.party)}"></span>
+      <span class="sv-party-name">${r.party}</span>
+      <span class="sv-party-num">${r.latestVal}</span>
+      <span class="sv-party-delta ${d.cls}">${d.arrow} ${d.txt}</span>
+    `;
+    list.appendChild(row);
+  });
+}
+
+async function renderShareFormat(format){
+  currentShareFormat = format;
+  const postBtn = document.getElementById('formatPostBtn');
+  const storyBtn = document.getElementById('formatStoryBtn');
+  if(postBtn) postBtn.classList.toggle('active', format==='post');
+  if(storyBtn) storyBtn.classList.toggle('active', format==='story');
+
+  let canvas;
+  if(format === 'story'){
+    populateVerticalShare();
+    canvas = await html2canvas(document.getElementById('shareTemplateVertical'), { scale:3, backgroundColor:'#F2F4F8', useCORS:true });
+  }else{
+    populateHorizontalShare();
+    canvas = await html2canvas(document.getElementById('shareTemplate'), { scale:3, backgroundColor:'#F2F4F8', useCORS:true });
+  }
+  summaryDataUrl = canvas.toDataURL('image/png');
+  document.getElementById('summaryImg').src = summaryDataUrl;
+  document.getElementById('summaryModal').classList.add('open');
+  refreshShareButtonVisibility();
+}
+
+function switchShareFormat(format){
+  if(format === currentShareFormat) return;
+  const btns = document.querySelectorAll('.format-pill');
+  btns.forEach(b=>b.disabled = true);
+  renderShareFormat(format).catch(err=>{
+    console.error(err);
+    alert("לא הצלחנו להכין את התמונה. נסו שוב.");
+  }).finally(()=>{
+    btns.forEach(b=>b.disabled = false);
+  });
 }
 
 function downloadSummary(){
@@ -1853,6 +2044,31 @@ function downloadSummary(){
   a.href = summaryDataUrl;
   a.download = summaryFilenamePrefix + "-" + new Date().toISOString().slice(0,10) + ".png";
   a.click();
+}
+
+// Native share sheet on supporting devices (mostly mobile) — falls back to
+// a plain download anywhere it isn't available or fails/gets cancelled.
+async function shareSummaryImage(){
+  if(!summaryDataUrl) return;
+  try{
+    const res = await fetch(summaryDataUrl);
+    const blob = await res.blob();
+    const file = new File([blob], summaryFilenamePrefix + ".png", {type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:'המצב הנתון', text:'תמונת מצב סקרי מנדטים'});
+      return;
+    }
+  }catch(err){
+    if(err && err.name === 'AbortError') return; // user closed the share sheet — not an error
+    console.error(err);
+  }
+  downloadSummary();
+}
+
+function refreshShareButtonVisibility(){
+  const shareBtn = document.getElementById('shareNativeBtn');
+  if(!shareBtn) return;
+  shareBtn.style.display = (typeof navigator.share === 'function') ? 'inline-flex' : 'none';
 }
 
 function closeSummaryModal(){
@@ -1867,6 +2083,7 @@ async function prepareOutletSummary(){
   btn.innerHTML = "מכין תמונה...";
 
   try{
+    document.getElementById('modalFormatToggle').style.display = 'none';
     document.getElementById('brandLogoOutletShare').src = LOGO_DATA_URI;
     const rows = computeOutletCompareRows();
     const grid = document.getElementById('ostGrid');
@@ -1899,6 +2116,7 @@ async function prepareOutletSummary(){
 
     document.getElementById('summaryImg').src = summaryDataUrl;
     document.getElementById('summaryModal').classList.add('open');
+    refreshShareButtonVisibility();
   }catch(err){
     console.error(err);
     alert("לא הצלחנו להכין את התמונה. נסו שוב.");
