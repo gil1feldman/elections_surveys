@@ -1248,7 +1248,12 @@ function initDashboard(){
 
   const outlets = getOutlets();
   allOutletsList = outlets;
-  selectedOutlets = new Set(outlets.filter(o=>!isExcludedByDefault(o)));
+  // Default: only the outlet that ran the single most-recent survey overall —
+  // the clearest, least ambiguous "what's the news right now" starting point.
+  // User can still turn on more outlets manually via the chips.
+  selectedOutlets = allSurveys.length
+    ? new Set([allSurveys[allSurveys.length-1].outlet])
+    : new Set(outlets);
   if(selectedOutlets.size===0) selectedOutlets = new Set(outlets); // safety net — never start empty
   renderOutletPills();
 
@@ -1266,21 +1271,6 @@ function initDashboard(){
   renderSpotlightPills();
   renderHouseEffect();
   render();
-}
-
-// Default outlet selection excludes ערוץ 14 / i24, and any outlet whose most
-// recent survey is a month or more old — a stale pollster shouldn't be in the
-// default view, though the user can still turn it back on manually.
-function isExcludedByDefault(outlet){
-  if(outlet.includes("i24") || outlet.includes("ערוץ 14")) return true;
-  if(allSurveys.length===0) return false;
-  const maxDate = allSurveys[allSurveys.length-1].dateObj;
-  const cutoff = new Date(maxDate);
-  cutoff.setMonth(cutoff.getMonth()-1);
-  const outletSurveys = allSurveys.filter(s=>s.outlet===outlet);
-  if(outletSurveys.length===0) return true;
-  const outletMaxDate = outletSurveys.reduce((max,s)=> s.dateObj>max ? s.dateObj : max, outletSurveys[0].dateObj);
-  return outletMaxDate < cutoff;
 }
 
 function renderOutletPills(){
@@ -1893,8 +1883,8 @@ function buildMainShareText(){
   const {risers, fallers} = computeRisersFallers(moverRows);
   if(risers.length || fallers.length){
     text += `\n📊 השינויים מהסקר הקודם:\n`;
-    risers.forEach(r=>{ text += `🔺 ${r.party} +${r.d}\n`; });
-    fallers.forEach(r=>{ text += `🔻 ${r.party} ${r.d}\n`; });
+    risers.forEach(r=>{ text += `🟢 ${r.party} +${r.d}\n`; });
+    fallers.forEach(r=>{ text += `🔴 ${r.party} ${r.d}\n`; });
   }else{
     text += `\n↔️ אין שינוי מהסקר הקודם.\n`;
   }
