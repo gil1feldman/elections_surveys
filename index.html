@@ -421,6 +421,7 @@
   }
   .modal-actions .download-btn{background:var(--ink);color:var(--paper);border:1.5px solid var(--ink);}
   .modal-actions .share-btn{background:var(--gold);color:#fff;border:1.5px solid var(--gold);}
+  .modal-actions .copy-btn{background:var(--paper-raised);color:var(--gold);border:1.5px solid var(--gold);}
   .modal-actions .close-btn{background:var(--paper-raised);color:var(--ink);border:1.5px solid var(--line);}
 
   /* ---------- Off-screen template (PREMIUM DESIGN) ---------- */
@@ -828,6 +829,7 @@
     <img id="summaryImg" alt="תמונת סיכום">
     <div class="modal-actions">
       <button class="share-btn" id="shareNativeBtn" onclick="shareSummaryImage()" style="display:none;">שיתוף</button>
+      <button class="copy-btn" id="copyTextBtn" onclick="copyShareText()">העתקת טקסט לשיתוף</button>
       <button class="download-btn" onclick="downloadSummary()">הורדת תמונה</button>
       <button class="close-btn" onclick="closeSummaryModal()">סגירה</button>
     </div>
@@ -1874,8 +1876,34 @@ let summaryDataUrl = null;
 let summaryFilenamePrefix = "coalition-summary";
 
 let currentShareFormat = 'post';
+let currentShareKind = 'main';
+const DASHBOARD_URL = "https://gil1feldman.github.io/elections_surveys/";
+
+function buildMainShareText(){
+  const { latest, coalSeats, moverRows } = lastState;
+  let text = `הנה תמונת המנדטים בסקר של ${latest.outlet} מתאריך ${fmtDate(latest.dateObj)}.\nלקואליציה יש ${coalSeats} מנדטים.\n`;
+  const {risers, fallers} = computeRisersFallers(moverRows);
+  if(risers.length || fallers.length){
+    text += `השינויים מהסקר הקודם:\n`;
+    risers.forEach(r=>{ text += `▲ ${r.party} +${r.d}\n`; });
+    fallers.forEach(r=>{ text += `▼ ${r.party} ${r.d}\n`; });
+  }else{
+    text += `אין שינוי מהסקר הקודם.\n`;
+  }
+  text += `\nלדשבורד המלא: ${DASHBOARD_URL}`;
+  return text;
+}
+
+function buildOutletShareText(){
+  return `תמונת מצב במנדטי הקואליציה, לפי כלי התקשורת.\n\nלדשבורד המלא: ${DASHBOARD_URL}`;
+}
+
+function currentShareText(){
+  return currentShareKind === 'outlet' ? buildOutletShareText() : buildMainShareText();
+}
 
 async function prepareSummary(){
+  currentShareKind = 'main';
   summaryFilenamePrefix = "coalition-summary";
   if(!lastState){ return; }
   const btn = document.getElementById('summaryBtn');
@@ -2055,7 +2083,7 @@ async function shareSummaryImage(){
     const blob = await res.blob();
     const file = new File([blob], summaryFilenamePrefix + ".png", {type:'image/png'});
     if(navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share({files:[file], title:'המצב הנתון', text:'תמונת מצב סקרי מנדטים'});
+      await navigator.share({files:[file], title:'המצב הנתון', text: currentShareText()});
       return;
     }
   }catch(err){
@@ -2071,11 +2099,25 @@ function refreshShareButtonVisibility(){
   shareBtn.style.display = (typeof navigator.share === 'function') ? 'inline-flex' : 'none';
 }
 
+async function copyShareText(){
+  const btn = document.getElementById('copyTextBtn');
+  const origLabel = btn.textContent;
+  try{
+    await navigator.clipboard.writeText(currentShareText());
+    btn.textContent = "הועתק!";
+  }catch(err){
+    console.error(err);
+    btn.textContent = "לא הצלחנו להעתיק";
+  }
+  setTimeout(()=>{ btn.textContent = origLabel; }, 1600);
+}
+
 function closeSummaryModal(){
   document.getElementById('summaryModal').classList.remove('open');
 }
 
 async function prepareOutletSummary(){
+  currentShareKind = 'outlet';
   summaryFilenamePrefix = "outlet-compare";
   const btn = document.getElementById('outletSummaryBtn');
   btn.disabled = true;
