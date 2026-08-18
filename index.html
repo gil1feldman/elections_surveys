@@ -421,7 +421,6 @@
   }
   .modal-actions .download-btn{background:var(--ink);color:var(--paper);border:1.5px solid var(--ink);}
   .modal-actions .share-btn{background:var(--gold);color:#fff;border:1.5px solid var(--gold);}
-  .modal-actions .copy-btn{background:var(--paper-raised);color:var(--gold);border:1.5px solid var(--gold);}
   .modal-actions .close-btn{background:var(--paper-raised);color:var(--ink);border:1.5px solid var(--line);}
 
   /* ---------- Off-screen template (PREMIUM DESIGN) ---------- */
@@ -665,10 +664,19 @@
 
   <div id="dashboard">
 
-    <div class="filterbar">
-      <div class="filter-group">
-        <span class="glabel">כלי תקשורת (בחירה מרובה):</span>
-        <div class="pillbar" id="pillbar"></div>
+    <button class="advanced-toggle-bar" id="outletToggleBar" onclick="toggleOutletFilter()">
+      <span class="advanced-toggle-label">
+        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        כלי תקשורת
+      </span>
+      <span class="advanced-toggle-sub" id="outletToggleSub"></span>
+    </button>
+    <div class="advanced-content" id="outletFilterContent">
+      <div class="filterbar">
+        <div class="filter-group">
+          <span class="glabel">כלי תקשורת (בחירה מרובה):</span>
+          <div class="pillbar" id="pillbar"></div>
+        </div>
       </div>
     </div>
     <div class="context-line" id="contextLine"></div>
@@ -829,7 +837,6 @@
     <img id="summaryImg" alt="תמונת סיכום">
     <div class="modal-actions">
       <button class="share-btn" id="shareNativeBtn" onclick="shareSummaryImage()" style="display:none;">שיתוף</button>
-      <button class="copy-btn" id="copyTextBtn" onclick="copyShareText()">העתקת טקסט לשיתוף</button>
       <button class="download-btn" onclick="downloadSummary()">הורדת תמונה</button>
       <button class="close-btn" onclick="closeSummaryModal()">סגירה</button>
     </div>
@@ -1367,6 +1374,7 @@ function render(){
   const prevSurvey = baselinePool.length ? baselinePool[0] : null;
 
   document.getElementById('pageTitle').textContent = outletScopeLabel();
+  document.getElementById('outletToggleSub').textContent = outletScopeLabel();
 
   const allSelected = selectedOutlets.size === allOutletsList.length;
   document.getElementById('contextLine').innerHTML =
@@ -1881,21 +1889,21 @@ const DASHBOARD_URL = "https://gil1feldman.github.io/elections_surveys/";
 
 function buildMainShareText(){
   const { latest, coalSeats, moverRows } = lastState;
-  let text = `הנה תמונת המנדטים בסקר של ${latest.outlet} מתאריך ${fmtDate(latest.dateObj)}.\nלקואליציה יש ${coalSeats} מנדטים.\n`;
+  let text = `🗳️ הנה תמונת המנדטים בסקר של ${latest.outlet} מתאריך ${fmtDate(latest.dateObj)}.\n🏛️ לקואליציה יש ${coalSeats} מנדטים.\n`;
   const {risers, fallers} = computeRisersFallers(moverRows);
   if(risers.length || fallers.length){
-    text += `השינויים מהסקר הקודם:\n`;
-    risers.forEach(r=>{ text += `▲ ${r.party} +${r.d}\n`; });
-    fallers.forEach(r=>{ text += `▼ ${r.party} ${r.d}\n`; });
+    text += `\n📊 השינויים מהסקר הקודם:\n`;
+    risers.forEach(r=>{ text += `🔺 ${r.party} +${r.d}\n`; });
+    fallers.forEach(r=>{ text += `🔻 ${r.party} ${r.d}\n`; });
   }else{
-    text += `אין שינוי מהסקר הקודם.\n`;
+    text += `\n↔️ אין שינוי מהסקר הקודם.\n`;
   }
-  text += `\nלדשבורד המלא: ${DASHBOARD_URL}`;
+  text += `\n🔗 לדשבורד המלא: ${DASHBOARD_URL}`;
   return text;
 }
 
 function buildOutletShareText(){
-  return `תמונת מצב במנדטי הקואליציה, לפי כלי התקשורת.\n\nלדשבורד המלא: ${DASHBOARD_URL}`;
+  return `📊 תמונת מצב במנדטי הקואליציה, לפי כלי התקשורת.\n\n🔗 לדשבורד המלא: ${DASHBOARD_URL}`;
 }
 
 function currentShareText(){
@@ -2099,19 +2107,6 @@ function refreshShareButtonVisibility(){
   shareBtn.style.display = (typeof navigator.share === 'function') ? 'inline-flex' : 'none';
 }
 
-async function copyShareText(){
-  const btn = document.getElementById('copyTextBtn');
-  const origLabel = btn.textContent;
-  try{
-    await navigator.clipboard.writeText(currentShareText());
-    btn.textContent = "הועתק!";
-  }catch(err){
-    console.error(err);
-    btn.textContent = "לא הצלחנו להעתיק";
-  }
-  setTimeout(()=>{ btn.textContent = origLabel; }, 1600);
-}
-
 function closeSummaryModal(){
   document.getElementById('summaryModal').classList.remove('open');
 }
@@ -2185,13 +2180,29 @@ function toggleAdvanced(){
   try{ localStorage.setItem('advancedAnalysisOpen', isOpen ? '1' : '0'); }catch(e){}
 }
 
-// Restore the advanced-section open/closed state from last visit (default: closed)
+function toggleOutletFilter(){
+  const content = document.getElementById('outletFilterContent');
+  const bar = document.getElementById('outletToggleBar');
+  const isOpen = content.classList.toggle('open');
+  bar.classList.toggle('open', isOpen);
+  try{ localStorage.setItem('outletFilterOpen', isOpen ? '1' : '0'); }catch(e){}
+}
+
+// Restore the advanced-section / outlet-filter open/closed state from last
+// visit (default: closed for both — the outlet chip list otherwise pushed
+// everything below the fold on first load)
 (function initAdvancedToggleState(){
   let wasOpen = false;
   try{ wasOpen = localStorage.getItem('advancedAnalysisOpen') === '1'; }catch(e){}
   if(wasOpen){
     document.getElementById('advancedContent').classList.add('open');
     document.getElementById('advancedToggleBar').classList.add('open');
+  }
+  let outletWasOpen = false;
+  try{ outletWasOpen = localStorage.getItem('outletFilterOpen') === '1'; }catch(e){}
+  if(outletWasOpen){
+    document.getElementById('outletFilterContent').classList.add('open');
+    document.getElementById('outletToggleBar').classList.add('open');
   }
 })();
 </script>
