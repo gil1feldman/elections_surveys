@@ -1877,9 +1877,20 @@ let currentShareFormat = 'post';
 let currentShareKind = 'main';
 const DASHBOARD_URL = "https://gil1feldman.github.io/elections_surveys/";
 
+function relativeDateLabel(dateObj){
+  const now = new Date();
+  const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const diffDays = Math.round((startOfDay(now) - startOfDay(dateObj)) / 86400000);
+  if(diffDays === 0) return {relative:true, text:"היום"};
+  if(diffDays === 1) return {relative:true, text:"אתמול"};
+  return {relative:false, text:fmtDate(dateObj)};
+}
+
 function buildMainShareText(){
   const { latest, coalSeats, moverRows } = lastState;
-  let text = `🗳️ הנה תמונת המנדטים בסקר של ${latest.outlet} מתאריך ${fmtDate(latest.dateObj)}.\n🏛️ לקואליציה יש ${coalSeats} מנדטים.\n`;
+  const dl = relativeDateLabel(latest.dateObj);
+  const dateClause = dl.relative ? `מ${dl.text}` : `מתאריך ${dl.text}`;
+  let text = `🗳️ הנה תמונת המנדטים בסקר של ${latest.outlet} ${dateClause}.\n🏛️ לקואליציה יש ${coalSeats} מנדטים.\n`;
   const {risers, fallers} = computeRisersFallers(moverRows);
   if(risers.length || fallers.length){
     text += `\n📊 השינויים מהסקר הקודם:\n`;
@@ -1889,6 +1900,7 @@ function buildMainShareText(){
     text += `\n↔️ אין שינוי מהסקר הקודם.\n`;
   }
   text += `\n🔗 לדשבורד המלא: ${DASHBOARD_URL}`;
+  text += `\n\n⏳ לצפייה עוד כמה זמן נותר עד הבחירות ותזכורת למה הן הכי חשובות שהיו: https://www.hamatzav-hanatun.co.il/%D7%A1%D7%95%D7%A4%D7%A8%D7%99%D7%9D-%D7%9C%D7%91%D7%97%D7%99%D7%A8%D7%95%D7%AA`;
   return text;
 }
 
