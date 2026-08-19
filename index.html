@@ -323,6 +323,7 @@
   .chart-pill.coalition-pill{border-color:var(--gold);color:var(--gold);font-weight:700;}
   .chart-pill.coalition-pill.active{background:var(--gold);color:#fff;border-color:var(--gold);}
   .chart-wrap{position:relative;height:210px;}
+  .chart-wrap.oc-chart{height:320px;}
 
   /* ---------- Spotlight table ---------- */
   .spotlight-card{
@@ -796,6 +797,26 @@
       </table>
     </div>
 
+    <!-- OUTLET-PARTY COMPARISON CHART -->
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">השוואה גרפית בין כלי תקשורת</div>
+        <h2>ממוצע 5 הסקרים האחרונים לכל מפלגה, לפי כלי תקשורת</h2>
+        <p>מתייחס רק לסקרים מהחודשיים האחרונים, ומתוכם נלקחים 5 הסקרים האחרונים של כל כלי תקשורת. בחרו אילו מפלגות ואילו כלי תקשורת להציג — המפלגות מסודרות מהגבוה לנמוך לפי הממוצע שלהן בכלי התקשורת שנבחרו.</p>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="filter-group" style="margin-bottom:6px;">
+        <span class="glabel">מפלגות:</span>
+        <div class="chart-controls" id="ocPartyControls" style="margin-bottom:0;padding-bottom:0;border-bottom:none;"></div>
+      </div>
+      <div class="filter-group" style="margin-bottom:10px;">
+        <span class="glabel">כלי תקשורת:</span>
+        <div class="pillbar" id="ocOutletControls"></div>
+      </div>
+      <div class="chart-wrap oc-chart"><canvas id="outletCompareChart"></canvas></div>
+    </div>
+
     <!-- PARTY SPOTLIGHT TABLE -->
     <div class="section-head">
       <div>
@@ -1212,6 +1233,167 @@ function renderHouseEffect(){
   });
 }
 
+// ---------- Outlet × party comparison bar chart ----------
+let ocSelectedParties = new Set();
+let ocSelectedOutlets = new Set();
+let ocChartInstance = null;
+
+// Curated, high-contrast palette assigned by stable outlet order (not a hash)
+// so colors stay clearly distinguishable regardless of outlet name/length.
+const OUTLET_PALETTE = [
+  "#2456A6", "#C1483B", "#1F8A57", "#8E6BAF", "#D9822B",
+  "#0E7C66", "#B8860B", "#5C6BC0", "#C2478A", "#556B2F",
+  "#4A5FA0", "#A6552B"
+];
+function outletColorFor(outlet){
+  const idx = allOutletsList.indexOf(outlet);
+  if(idx>=0 && idx < OUTLET_PALETTE.length) return OUTLET_PALETTE[idx];
+  let h=0; for(let i=0;i<outlet.length;i++) h = (h*31 + outlet.charCodeAt(i)) % 360;
+  return `hsl(${h},55%,45%)`;
+}
+
+// Each outlet's own last-5-surveys average per party — independent of the
+// "active outlet" (≥5 surveys/6wks) restriction that the house-effect table
+// uses, since this chart is a general comparison tool, not a bias check.
+function computeOutletPartyAverages(){
+  const data = {};
+  const maxDate = allSurveys.length ? allSurveys[allSurveys.length-1].dateObj : null;
+  let twoMonthCutoff = null;
+  if(maxDate){
+    twoMonthCutoff = new Date(maxDate);
+    twoMonthCutoff.setMonth(twoMonthCutoff.getMonth()-2);
+  }
+  allOutletsList.forEach(outlet=>{
+    let pool = allSurveys.filter(s=>s.outlet===outlet);
+    if(twoMonthCutoff) pool = pool.filter(s=> s.dateObj >= twoMonthCutoff);
+    pool = pool.sort((a,b)=>b.dateObj-a.dateObj).slice(0,5);
+    const avgs = {};
+    allPartiesList.forEach(party=>{
+      const vals = pool.map(s=> s.parties[party]||0);
+      avgs[party] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+    });
+    data[outlet] = avgs;
+  });
+  return data;
+}
+
+// This chart's own default outlet selection — excludes ערוץ 16, ישראל היום,
+// and any stale outlet (no survey in the last month). i24 and ערוץ 14 are
+// no longer excluded here (previously were).
+function isStaleOrExcludedOutlet(outlet){
+  if(outlet.includes("ערוץ 16") || outlet.includes("ישראל היום")) return true;
+  if(allSurveys.length===0) return false;
+  const maxDate = allSurveys[allSurveys.length-1].dateObj;
+  const cutoff = new Date(maxDate);
+  cutoff.setMonth(cutoff.getMonth()-1);
+  const outletSurveys = allSurveys.filter(s=>s.outlet===outlet);
+  if(outletSurveys.length===0) return true;
+  const outletMaxDate = outletSurveys.reduce((max,s)=> s.dateObj>max ? s.dateObj : max, outletSurveys[0].dateObj);
+  return outletMaxDate < cutoff;
+}
+
+function initOutletCompareChart(){
+  ocSelectedOutlets = new Set(allOutletsList.filter(o=>!isStaleOrExcludedOutlet(o)));
+  if(ocSelectedOutlets.size===0) ocSelectedOutlets = new Set(allOutletsList);
+
+  // Default parties = the 6 biggest by average across the default outlets
+  const data = computeOutletPartyAverages();
+  const outlets = Array.from(ocSelectedOutlets);
+  const partyAvg = {};
+  allPartiesList.forEach(p=>{
+    const vals = outlets.map(o=> data[o][p]).filter(v=>v!==null);
+    partyAvg[p] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+  });
+  const topParties = allPartiesList.slice().sort((a,b)=> partyAvg[b]-partyAvg[a]).slice(0,6);
+  ocSelectedParties = new Set(topParties);
+
+  renderOcControls();
+  renderOutletCompareChart();
+}
+
+function renderOcControls(){
+  const partyBar = document.getElementById('ocPartyControls');
+  partyBar.innerHTML = "";
+  allPartiesList.forEach(party=>{
+    const btn = document.createElement('button');
+    const isOn = ocSelectedParties.has(party);
+    btn.className = "chart-pill" + (isOn ? " active" : "");
+    btn.innerHTML = `<span class="cdot" style="background:${colorFor(party)}"></span>${party}`;
+    btn.onclick = ()=>{
+      if(ocSelectedParties.has(party)) ocSelectedParties.delete(party);
+      else ocSelectedParties.add(party);
+      renderOcControls();
+      renderOutletCompareChart();
+    };
+    partyBar.appendChild(btn);
+  });
+
+  const outletBar = document.getElementById('ocOutletControls');
+  outletBar.innerHTML = "";
+  allOutletsList.forEach(outlet=>{
+    const btn = document.createElement('button');
+    const isOn = ocSelectedOutlets.has(outlet);
+    btn.className = "outlet-pill" + (isOn ? " active" : "");
+    btn.innerHTML = (isOn ? "✓ " : "") + outlet;
+    btn.onclick = ()=>{
+      if(ocSelectedOutlets.has(outlet)){
+        if(ocSelectedOutlets.size > 1) ocSelectedOutlets.delete(outlet);
+      }else{
+        ocSelectedOutlets.add(outlet);
+      }
+      renderOcControls();
+      renderOutletCompareChart();
+    };
+    outletBar.appendChild(btn);
+  });
+}
+
+function renderOutletCompareChart(){
+  const data = computeOutletPartyAverages();
+  const outlets = Array.from(ocSelectedOutlets);
+  let parties = Array.from(ocSelectedParties);
+
+  const partyAvg = {};
+  parties.forEach(p=>{
+    const vals = outlets.map(o=> data[o][p]).filter(v=>v!==null);
+    partyAvg[p] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+  });
+  parties = parties.sort((a,b)=> partyAvg[b]-partyAvg[a]);
+
+  const datasets = outlets.map(outlet=>({
+    label: outlet,
+    data: parties.map(p=> data[outlet][p]),
+    backgroundColor: outletColorFor(outlet)
+  }));
+
+  const ctx = document.getElementById('outletCompareChart').getContext('2d');
+  if(ocChartInstance) ocChartInstance.destroy();
+
+  if(parties.length===0 || outlets.length===0){
+    return;
+  }
+
+  ocChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: parties, datasets },
+    options: {
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{
+          position:'bottom', rtl:true,
+          labels:{ font:{family:'Assistant', weight:600, size:11}, boxWidth:10, usePointStyle:true }
+        },
+        tooltip:{ rtl:true, titleAlign:'right', bodyAlign:'right' }
+      },
+      scales:{
+        x:{ ticks:{ font:{family:'Assistant', size:11} }, grid:{ display:false } },
+        y:{ beginAtZero:true, ticks:{ font:{family:'Assistant', size:10} }, grid:{ color:'#EEEBE2' } }
+      }
+    }
+  });
+}
+
 let selectedOutlets = new Set();
 let allOutletsList = [];
 let currentRange = "3m";
@@ -1270,6 +1452,7 @@ function initDashboard(){
 
   renderSpotlightPills();
   renderHouseEffect();
+  initOutletCompareChart();
   render();
 }
 
