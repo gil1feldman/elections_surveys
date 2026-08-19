@@ -1568,10 +1568,10 @@ function render(){
   let statusText, statusClass;
   if(coalSeats >= THRESHOLD){
     statusClass = "pass";
-    statusText = `רוב קואליציוני — ${diff} מנדטים מעל הדרוש`;
+    statusText = `לקואליציה יש רוב — ${diff} מנדטים מעל הדרוש`;
   }else{
     statusClass = "fail";
-    statusText = `אין רוב — חסרים ${Math.abs(diff)} מנדטים ל-61`;
+    statusText = `לקואליציה אין רוב — חסרים לה ${Math.abs(diff)} מנדטים ל-61`;
   }
   statusEl.className = "gauge-status " + statusClass;
   statusEl.textContent = statusText;
@@ -1637,11 +1637,13 @@ function render(){
   lastState = { latest, coalSeats, statusText, statusClass, captionText, coalTrend, prevSurvey, moverRows, rows, streakInfo };
 }
 
+// Only ever called with coalition totals (never per-party), so it's safe to
+// name the coalition explicitly in the text.
 function trendParts(latestVal, prevVal){
   const d = latestVal - prevVal;
-  if(d > 0) return {cls:"up", arrow:"▲", txt:`עלייה של ${d} מנדטים`, diff:d};
-  if(d < 0) return {cls:"down", arrow:"▼", txt:`ירידה של ${Math.abs(d)} מנדטים`, diff:d};
-  return {cls:"flat", arrow:"●", txt:"ללא שינוי", diff:0};
+  if(d > 0) return {cls:"up", arrow:"▲", txt:`עלייה של ${d} מנדטים לקואליציה`, diff:d};
+  if(d < 0) return {cls:"down", arrow:"▼", txt:`ירידה של ${Math.abs(d)} מנדטים לקואליציה`, diff:d};
+  return {cls:"flat", arrow:"●", txt:"ללא שינוי בקואליציה", diff:0};
 }
 
 // Always all outlets, regardless of the top selectedOutlets/date filters —
