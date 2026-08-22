@@ -634,6 +634,42 @@
   }
   .ost-card-maj b{color:var(--ink);font-family:'Frank Ruhl Libre',serif;font-weight:800;font-size:19px;}
 
+  /* ---------- Weekly summary share image ---------- */
+  #weeklyShareTemplate{
+    position:fixed;left:-9999px;top:0;width:1080px;
+    background:var(--paper);
+    font-family:'Assistant',sans-serif;color:var(--ink);
+    padding:60px;box-sizing:border-box;
+  }
+  .ws-logo{height:64px;width:auto;display:block;margin:0 auto 20px;}
+  .ws-title{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:44px;text-align:center;margin-bottom:8px;}
+  .ws-subtitle{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--gold);text-align:center;margin-bottom:30px;}
+  .ws-card{background:#FFFFFF;border:2px solid #E2E6EC;border-radius:16px;padding:26px;margin-bottom:22px;}
+  .ws-eyebrow{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;text-align:center;}
+  .ws-heading{font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:24px;margin-bottom:20px;}
+  .ws-avg-wrap{text-align:center;padding:34px 26px;border-top:8px solid var(--gold);}
+  .ws-avg-num{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:108px;line-height:1;}
+  .ws-avg-caption{font-family:'Assistant',sans-serif;font-size:20px;color:var(--ink-soft);margin-top:12px;}
+  .ws-empty{font-size:18px;color:var(--ink-soft);text-align:center;}
+  .ws-footer{text-align:center;font-family:var(--mono);font-size:15px;color:var(--ink-soft);margin-top:10px;padding-top:18px;border-top:1.5px solid var(--line);}
+
+  /* bar-chart visual for the per-survey list */
+  .ws-bar-list{display:flex;flex-direction:column;gap:16px;}
+  .ws-bar-row{display:flex;align-items:center;gap:16px;}
+  .ws-bar-label{width:180px;flex:none;text-align:right;}
+  .ws-bar-outlet{font-weight:800;font-size:19px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ws-bar-date{font-family:var(--mono);font-size:13px;color:var(--ink-soft);margin-top:2px;}
+  .ws-bar-track{flex:1;position:relative;height:36px;background:var(--paper);border-radius:8px;overflow:hidden;}
+  .ws-bar-fill{position:absolute;top:0;right:0;height:100%;border-radius:8px;transition:none;}
+  .ws-bar-threshold{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);opacity:0.4;}
+  .ws-bar-threshold-label{position:absolute;top:-20px;font-family:var(--mono);font-size:11px;color:var(--ink-soft);transform:translateX(50%);}
+  .ws-bar-value{width:58px;flex:none;text-align:left;font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:26px;}
+
+  /* outlet picker shown inside the modal before the weekly image is built */
+  .ws-picker-title{font-weight:700;font-size:14px;margin-bottom:10px;text-align:center;color:var(--ink);}
+  #weeklyOutletPicker .pillbar{justify-content:center;margin-bottom:16px;}
+  .ws-picker-go{display:block;margin:0 auto;}
+
   #dashboard{display:none;}
 </style>
 </head>
@@ -646,6 +682,10 @@
       <h1 id="pageTitle">מעקב נתוני סקרים</h1>
     </div>
     <div class="header-right">
+      <button class="summary-btn small" id="weeklySummaryBtn" onclick="openWeeklyPicker()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+        סיכום שבועי
+      </button>
       <button class="summary-btn" id="summaryBtn" onclick="prepareSummary()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>
         הכן סיכום לפרסום
@@ -855,8 +895,13 @@
       <button class="format-pill active" id="formatPostBtn" onclick="switchShareFormat('post')">פוסט (רוחב)</button>
       <button class="format-pill" id="formatStoryBtn" onclick="switchShareFormat('story')">סטורי (אורך)</button>
     </div>
+    <div id="weeklyOutletPicker" style="display:none;">
+      <div class="ws-picker-title">בחר אילו כלי תקשורת לכלול בסיכום השבועי</div>
+      <div class="pillbar" id="weeklyOutletPills"></div>
+      <button class="download-btn ws-picker-go" onclick="generateWeeklyImage()">הכן תמונה</button>
+    </div>
     <img id="summaryImg" alt="תמונת סיכום">
-    <div class="modal-actions">
+    <div class="modal-actions" id="modalActions">
       <button class="share-btn" id="shareNativeBtn" onclick="shareSummaryImage()" style="display:none;">שיתוף</button>
       <button class="download-btn" onclick="downloadSummary()">הורדת תמונה</button>
       <button class="close-btn" onclick="closeSummaryModal()">סגירה</button>
@@ -946,6 +991,27 @@
   <div class="st-page-title">תמונת מצב בסקרי המנדטים האחרונים</div>
   <div class="ost-grid" id="ostGrid"></div>
   <div class="st-footer-plain">פיתוח: גיל פלדמן · x.com/feldman_gil</div>
+</div>
+
+<!-- Off-screen template for the weekly-summary share image -->
+<div id="weeklyShareTemplate">
+  <img id="brandLogoWeekly" class="ws-logo" alt="המצב הנתון">
+  <div class="ws-title">סיכום שבועי — סקרי המנדטים</div>
+  <div class="ws-subtitle" id="wsDateRange"></div>
+
+  <div class="ws-card ws-avg-wrap">
+    <div class="ws-eyebrow">ממוצע השבוע</div>
+    <div class="ws-avg-num" id="wsAvgNum"></div>
+    <div class="ws-avg-caption" id="wsAvgCaption"></div>
+  </div>
+
+  <div class="ws-card">
+    <div class="ws-eyebrow">השבוע הזה</div>
+    <div class="ws-heading">מנדטי הקואליציה בכל סקר, מהגבוה לנמוך</div>
+    <div class="ws-bar-list" id="wsSurveyList"></div>
+  </div>
+
+  <div class="ws-footer">פיתוח: גיל פלדמן · x.com/feldman_gil</div>
 </div>
 
 <script>
@@ -2093,8 +2159,160 @@ function buildOutletShareText(){
   return `📊 תמונת מצב במנדטי הקואליציה, לפי כלי התקשורת.\n\n🔗 לדשבורד המלא: ${DASHBOARD_URL}`;
 }
 
+// Sunday-Saturday week containing `anchor` (JS Date.getDay(): Sun=0..Sat=6)
+function weekRange(anchor){
+  const day = anchor.getDay();
+  const start = new Date(anchor);
+  start.setDate(anchor.getDate() - day);
+  start.setHours(0,0,0,0);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  end.setHours(23,59,59,999);
+  return {start, end};
+}
+
+let weeklySelectedOutlets = new Set();
+
+// Always uses the real current date (not the dataset's latest survey date);
+// outlet scope is whatever the user picked in the picker (defaults to all).
+// Sorted by coalition mandates, highest first, per spec.
+function computeWeeklySummaryData(){
+  const now = new Date();
+  const {start, end} = weekRange(now);
+  let inWeek = allSurveys.filter(s=> s.dateObj >= start && s.dateObj <= end && weeklySelectedOutlets.has(s.outlet));
+  inWeek = inWeek.sort((a,b)=> coalitionTotal(b) - coalitionTotal(a));
+
+  const coalVals = inWeek.map(s=> coalitionTotal(s));
+  const weekAvg = coalVals.length ? coalVals.reduce((a,b)=>a+b,0)/coalVals.length : null;
+
+  return {start, end, inWeek, weekAvg};
+}
+
+function buildWeeklyShareText(){
+  const data = computeWeeklySummaryData();
+  let text = `📅 סיכום שבועי — סקרי מנדטים (${fmtDate(data.start)} — ${fmtDate(data.end)})\n`;
+  if(data.weekAvg !== null){
+    text += `🏛️ ממוצע מנדטים לקואליציה השבוע: ${data.weekAvg.toFixed(1)}\n`;
+  }else{
+    text += `🏛️ לא בוצעו סקרים השבוע.\n`;
+  }
+  text += `\n🔗 לדשבורד המלא: ${DASHBOARD_URL}`;
+  return text;
+}
+
 function currentShareText(){
-  return currentShareKind === 'outlet' ? buildOutletShareText() : buildMainShareText();
+  if(currentShareKind === 'outlet') return buildOutletShareText();
+  if(currentShareKind === 'weekly') return buildWeeklyShareText();
+  return buildMainShareText();
+}
+
+function populateWeeklyShare(){
+  const data = computeWeeklySummaryData();
+  document.getElementById('brandLogoWeekly').src = LOGO_DATA_URI;
+  document.getElementById('wsDateRange').textContent = `${fmtDate(data.start)} — ${fmtDate(data.end)}`;
+
+  // average card (now the hero, at the top of the template)
+  const avgEl = document.getElementById('wsAvgNum');
+  const capEl = document.getElementById('wsAvgCaption');
+  if(data.weekAvg !== null){
+    const color = data.weekAvg<THRESHOLD ? "var(--alert)" : (data.weekAvg>THRESHOLD ? "var(--good)" : "var(--ink-soft)");
+    avgEl.style.color = color;
+    avgEl.textContent = data.weekAvg.toFixed(1);
+    const diff = data.weekAvg - THRESHOLD;
+    capEl.textContent = diff>=0
+      ? `מנדטים לקואליציה בממוצע — ${diff.toFixed(1)} מעל ה-61 הדרושים`
+      : `מנדטים לקואליציה בממוצע — חסרים ${Math.abs(diff).toFixed(1)} ל-61`;
+  }else{
+    avgEl.style.color = "var(--ink-soft)";
+    avgEl.textContent = "—";
+    capEl.textContent = "אין נתונים";
+  }
+
+  // per-survey horizontal bar chart, sorted high to low, with a 61-seat
+  // threshold marker running through every bar for visual reference
+  const list = document.getElementById('wsSurveyList');
+  list.innerHTML = "";
+  if(data.inWeek.length===0){
+    list.innerHTML = `<div class="ws-empty">לא בוצעו סקרים בשבוע זה עבור כלי התקשורת שנבחרו.</div>`;
+  }else{
+    const maxVal = Math.max(...data.inWeek.map(s=>coalitionTotal(s)), THRESHOLD) * 1.15;
+    const thresholdPct = (THRESHOLD / maxVal) * 100;
+    data.inWeek.forEach(s=>{
+      const seats = coalitionTotal(s);
+      const color = seats<THRESHOLD ? "var(--alert)" : (seats>THRESHOLD ? "var(--good)" : "var(--ink-soft)");
+      const pct = Math.max((seats / maxVal) * 100, 2);
+      const row = document.createElement('div');
+      row.className = "ws-bar-row";
+      row.innerHTML = `
+        <div class="ws-bar-label">
+          <div class="ws-bar-outlet">${s.outlet}</div>
+          <div class="ws-bar-date">${fmtDate(s.dateObj)}</div>
+        </div>
+        <div class="ws-bar-track">
+          <div class="ws-bar-fill" style="width:${pct}%;background:${color}"></div>
+          <div class="ws-bar-threshold" style="right:${thresholdPct}%"></div>
+        </div>
+        <div class="ws-bar-value" style="color:${color}">${seats}</div>
+      `;
+      list.appendChild(row);
+    });
+  }
+}
+
+function openWeeklyPicker(){
+  if(weeklySelectedOutlets.size === 0) weeklySelectedOutlets = new Set(allOutletsList);
+  document.getElementById('modalFormatToggle').style.display = 'none';
+  document.getElementById('weeklyOutletPicker').style.display = 'block';
+  document.getElementById('summaryImg').style.display = 'none';
+  document.getElementById('modalActions').style.display = 'none';
+  renderWeeklyOutletPills();
+  document.getElementById('summaryModal').classList.add('open');
+}
+
+function renderWeeklyOutletPills(){
+  const bar = document.getElementById('weeklyOutletPills');
+  bar.innerHTML = "";
+  allOutletsList.forEach(o=>{
+    const btn = document.createElement('button');
+    const isOn = weeklySelectedOutlets.has(o);
+    btn.className = "outlet-pill" + (isOn ? " active" : "");
+    btn.innerHTML = (isOn ? "✓ " : "") + o;
+    btn.onclick = ()=>{
+      if(weeklySelectedOutlets.has(o)){
+        if(weeklySelectedOutlets.size > 1) weeklySelectedOutlets.delete(o);
+      }else{
+        weeklySelectedOutlets.add(o);
+      }
+      renderWeeklyOutletPills();
+    };
+    bar.appendChild(btn);
+  });
+}
+
+async function generateWeeklyImage(){
+  currentShareKind = 'weekly';
+  summaryFilenamePrefix = "weekly-summary";
+  const goBtn = document.querySelector('.ws-picker-go');
+  goBtn.disabled = true;
+  const origLabel = goBtn.textContent;
+  goBtn.textContent = "מכין תמונה...";
+
+  try{
+    populateWeeklyShare();
+    const canvas = await html2canvas(document.getElementById('weeklyShareTemplate'), { scale:3, backgroundColor:'#F2F4F8', useCORS:true });
+    summaryDataUrl = canvas.toDataURL('image/png');
+    document.getElementById('summaryImg').src = summaryDataUrl;
+    document.getElementById('weeklyOutletPicker').style.display = 'none';
+    document.getElementById('summaryImg').style.display = 'block';
+    document.getElementById('modalActions').style.display = 'flex';
+    refreshShareButtonVisibility();
+  }catch(err){
+    console.error(err);
+    alert("לא הצלחנו להכין את התמונה. נסו שוב.");
+  }finally{
+    goBtn.disabled = false;
+    goBtn.textContent = origLabel;
+  }
 }
 
 async function prepareSummary(){
@@ -2296,6 +2514,10 @@ function refreshShareButtonVisibility(){
 
 function closeSummaryModal(){
   document.getElementById('summaryModal').classList.remove('open');
+  // reset picker-mode display overrides so the next open (any share kind) starts clean
+  document.getElementById('weeklyOutletPicker').style.display = 'none';
+  document.getElementById('summaryImg').style.display = 'block';
+  document.getElementById('modalActions').style.display = 'flex';
 }
 
 async function prepareOutletSummary(){
