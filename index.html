@@ -662,7 +662,6 @@
   .ws-bar-track{flex:1;position:relative;height:36px;background:var(--paper);border-radius:8px;overflow:hidden;}
   .ws-bar-fill{position:absolute;top:0;right:0;height:100%;border-radius:8px;transition:none;}
   .ws-bar-threshold{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);opacity:0.4;}
-  .ws-bar-threshold-label{position:absolute;top:-20px;font-family:var(--mono);font-size:11px;color:var(--ink-soft);transform:translateX(50%);}
   .ws-bar-value{width:58px;flex:none;text-align:left;font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:26px;}
 
   /* outlet picker shown inside the modal before the weekly image is built */
@@ -1019,7 +1018,7 @@ const CSV_URLS = [
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQK1m56FbAYwrjVs7MC5Ne994q6xX9erBYY20OW96ajLwE5IBhKwyoB6yDmYAUHgro8YZvHvcLMmd_/pub?gid=0&single=true&output=csv"
 ];
 
-const COALITION = ["ש״ס","הציונות הדתית","עוצמה יהודית","הליכוד","יהדות התורה"];
+const COALITION = ["ש״ס","הציונות הדתית","עוצמה יהודית","הליכוד","יהדות התורה","עמך ישראל"];
 const THRESHOLD = 61;
 const TOTAL_SEATS = 120;
 const BASELINE_WINDOW = 5;
@@ -1032,6 +1031,7 @@ const PARTY_COLORS = {
   "יהדות התורה":"#8B6914",
   "הציונות הדתית":"#D9822B",
   "עוצמה יהודית":"#A9791F",
+  "עמך ישראל":"#C08A3E",
   "כחול לבן":"#3B6FA0",
   "יש עתיד":"#3AAFB9",
   "חדש תע״ל":"#7FA6C4",
@@ -1625,7 +1625,7 @@ function render(){
   const coalSeats = coalitionTotal(latest);
   drawGaugeCanvas('gaugeCanvas', coalSeats);
   document.getElementById('gaugeSentence').innerHTML =
-    `לקואליציה (ש״ס · הציונות הדתית · עוצמה יהודית · הליכוד · יהדות התורה) <b>${coalSeats} מנדטים</b>`;
+    `לקואליציה (ש״ס · הציונות הדתית · עוצמה יהודית · הליכוד · יהדות התורה · עמך ישראל) <b>${coalSeats} מנדטים</b>`;
   
   const diff = coalSeats - THRESHOLD;
   const statusEl = document.getElementById('gaugeStatus');
@@ -2209,7 +2209,7 @@ function populateWeeklyShare(){
   document.getElementById('brandLogoWeekly').src = LOGO_DATA_URI;
   document.getElementById('wsDateRange').textContent = `${fmtDate(data.start)} — ${fmtDate(data.end)}`;
 
-  // average card (now the hero, at the top of the template)
+  // average card (the hero, at the top of the template)
   const avgEl = document.getElementById('wsAvgNum');
   const capEl = document.getElementById('wsAvgCaption');
   if(data.weekAvg !== null){
@@ -2344,7 +2344,7 @@ function populateHorizontalShare(){
   document.getElementById('stGaugeMeta').innerHTML =
     `<span><b>${latest.outlet}</b></span><span><b>${fmtDate(latest.dateObj)}</b></span>`;
   document.getElementById('stGaugeSentence').innerHTML =
-    `לקואליציה (ש״ס · הציונות הדתית · עוצמה יהודית · הליכוד · יהדות התורה) <b>${coalSeats} מנדטים</b>`;
+    `לקואליציה (ש״ס · הציונות הדתית · עוצמה יהודית · הליכוד · יהדות התורה · עמך ישראל) <b>${coalSeats} מנדטים</b>`;
   drawGaugeCanvas('stGaugeCanvas', coalSeats);
   document.getElementById('stGaugeCaption').textContent = captionText;
   const stStatus = document.getElementById('stStatus');
