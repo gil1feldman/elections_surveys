@@ -1608,7 +1608,15 @@ function render(){
     .filter(s => s.outlet===baselineOutlet && s.dateObj < latest.dateObj)
     .sort((a,b)=> b.dateObj - a.dateObj)
     .slice(0, BASELINE_WINDOW);
-  const prevSurvey = baselinePool.length ? baselinePool[0] : null;
+  let prevSurvey = baselinePool.length ? baselinePool[0] : null;
+  // If the gap since that previous survey is more than 2 weeks, the
+  // comparison isn't meaningful (e.g. an outlet that only polls twice a
+  // year) — treat it as if there's no previous survey to compare against.
+  let prevSurveyStale = false;
+  if(prevSurvey && (latest.dateObj - prevSurvey.dateObj)/86400000 > 14){
+    prevSurveyStale = true;
+    prevSurvey = null;
+  }
 
   document.getElementById('pageTitle').textContent = outletScopeLabel();
   document.getElementById('outletToggleSub').textContent = outletScopeLabel();
@@ -1676,7 +1684,7 @@ function render(){
     latestVal: latest.parties[party]||0,
     prevVal: prevSurvey ? (prevSurvey.parties[party]||0) : null
   }));
-  renderTrendCard(coalTrend, moverRows, prevSurvey, latest);
+  renderTrendCard(coalTrend, moverRows, prevSurvey, latest, prevSurveyStale);
 
   // ---- consecutive-surveys-without-majority streak (respects outlet filter, ignores date range) ----
   const streakInfo = renderStreakCard();
@@ -1717,7 +1725,11 @@ function computeOutletCompareRows(){
     const pool = allSurveys.filter(s=>s.outlet===outlet).sort((a,b)=> b.dateObj - a.dateObj);
     if(pool.length===0) return null;
     const latest = pool[0];
-    const prev = pool[1] || null;
+    let prev = pool[1] || null;
+    // Same 2-week staleness rule as the main trend comparison
+    if(prev && (latest.dateObj - prev.dateObj)/86400000 > 14){
+      prev = null;
+    }
     const coalLatest = coalitionTotal(latest);
     const coalPrev = prev ? coalitionTotal(prev) : null;
     const trend = prev ? trendParts(coalLatest, coalPrev) : null;
@@ -1829,7 +1841,7 @@ function buildMoversHtml(risers, fallers, rowCls, colCls, titleCls, emptyCls){
   `;
 }
 
-function renderTrendCard(coalTrend, rows, prevSurvey, latest){
+function renderTrendCard(coalTrend, rows, prevSurvey, latest, prevSurveyStale){
   const bigEl = document.getElementById('trendBig');
 
   const subEl = document.getElementById('trendSub');
@@ -1838,7 +1850,9 @@ function renderTrendCard(coalTrend, rows, prevSurvey, latest){
   if(!coalTrend){
     bigEl.className = "trend-big flat";
     bigEl.textContent = "אין סקר קודם להשוואה";
-    subEl.textContent = `זהו הסקר הראשון הזמין של ${latest.outlet} בטווח שנבחר.`;
+    subEl.textContent = prevSurveyStale
+      ? `הסקר הקודם של ${latest.outlet} ישן מדי (יותר משבועיים) להשוואה משמעותית.`
+      : `זהו הסקר הראשון הזמין של ${latest.outlet} בטווח שנבחר.`;
     moversEl.innerHTML = "";
     return;
   }
