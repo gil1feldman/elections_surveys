@@ -894,6 +894,10 @@
       <button class="format-pill active" id="formatPostBtn" onclick="switchShareFormat('post')">פוסט (רוחב)</button>
       <button class="format-pill" id="formatStoryBtn" onclick="switchShareFormat('story')">סטורי (אורך)</button>
     </div>
+    <div class="modal-format-toggle" id="modalCompareToggle">
+      <button class="format-pill active" id="compareWithBtn" onclick="switchCompareMode('with')">עם השוואה</button>
+      <button class="format-pill" id="compareNoneBtn" onclick="switchCompareMode('none')">רק תוצאות (בלי השוואה)</button>
+    </div>
     <div id="weeklyOutletPicker" style="display:none;">
       <div class="ws-picker-title">בחר אילו כלי תקשורת לכלול בסיכום השבועי</div>
       <div class="pillbar" id="weeklyOutletPills"></div>
@@ -949,7 +953,7 @@
 
   <div class="st-party-table-wrap">
     <table class="st-party-table">
-      <thead>
+      <thead id="stPartyThead">
         <tr><th>מפלגה</th><th>הסקר האחרון</th><th>ממוצע 5 סקרים</th><th>שינוי</th></tr>
       </thead>
       <tbody id="stPartyBody"></tbody>
@@ -973,11 +977,11 @@
   <div class="sv-movers" id="svMoversBox"></div>
   <div class="sv-line" id="svStreakLine"></div>
 
-  <div class="sv-party-list-header">
+  <div class="sv-party-list-header" id="svPartyListHeader">
     <span class="sv-header-spacer"></span>
     <span class="sv-header-name">מפלגה</span>
     <span class="sv-header-num">מנדטים</span>
-    <span class="sv-header-delta">שינוי ביחס ל-5 הסקרים האחרונים</span>
+    <span class="sv-header-delta" id="svHeaderDelta">שינוי ביחס ל-5 הסקרים האחרונים</span>
   </div>
   <div class="sv-party-list" id="svPartyList"></div>
 
@@ -2274,6 +2278,7 @@ function populateWeeklyShare(){
 function openWeeklyPicker(){
   if(weeklySelectedOutlets.size === 0) weeklySelectedOutlets = new Set(allOutletsList);
   document.getElementById('modalFormatToggle').style.display = 'none';
+  document.getElementById('modalCompareToggle').style.display = 'none';
   document.getElementById('weeklyOutletPicker').style.display = 'block';
   document.getElementById('summaryImg').style.display = 'none';
   document.getElementById('modalActions').style.display = 'none';
@@ -2338,6 +2343,10 @@ async function prepareSummary(){
 
   try{
     document.getElementById('modalFormatToggle').style.display = 'flex';
+    document.getElementById('modalCompareToggle').style.display = 'flex';
+    shareComparisonMode = 'with';
+    document.getElementById('compareWithBtn').classList.add('active');
+    document.getElementById('compareNoneBtn').classList.remove('active');
     await renderShareFormat('post');
   }catch(err){
     console.error(err);
@@ -2365,49 +2374,76 @@ function populateHorizontalShare(){
   stStatus.className = "st-status-pill " + statusClass;
   stStatus.textContent = statusText;
 
-  // trend mini-card
+  // trend mini-card — hidden entirely in "results only" mode
+  const stTrendMini = document.getElementById('stStreakMini').previousElementSibling; // .st-trend-mini
   const stTrendBig = document.getElementById('stTrendBig');
   const stTrendSub = document.getElementById('stTrendSub');
   const stMovers = document.getElementById('stMoversBox');
-  if(coalTrend){
-    stTrendBig.className = "st-trend-big " + coalTrend.cls;
-    stTrendBig.textContent = `${coalTrend.arrow} ${coalTrend.txt}`;
-    stTrendSub.textContent = `סך הקואליציה לעומת הסקר הקודם של ${latest.outlet} (${fmtDate(prevSurvey.dateObj)})`;
-    const {risers, fallers} = computeRisersFallers(moverRows);
-    stMovers.innerHTML = buildMoversHtml(risers, fallers, "st-movers-row", "st-movers-col", "st-movers-title", "st-movers-empty");
+  if(shareComparisonMode === 'none'){
+    stTrendMini.style.display = 'none';
   }else{
-    stTrendBig.className = "st-trend-big flat";
-    stTrendBig.textContent = "אין סקר קודם להשוואה";
-    stTrendSub.textContent = "";
-    stMovers.innerHTML = "";
+    stTrendMini.style.display = '';
+    if(coalTrend){
+      stTrendBig.className = "st-trend-big " + coalTrend.cls;
+      stTrendBig.textContent = `${coalTrend.arrow} ${coalTrend.txt}`;
+      stTrendSub.textContent = `סך הקואליציה לעומת הסקר הקודם של ${latest.outlet} (${fmtDate(prevSurvey.dateObj)})`;
+      const {risers, fallers} = computeRisersFallers(moverRows);
+      stMovers.innerHTML = buildMoversHtml(risers, fallers, "st-movers-row", "st-movers-col", "st-movers-title", "st-movers-empty");
+    }else{
+      stTrendBig.className = "st-trend-big flat";
+      stTrendBig.textContent = "אין סקר קודם להשוואה";
+      stTrendSub.textContent = "";
+      stMovers.innerHTML = "";
+    }
   }
 
-  // streak mini-card
+  // streak mini-card — also hidden in "results only" mode (it's a
+  // comparison across surveys, same as trend/movers)
   const stStreakMini = document.getElementById('stStreakMini');
-  stStreakMini.className = "st-mini-card st-streak-mini" + (streakInfo.numClass==="bad" ? " state-bad" : streakInfo.numClass==="good" ? " state-good" : "");
-  const stStreakNum = document.getElementById('stStreakNumber');
-  stStreakNum.className = "st-streak-number" + (streakInfo.numClass ? " " + streakInfo.numClass : "");
-  stStreakNum.textContent = streakInfo.numText;
-  document.getElementById('stStreakLastMajority').textContent = streakInfo.lastMajText;
-  const stStreakSub = document.getElementById('stStreakSub');
-  stStreakSub.className = "st-streak-sub" + (streakInfo.emphasis ? " emphasis" : "");
-  stStreakSub.textContent = streakInfo.subText;
+  if(shareComparisonMode === 'none'){
+    stStreakMini.style.display = 'none';
+  }else{
+    stStreakMini.style.display = '';
+    stStreakMini.className = "st-mini-card st-streak-mini" + (streakInfo.numClass==="bad" ? " state-bad" : streakInfo.numClass==="good" ? " state-good" : "");
+    const stStreakNum = document.getElementById('stStreakNumber');
+    stStreakNum.className = "st-streak-number" + (streakInfo.numClass ? " " + streakInfo.numClass : "");
+    stStreakNum.textContent = streakInfo.numText;
+    document.getElementById('stStreakLastMajority').textContent = streakInfo.lastMajText;
+    const stStreakSub = document.getElementById('stStreakSub');
+    stStreakSub.className = "st-streak-sub" + (streakInfo.emphasis ? " emphasis" : "");
+    stStreakSub.textContent = streakInfo.subText;
+  }
 
-  // party breakdown table
+  // party breakdown table — drop the average/delta columns in "results only" mode
+  const thead = document.getElementById('stPartyThead');
   const tbody = document.getElementById('stPartyBody');
   tbody.innerHTML = "";
-  rows.forEach(r=>{
-    const d = deltaParts(r.latestVal, r.baseAvg);
-    const tr = document.createElement('tr');
-    if(isCoalition(r.party)) tr.className = "coal-row";
-    tr.innerHTML = `
-      <td class="pname-cell"><span class="pdot" style="background:${colorFor(r.party)}"></span>${r.party} ${isCoalition(r.party) ? '<span class="coal-tag">קואליציה</span>' : ''}</td>
-      <td class="num">${r.latestVal}</td>
-      <td class="avg">${r.baseAvg!==null ? r.baseAvg.toFixed(1) : '—'}</td>
-      <td><span class="delta ${d.cls}">${d.arrow} ${d.txt}</span></td>
-    `;
-    tbody.appendChild(tr);
-  });
+  if(shareComparisonMode === 'none'){
+    thead.innerHTML = `<tr><th>מפלגה</th><th>מנדטים</th></tr>`;
+    rows.forEach(r=>{
+      const tr = document.createElement('tr');
+      if(isCoalition(r.party)) tr.className = "coal-row";
+      tr.innerHTML = `
+        <td class="pname-cell"><span class="pdot" style="background:${colorFor(r.party)}"></span>${r.party} ${isCoalition(r.party) ? '<span class="coal-tag">קואליציה</span>' : ''}</td>
+        <td class="num">${r.latestVal}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }else{
+    thead.innerHTML = `<tr><th>מפלגה</th><th>הסקר האחרון</th><th>ממוצע 5 סקרים</th><th>שינוי</th></tr>`;
+    rows.forEach(r=>{
+      const d = deltaParts(r.latestVal, r.baseAvg);
+      const tr = document.createElement('tr');
+      if(isCoalition(r.party)) tr.className = "coal-row";
+      tr.innerHTML = `
+        <td class="pname-cell"><span class="pdot" style="background:${colorFor(r.party)}"></span>${r.party} ${isCoalition(r.party) ? '<span class="coal-tag">קואליציה</span>' : ''}</td>
+        <td class="num">${r.latestVal}</td>
+        <td class="avg">${r.baseAvg!==null ? r.baseAvg.toFixed(1) : '—'}</td>
+        <td><span class="delta ${d.cls}">${d.arrow} ${d.txt}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
 }
 
 function populateVerticalShare(){
@@ -2423,37 +2459,61 @@ function populateVerticalShare(){
 
   const trendLine = document.getElementById('svTrendLine');
   const moversBox = document.getElementById('svMoversBox');
-  if(coalTrend){
-    trendLine.className = "sv-line " + coalTrend.cls;
-    trendLine.textContent = `${coalTrend.arrow} ${coalTrend.txt} מהסקר הקודם`;
-    const {risers, fallers} = computeRisersFallers(moverRows);
-    moversBox.innerHTML = buildMoversHtml(risers, fallers, "sv-movers-row", "sv-movers-col", "sv-movers-title", "sv-movers-empty");
+  const svHeaderDelta = document.getElementById('svHeaderDelta');
+
+  if(shareComparisonMode === 'none'){
+    trendLine.style.display = 'none';
+    moversBox.style.display = 'none';
+    svHeaderDelta.style.display = 'none';
   }else{
-    trendLine.className = "sv-line flat";
-    trendLine.textContent = "אין סקר קודם להשוואה";
-    moversBox.innerHTML = "";
+    trendLine.style.display = '';
+    moversBox.style.display = '';
+    svHeaderDelta.style.display = '';
+    if(coalTrend){
+      trendLine.className = "sv-line " + coalTrend.cls;
+      trendLine.textContent = `${coalTrend.arrow} ${coalTrend.txt} מהסקר הקודם`;
+      const {risers, fallers} = computeRisersFallers(moverRows);
+      moversBox.innerHTML = buildMoversHtml(risers, fallers, "sv-movers-row", "sv-movers-col", "sv-movers-title", "sv-movers-empty");
+    }else{
+      trendLine.className = "sv-line flat";
+      trendLine.textContent = "אין סקר קודם להשוואה";
+      moversBox.innerHTML = "";
+    }
   }
 
   const streakLine = document.getElementById('svStreakLine');
-  streakLine.className = "sv-line " + (streakInfo.numClass || "flat");
-  streakLine.textContent = streakInfo.emphasis
-    ? streakInfo.subText
-    : (streakInfo.numText!=="0"
-        ? `${streakInfo.numText} סקרים ברצף ללא רוב · רוב אחרון: ${streakInfo.lastMajText}`
-        : `רוב אחרון: ${streakInfo.lastMajText}`);
+  if(shareComparisonMode === 'none'){
+    streakLine.style.display = 'none';
+  }else{
+    streakLine.style.display = '';
+    streakLine.className = "sv-line " + (streakInfo.numClass || "flat");
+    streakLine.textContent = streakInfo.emphasis
+      ? streakInfo.subText
+      : (streakInfo.numText!=="0"
+          ? `${streakInfo.numText} סקרים ברצף ללא רוב · רוב אחרון: ${streakInfo.lastMajText}`
+          : `רוב אחרון: ${streakInfo.lastMajText}`);
+  }
 
   const list = document.getElementById('svPartyList');
   list.innerHTML = "";
   rows.forEach(r=>{
-    const d = deltaParts(r.latestVal, r.baseAvg);
     const row = document.createElement('div');
     row.className = "sv-party-row" + (isCoalition(r.party) ? " coal" : "");
-    row.innerHTML = `
-      <span class="sv-party-dot" style="background:${colorFor(r.party)}"></span>
-      <span class="sv-party-name">${r.party}</span>
-      <span class="sv-party-num">${r.latestVal}</span>
-      <span class="sv-party-delta ${d.cls}">${d.arrow} ${d.txt}</span>
-    `;
+    if(shareComparisonMode === 'none'){
+      row.innerHTML = `
+        <span class="sv-party-dot" style="background:${colorFor(r.party)}"></span>
+        <span class="sv-party-name">${r.party}</span>
+        <span class="sv-party-num">${r.latestVal}</span>
+      `;
+    }else{
+      const d = deltaParts(r.latestVal, r.baseAvg);
+      row.innerHTML = `
+        <span class="sv-party-dot" style="background:${colorFor(r.party)}"></span>
+        <span class="sv-party-name">${r.party}</span>
+        <span class="sv-party-num">${r.latestVal}</span>
+        <span class="sv-party-delta ${d.cls}">${d.arrow} ${d.txt}</span>
+      `;
+    }
     list.appendChild(row);
   });
 }
@@ -2484,6 +2544,25 @@ function switchShareFormat(format){
   const btns = document.querySelectorAll('.format-pill');
   btns.forEach(b=>b.disabled = true);
   renderShareFormat(format).catch(err=>{
+    console.error(err);
+    alert("לא הצלחנו להכין את התמונה. נסו שוב.");
+  }).finally(()=>{
+    btns.forEach(b=>b.disabled = false);
+  });
+}
+
+// 'with' = normal (trend/streak/avg-vs-baseline, as today); 'none' = just
+// this survey's raw numbers, no comparison to the previous survey or to any
+// baseline average — for surveys where that comparison isn't meaningful.
+let shareComparisonMode = 'with';
+function switchCompareMode(mode){
+  if(mode === shareComparisonMode) return;
+  shareComparisonMode = mode;
+  document.getElementById('compareWithBtn').classList.toggle('active', mode==='with');
+  document.getElementById('compareNoneBtn').classList.toggle('active', mode==='none');
+  const btns = document.querySelectorAll('.format-pill');
+  btns.forEach(b=>b.disabled = true);
+  renderShareFormat(currentShareFormat).catch(err=>{
     console.error(err);
     alert("לא הצלחנו להכין את התמונה. נסו שוב.");
   }).finally(()=>{
@@ -2542,6 +2621,7 @@ async function prepareOutletSummary(){
 
   try{
     document.getElementById('modalFormatToggle').style.display = 'none';
+    document.getElementById('modalCompareToggle').style.display = 'none';
     document.getElementById('brandLogoOutletShare').src = LOGO_DATA_URI;
     const rows = computeOutletCompareRows();
     const grid = document.getElementById('ostGrid');
