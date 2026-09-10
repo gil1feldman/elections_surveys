@@ -634,6 +634,26 @@
   }
   .ost-card-maj b{color:var(--ink);font-family:'Frank Ruhl Libre',serif;font-weight:800;font-size:19px;}
 
+  /* ---------- Latest-survey-comparison share image ---------- */
+  #latestCompareShareTemplate{
+    position:fixed;left:-9999px;top:0;width:1200px;
+    background:var(--paper);
+    font-family:'Assistant',sans-serif;color:var(--ink);
+    padding:52px;box-sizing:border-box;
+  }
+  table.lc-share-table{width:100%;border-collapse:collapse;font-size:22px;margin-top:24px;}
+  table.lc-share-table th{
+    text-align:center;font-family:var(--mono);font-size:16px;color:var(--ink-soft);font-weight:700;
+    padding:14px 12px;border-bottom:3px solid var(--ink);
+  }
+  table.lc-share-table th:first-child{text-align:right;}
+  table.lc-share-table .lc-date{display:block;font-weight:500;font-size:13px;margin-top:4px;}
+  table.lc-share-table td{padding:14px 12px;border-bottom:1.5px solid var(--line);text-align:center;}
+  table.lc-share-table td:first-child{text-align:right;display:flex;align-items:center;gap:10px;font-weight:800;}
+  table.lc-share-table tr.coal-row{background:#EAF1FA;}
+  table.lc-share-table td.lc-num{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:28px;}
+  table.lc-share-table .pdot{width:16px;height:16px;border-radius:50%;flex:none;}
+
   /* ---------- Weekly summary share image ---------- */
   #weeklyShareTemplate{
     position:fixed;left:-9999px;top:0;width:1080px;
@@ -821,6 +841,25 @@
     </div>
     <div class="outlet-compare-grid" id="outletCompareGrid"></div>
 
+    <!-- LATEST SURVEY COMPARISON -->
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">השוואת סקר אחרון</div>
+        <h2>הסקר האחרון של כל כלי תקשורת, מפלגה מול מפלגה</h2>
+        <p>לכל כלי תקשורת שנבחר למעלה: תוצאות הסקר האחרון שלו בלבד (לא ממוצע), לפי כל המפלגות. תאריך הסקר האחרון מופיע מתחת לשם כל כלי תקשורת.</p>
+      </div>
+      <button class="summary-btn small" id="latestCompareSummaryBtn" onclick="prepareLatestCompareSummary()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>
+        שמור כתמונה
+      </button>
+    </div>
+    <div class="breakdown-card house-effect-wrap">
+      <table class="breakdown house-effect" id="latestCompareTable">
+        <thead><tr id="latestCompareHead"></tr></thead>
+        <tbody id="latestCompareBody"></tbody>
+      </table>
+    </div>
+
     <!-- HOUSE EFFECT -->
     <div class="section-head">
       <div>
@@ -996,6 +1035,17 @@
   <div class="st-footer-plain">פיתוח: גיל פלדמן · x.com/feldman_gil</div>
 </div>
 
+<!-- Off-screen template for the latest-survey-comparison image -->
+<div id="latestCompareShareTemplate">
+  <img id="brandLogoLatestCompare" class="st-logo" alt="המצב הנתון">
+  <div class="st-page-title">השוואת הסקר האחרון בכל כלי תקשורת</div>
+  <table class="lc-share-table" id="lcShareTable">
+    <thead id="lcShareHead"></thead>
+    <tbody id="lcShareBody"></tbody>
+  </table>
+  <div class="st-footer-plain">פיתוח: גיל פלדמן · x.com/feldman_gil</div>
+</div>
+
 <!-- Off-screen template for the weekly-summary share image -->
 <div id="weeklyShareTemplate">
   <img id="brandLogoWeekly" class="ws-logo" alt="המצב הנתון">
@@ -1024,6 +1074,10 @@ const CSV_URLS = [
 
 const COALITION = ["ש״ס","הציונות הדתית","עוצמה יהודית","הליכוד","יהדות התורה","עמך ישראל"];
 const THRESHOLD = 61;
+// Electoral (entry) threshold — 3.25% of 120 seats ≈ 3.9, so 4 mandates is
+// the practical minimum to be considered "in" the Knesset. Distinct from
+// THRESHOLD above, which is the 61-seat governing-majority threshold.
+const ELECTION_THRESHOLD_SEATS = 4;
 const TOTAL_SEATS = 120;
 const BASELINE_WINDOW = 5;
 
@@ -1674,6 +1728,7 @@ function render(){
   renderChartControls(filtered);
   renderChart(filtered);
   renderSpotlightTable();
+  renderLatestCompare();
 
   // ---- coalition trend + all movers vs the previous survey (same outlet) ----
   // Uses the full union of parties from both surveys, treating a party missing
@@ -1767,6 +1822,80 @@ function renderOutletCompare(){
     `;
     container.appendChild(card);
   });
+}
+
+// ---------- Latest-survey comparison (party × outlet matrix) ----------
+// Respects the top outlet filter (selectedOutlets), same as outlet-compare
+// cards, since it's a "what does each channel currently say" comparison.
+function computeLatestSurveyComparison(){
+  const outlets = allOutletsList.filter(o=>selectedOutlets.has(o));
+  const outletData = {};
+  outlets.forEach(outlet=>{
+    const pool = allSurveys.filter(s=>s.outlet===outlet).sort((a,b)=> b.dateObj - a.dateObj);
+    outletData[outlet] = pool.length ? pool[0] : null;
+  });
+  return {outlets, outletData};
+}
+
+function renderLatestCompare(){
+  const {outlets, outletData} = computeLatestSurveyComparison();
+  const headRow = document.getElementById('latestCompareHead');
+  const body = document.getElementById('latestCompareBody');
+  if(!headRow || !body) return;
+
+  if(outlets.length < 1){
+    headRow.innerHTML = "";
+    body.innerHTML = `<tr><td style="color:var(--ink-soft);">בחרו לפחות כלי תקשורת אחד למעלה.</td></tr>`;
+    return;
+  }
+
+  headRow.innerHTML = `<th>מפלגה</th>` + outlets.map(o=>{
+    const s = outletData[o];
+    return `<th>${o}${s ? `<br><span style="font-weight:400;text-transform:none;">${fmtDate(s.dateObj)}</span>` : ''}</th>`;
+  }).join("");
+
+  // Only parties clearing the electoral threshold (on average across the
+  // shown outlets) are listed — this also naturally drops any party that
+  // got 0 everywhere. Only needs to pass the threshold in ONE of the shown
+  // surveys to qualify, but is still sorted by its average across them.
+  const partySet = new Set();
+  outlets.forEach(o=>{ const s = outletData[o]; if(s) Object.keys(s.parties).forEach(p=>partySet.add(p)); });
+  let parties = Array.from(partySet);
+  const avgVal = {};
+  const maxVal = {};
+  parties.forEach(p=>{
+    const vals = outlets.map(o=> outletData[o] ? (outletData[o].parties[p]||0) : 0);
+    avgVal[p] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+    maxVal[p] = vals.length ? Math.max(...vals) : 0;
+  });
+  parties = parties.filter(p=> maxVal[p] >= ELECTION_THRESHOLD_SEATS)
+                    .sort((a,b)=> avgVal[b]-avgVal[a]);
+
+  body.innerHTML = "";
+  parties.forEach(party=>{
+    const tr = document.createElement('tr');
+    if(isCoalition(party)) tr.className = "coal-row";
+    tr.innerHTML = `
+      <td class="pname-cell"><span class="pdot" style="background:${colorFor(party)}"></span>${party}</td>
+      ${outlets.map(o=>{
+        const s = outletData[o];
+        const val = s ? (s.parties[party]||0) : null;
+        return `<td class="he-avg">${val!==null ? val : '—'}</td>`;
+      }).join("")}
+    `;
+    body.appendChild(tr);
+  });
+
+  // coalition total — always shown, at the bottom, regardless of the
+  // threshold filter above (it's a bloc total, not an individual party)
+  const coalTr = document.createElement('tr');
+  coalTr.className = "coal-row";
+  coalTr.innerHTML = `<td class="pname-cell">★ סך הקואליציה (+עמך ישראל)</td>` + outlets.map(o=>{
+    const s = outletData[o];
+    const val = s ? coalitionTotal(s) : null;
+    return `<td class="he-avg">${val!==null ? val : '—'}</td>`;
+  }).join("");
+  body.appendChild(coalTr);
 }
 
 function computeStreakInfo(){
@@ -2175,6 +2304,10 @@ function buildOutletShareText(){
   return `📊 תמונת מצב במנדטי הקואליציה, לפי כלי התקשורת.\n\n🔗 לדשבורד המלא: ${DASHBOARD_URL}`;
 }
 
+function buildLatestCompareShareText(){
+  return `📊 השוואת הסקר האחרון בכל כלי תקשורת.\n\n🔗 לדשבורד המלא: ${DASHBOARD_URL}`;
+}
+
 // Sunday-Saturday week containing `anchor` (JS Date.getDay(): Sun=0..Sat=6)
 function weekRange(anchor){
   const day = anchor.getDay();
@@ -2219,6 +2352,7 @@ function buildWeeklyShareText(){
 function currentShareText(){
   if(currentShareKind === 'outlet') return buildOutletShareText();
   if(currentShareKind === 'weekly') return buildWeeklyShareText();
+  if(currentShareKind === 'latestCompare') return buildLatestCompareShareText();
   return buildMainShareText();
 }
 
@@ -2652,6 +2786,82 @@ async function prepareOutletSummary(){
     const canvas = await html2canvas(target, { scale:3, backgroundColor:'#F2F4F8', useCORS:true });
     summaryDataUrl = canvas.toDataURL('image/png');
 
+    document.getElementById('summaryImg').src = summaryDataUrl;
+    document.getElementById('summaryModal').classList.add('open');
+    refreshShareButtonVisibility();
+  }catch(err){
+    console.error(err);
+    alert("לא הצלחנו להכין את התמונה. נסו שוב.");
+  }finally{
+    btn.disabled = false;
+    btn.innerHTML = origHtml;
+  }
+}
+
+// ---------- Latest-survey comparison share image ----------
+function populateLatestCompareShare(){
+  document.getElementById('brandLogoLatestCompare').src = LOGO_DATA_URI;
+  const {outlets, outletData} = computeLatestSurveyComparison();
+  const head = document.getElementById('lcShareHead');
+  const body = document.getElementById('lcShareBody');
+
+  head.innerHTML = `<tr><th>מפלגה</th>` + outlets.map(o=>{
+    const s = outletData[o];
+    return `<th>${o}${s ? `<span class="lc-date">${fmtDate(s.dateObj)}</span>` : ''}</th>`;
+  }).join("") + `</tr>`;
+
+  const partySet = new Set();
+  outlets.forEach(o=>{ const s = outletData[o]; if(s) Object.keys(s.parties).forEach(p=>partySet.add(p)); });
+  let parties = Array.from(partySet);
+  const avgVal = {};
+  const maxVal = {};
+  parties.forEach(p=>{
+    const vals = outlets.map(o=> outletData[o] ? (outletData[o].parties[p]||0) : 0);
+    avgVal[p] = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+    maxVal[p] = vals.length ? Math.max(...vals) : 0;
+  });
+  parties = parties.filter(p=> maxVal[p] >= ELECTION_THRESHOLD_SEATS)
+                    .sort((a,b)=> avgVal[b]-avgVal[a]);
+
+  body.innerHTML = "";
+  parties.forEach(party=>{
+    const tr = document.createElement('tr');
+    if(isCoalition(party)) tr.className = "coal-row";
+    tr.innerHTML = `
+      <td><span class="pdot" style="background:${colorFor(party)}"></span>${party}</td>
+      ${outlets.map(o=>{
+        const s = outletData[o];
+        const val = s ? (s.parties[party]||0) : null;
+        return `<td class="lc-num">${val!==null ? val : '—'}</td>`;
+      }).join("")}
+    `;
+    body.appendChild(tr);
+  });
+
+  const coalTr = document.createElement('tr');
+  coalTr.className = "coal-row";
+  coalTr.innerHTML = `<td>★ סך הקואליציה (+עמך ישראל)</td>` + outlets.map(o=>{
+    const s = outletData[o];
+    const val = s ? coalitionTotal(s) : null;
+    return `<td class="lc-num">${val!==null ? val : '—'}</td>`;
+  }).join("");
+  body.appendChild(coalTr);
+}
+
+async function prepareLatestCompareSummary(){
+  currentShareKind = 'latestCompare';
+  summaryFilenamePrefix = "latest-survey-compare";
+  const btn = document.getElementById('latestCompareSummaryBtn');
+  btn.disabled = true;
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = "מכין תמונה...";
+
+  try{
+    document.getElementById('modalFormatToggle').style.display = 'none';
+    document.getElementById('modalCompareToggle').style.display = 'none';
+    populateLatestCompareShare();
+    const canvas = await html2canvas(document.getElementById('latestCompareShareTemplate'), { scale:3, backgroundColor:'#F2F4F8', useCORS:true });
+    summaryDataUrl = canvas.toDataURL('image/png');
     document.getElementById('summaryImg').src = summaryDataUrl;
     document.getElementById('summaryModal').classList.add('open');
     refreshShareButtonVisibility();
