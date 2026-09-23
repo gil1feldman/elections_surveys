@@ -690,6 +690,99 @@
   .ws-picker-go{display:block;margin:0 auto;}
 
   #dashboard{display:none;}
+
+  /* ===== CT-UPGRADE v1 ===== */
+  /* fix: JS renders .mn/.mv inside the trend-card movers */
+  .movers-row .mn{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .movers-row .mv{font-family:'Frank Ruhl Libre',serif;font-weight:800;font-size:14px;flex:none;}
+  .movers-row.up .mv{color:var(--good);}
+  .movers-row.down .mv{color:var(--alert);}
+
+  /* small global polish */
+  button:focus-visible, select:focus-visible, input:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  table.breakdown tbody tr:hover td, table.spotlight tbody tr:hover td{background:rgba(28,143,196,0.06);}
+  .chart-wrap:not(.oc-chart){height:250px;}
+
+  /* ---------- Time studio ---------- */
+  .ct-actions{display:flex;gap:6px;flex-wrap:wrap;}
+  .ct-card{padding:14px 16px;}
+  .ct-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;padding-bottom:10px;margin-bottom:10px;border-bottom:1px dashed var(--line);}
+  .ct-field{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+  .ct-field .glabel, .ct-outlets-row .glabel{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--ink-soft);}
+  .ct-select, .ct-date{
+    font-family:'Assistant',sans-serif;font-size:13px;font-weight:600;color:var(--ink);
+    background:var(--paper-raised);border:1.5px solid var(--line);border-radius:6px;padding:4px 8px;
+  }
+  .ct-select:hover, .ct-date:hover{border-color:var(--ink);}
+  #ctMetric{font-weight:800;min-width:170px;}
+  .ct-dash{font-size:12px;color:var(--ink-soft);}
+  .ct-check{font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;}
+  .ct-check input{accent-color:var(--coalition);width:15px;height:15px;margin:0;}
+  .ct-seg{display:inline-flex;border:1.5px solid var(--ink);border-radius:8px;overflow:hidden;}
+  .ct-seg button{
+    border:none;border-left:1px solid var(--line);background:var(--paper-raised);color:var(--ink);
+    font-family:'Assistant',sans-serif;font-size:12.5px;font-weight:600;padding:5px 12px;cursor:pointer;
+  }
+  .ct-seg button:last-child{border-left:none;}
+  .ct-seg button:hover{background:#EAF1FA;}
+  .ct-seg button.active{background:var(--ink);color:#fff;}
+  .ct-outlets-row{margin-bottom:12px;}
+
+  .ct-kpis{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;
+    background:var(--line);border:1.5px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:12px;
+  }
+  .ct-kpi{background:var(--paper-raised);padding:10px 14px;min-width:0;}
+  .ct-kpi-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--ink-soft);}
+  .ct-kpi-val{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:28px;line-height:1.15;margin-top:2px;color:var(--ink);}
+  .ct-kpi-val.good{color:var(--good);}
+  .ct-kpi-val.bad{color:var(--alert);}
+  .ct-kpi-sub{font-size:11px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  .ct-chart-wrap{position:relative;height:400px;}
+  .ct-empty{
+    display:none;position:absolute;inset:0;align-items:center;justify-content:center;text-align:center;
+    font-size:13px;font-weight:600;color:var(--ink-soft);padding:20px;
+  }
+  .ct-note{font-size:11.5px;color:var(--ink-soft);margin-top:10px;line-height:1.5;max-width:760px;}
+  @media (max-width:640px){
+    .ct-chart-wrap{height:320px;}
+    .ct-kpi-val{font-size:23px;}
+    .ct-seg button{padding:5px 8px;font-size:11.5px;}
+  }
+
+  /* ---------- Time studio share template (off-screen) ---------- */
+  #ctShareTemplate{
+    position:fixed;left:-9999px;top:0;width:1200px;
+    background:var(--paper);font-family:'Assistant',sans-serif;color:var(--ink);
+    padding:56px 60px 44px;box-sizing:border-box;direction:rtl;
+    display:flex;flex-direction:column;
+  }
+  #ctShareTemplate.story{width:1080px;min-height:1920px;padding:70px 56px 56px;}
+  .cts-title{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:54px;line-height:1.15;text-align:center;}
+  #ctShareTemplate.story .cts-title{font-size:62px;}
+  .cts-sub{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--ink-soft);text-align:center;margin:12px 0 30px;line-height:1.5;}
+  #ctShareTemplate.story .cts-sub{font-size:24px;}
+  .cts-kpis{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:#E2E6EC;
+    border:2px solid #E2E6EC;border-radius:18px;overflow:hidden;margin-bottom:24px;
+  }
+  #ctShareTemplate.story .cts-kpis{grid-template-columns:repeat(2,1fr);}
+  .cts-kpi{background:#FFFFFF;padding:22px 18px 20px;text-align:center;}
+  .cts-kpi-label{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--ink-soft);}
+  .cts-kpi-val{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:60px;line-height:1.1;margin-top:6px;color:var(--ink);}
+  .cts-kpi-val.good{color:var(--good);}
+  .cts-kpi-val.bad{color:var(--alert);}
+  .cts-kpi-sub{font-size:18px;font-weight:600;color:var(--ink-soft);margin-top:4px;}
+  #ctShareTemplate.story .cts-kpi-label{font-size:23px;}
+  #ctShareTemplate.story .cts-kpi-val{font-size:72px;}
+  #ctShareTemplate.story .cts-kpi-sub{font-size:21px;}
+  .cts-chart{
+    background:#FFFFFF;border:2px solid #E2E6EC;border-top:8px solid var(--gold);border-radius:18px;
+    padding:20px;margin-bottom:22px;flex:1;display:flex;align-items:center;
+  }
+  .cts-chart img{display:block;width:100%;height:auto;}
+  /* ===== /CT-UPGRADE v1 ===== */
 </style>
 </head>
 <body>
@@ -701,6 +794,10 @@
       <h1 id="pageTitle">מעקב נתוני סקרים</h1>
     </div>
     <div class="header-right">
+      <button class="summary-btn small" id="ctJumpBtn" onclick="ctScrollTo()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><line x1="3" y1="21" x2="21" y2="21"/></svg>
+        לאורך זמן
+      </button>
       <button class="summary-btn small" id="weeklySummaryBtn" onclick="openWeeklyPicker()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
         סיכום שבועי
@@ -814,6 +911,57 @@
     <div class="chart-card">
       <div class="chart-controls" id="chartControls"></div>
       <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+    </div>
+
+    <!-- CT-UPGRADE v1: coalition / party over time -->
+    <div class="section-head" id="ctSection">
+      <div>
+        <div class="eyebrow">לאורך זמן</div>
+        <h2 id="ctTitle">מנדטי הקואליציה לאורך זמן</h2>
+        <p>בחרו מה להציג, תקופה וכלי תקשורת. הגרף, המספרים והתמונה לשיתוף מתעדכנים יחד.</p>
+      </div>
+      <div class="ct-actions">
+        <button class="summary-btn small" id="ctCsvBtn" onclick="ctDownloadCsv()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M4 19h16"/></svg>
+          הורדת הנתונים (CSV)
+        </button>
+        <button class="summary-btn small" id="ctShareBtn" onclick="ctPrepareShare()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>
+          שמור כתמונה
+        </button>
+      </div>
+    </div>
+    <div class="chart-card ct-card">
+      <div class="ct-toolbar">
+        <label class="ct-field"><span class="glabel">מה להציג:</span><select id="ctMetric" class="ct-select"></select></label>
+        <div class="ct-field"><span class="glabel">תצוגה:</span><div class="ct-seg" id="ctModes"></div></div>
+      </div>
+      <div class="ct-toolbar">
+        <div class="ct-field"><span class="glabel">תקופה:</span><div class="pillbar" id="ctRanges"></div></div>
+        <div class="ct-field">
+          <input type="date" id="ctFrom" class="ct-date" aria-label="מתאריך">
+          <span class="ct-dash">עד</span>
+          <input type="date" id="ctTo" class="ct-date" aria-label="עד תאריך">
+        </div>
+        <div class="ct-field" id="ctAvgTypeWrap"><span class="glabel">סוג ממוצע:</span><div class="ct-seg" id="ctAvgType"></div></div>
+        <label class="ct-field" id="ctSmoothWrap"><span class="glabel">ממוצע על פני:</span>
+          <select id="ctWin" class="ct-select">
+            <option value="7">7 ימים</option>
+            <option value="14" selected>14 ימים</option>
+            <option value="30">30 ימים</option>
+          </select>
+        </label>
+        <label class="ct-field ct-check" id="ctBandWrap"><input type="checkbox" id="ctBand" checked> הצג פער בין כלי התקשורת</label>
+      </div>
+      <div class="ct-outlets-row">
+        <div class="filter-group"><span class="glabel">כלי תקשורת:</span><div class="pillbar" id="ctOutlets"></div></div>
+      </div>
+      <div class="ct-kpis" id="ctKpis"></div>
+      <div class="ct-chart-wrap" id="ctChartWrap">
+        <canvas id="ctCanvas"></canvas>
+        <div class="ct-empty" id="ctEmpty">אין סקרים בתקופה ובכלי התקשורת שנבחרו. הרחיבו את התקופה או הוסיפו כלי תקשורת.</div>
+      </div>
+      <div class="ct-note" id="ctNote"></div>
     </div>
 
     <!-- ADVANCED ANALYSIS TOGGLE -->
@@ -1063,6 +1211,16 @@
   </div>
 
   <div class="ws-footer">פיתוח: גיל פלדמן · x.com/feldman_gil</div>
+</div>
+
+<!-- CT-UPGRADE v1: off-screen template for the over-time image -->
+<div id="ctShareTemplate">
+  <img id="ctsLogo" class="st-logo" alt="המצב הנתון">
+  <div class="cts-title" id="ctsTitle"></div>
+  <div class="cts-sub" id="ctsSub"></div>
+  <div class="cts-kpis" id="ctsKpis"></div>
+  <div class="cts-chart"><img id="ctsChartImg" alt=""></div>
+  <div class="st-footer-plain">פיתוח: גיל פלדמן · x.com/feldman_gil</div>
 </div>
 
 <script>
@@ -2916,6 +3074,838 @@ function toggleOutletFilter(){
     document.getElementById('outletToggleBar').classList.add('open');
   }
 })();
+
+// =====================================================================
+// CT-UPGRADE v1 — coalition/party over time + chart polish (additive)
+// =====================================================================
+const CT_GOOD = "#1F8A57", CT_BAD = "#C1483B", CT_INK = "#1B2440", CT_BLUE = "#2456A6";
+const CT_REDUCED_MOTION = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+function ctAlpha(c, a){
+  if(!c) return c;
+  if(c[0]==='#'){
+    let h = c.slice(1);
+    if(h.length===3) h = h.split('').map(x=>x+x).join('');
+    const n = parseInt(h,16);
+    return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+  }
+  if(c.startsWith('hsl(')) return c.replace('hsl(','hsla(').replace(')',`,${a})`);
+  return c;
+}
+function ctRoundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function ctYOf(v){ return (v && typeof v==='object' && !Array.isArray(v)) ? v.y : v; }
+function ctFmt1(v){ return (Math.round(v*10)/10).toFixed(1); }
+
+// ---------- Chart.js defaults + small plugins (only act when configured) ----------
+(function ctSetupCharts(){
+  if(typeof Chart==='undefined') return;
+  try{
+    Chart.defaults.font.family = "'Assistant', sans-serif";
+    Chart.defaults.color = '#5A6479';
+    const tt = Chart.defaults.plugins.tooltip;
+    tt.backgroundColor = 'rgba(27,36,64,0.95)';
+    tt.padding = 10;
+    tt.cornerRadius = 8;
+    tt.boxPadding = 4;
+    tt.titleFont = {family:"'Assistant', sans-serif", weight:'700', size:12.5};
+    tt.bodyFont  = {family:"'Assistant', sans-serif", weight:'600', size:12};
+    tt.rtl = true;
+  }catch(e){ console.warn('CT: chart defaults', e); }
+
+  // dashed reference line (61 majority / 4 electoral threshold)
+  Chart.register({
+    id:'ctThreshold',
+    beforeDatasetsDraw(chart, args, o){
+      if(!o || typeof o.value!=='number') return;
+      const y = chart.scales.y; if(!y) return;
+      const a = chart.chartArea; const py = y.getPixelForValue(o.value);
+      if(!isFinite(py) || py < a.top-1 || py > a.bottom+1) return;
+      const k = o.scale || 1, ctx = chart.ctx, col = o.color || CT_INK;
+      ctx.save();
+      ctx.setLineDash([6*k,4*k]); ctx.lineWidth = 1.6*k; ctx.strokeStyle = col;
+      ctx.beginPath(); ctx.moveTo(a.left,py); ctx.lineTo(a.right,py); ctx.stroke();
+      ctx.restore();
+    },
+    afterDatasetsDraw(chart, args, o){
+      // label drawn after the data so points never hide it
+      if(!o || typeof o.value!=='number' || !o.label) return;
+      const y = chart.scales.y; if(!y) return;
+      const a = chart.chartArea; const py = y.getPixelForValue(o.value);
+      if(!isFinite(py) || py < a.top-1 || py > a.bottom+1) return;
+      const k = o.scale || 1, ctx = chart.ctx, col = o.color || CT_INK;
+      ctx.save();
+      {
+        ctx.direction = 'rtl';
+        ctx.font = `700 ${10.5*k}px 'Assistant', sans-serif`;
+        const tw = ctx.measureText(o.label).width, ph = 17*k, pw = tw + 12*k;
+        const x = a.left + 4*k, yy = py - ph - 3*k;
+        ctx.fillStyle = col; ctRoundRect(ctx,x,yy,pw,ph,4*k); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(o.label, x + pw/2, yy + ph/2 + 0.5*k);
+      }
+      ctx.restore();
+    }
+  });
+
+  // value tag at the last point of datasets flagged with ctEndLabel
+  Chart.register({
+    id:'ctEndLabel',
+    afterDatasetsDraw(chart, args, o){
+      const k = (o && o.scale) || 1, ctx = chart.ctx;
+      chart.data.datasets.forEach((ds,i)=>{
+        if(!ds.ctEndLabel || !chart.isDatasetVisible(i)) return;
+        const meta = chart.getDatasetMeta(i);
+        let idx = -1;
+        for(let j=ds.data.length-1;j>=0;j--){ const y = ctYOf(ds.data[j]); if(y!==null && y!==undefined && !isNaN(y)){ idx=j; break; } }
+        if(idx<0 || !meta.data[idx]) return;
+        const el = meta.data[idx], txt = ctFmt1(ctYOf(ds.data[idx]));
+        ctx.save();
+        ctx.font = `800 ${13*k}px 'Frank Ruhl Libre', serif`;
+        const w = ctx.measureText(txt).width + 12*k, h = 21*k, x = el.x + 7*k, y = el.y - h/2;
+        ctx.fillStyle = ds.ctEndColor || ds.borderColor || CT_INK;
+        ctRoundRect(ctx,x,y,w,h,5*k); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(txt, x + w/2, y + h/2 + 0.5*k);
+        ctx.restore();
+      });
+    }
+  });
+
+  // numbers above points of datasets flagged with ctPointValues
+  Chart.register({
+    id:'ctPointValues',
+    afterDatasetsDraw(chart, args, o){
+      const k = (o && o.scale) || 1, ctx = chart.ctx;
+      chart.data.datasets.forEach((ds,i)=>{
+        if(!ds.ctPointValues || !chart.isDatasetVisible(i)) return;
+        const meta = chart.getDatasetMeta(i), n = ds.data.length, step = n > 30 ? Math.ceil(n/20) : 1;
+        ctx.save();
+        ctx.font = `700 ${10.5*k}px 'IBM Plex Mono', monospace`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+        ctx.lineJoin = 'round'; ctx.lineWidth = 3*k; ctx.strokeStyle = '#fff';
+        meta.data.forEach((el,j)=>{
+          const v = ctYOf(ds.data[j]);
+          if(v===null || v===undefined || isNaN(v) || (j % step && j!==n-1)) return;
+          const t = ctFmt1(v), yy = el.y - 8*k;
+          ctx.strokeText(t, el.x, yy);
+          ctx.fillStyle = CT_INK; ctx.fillText(t, el.x, yy);
+        });
+        ctx.restore();
+      });
+    }
+  });
+
+  // solid background (for exported images)
+  Chart.register({
+    id:'ctBg',
+    beforeDraw(chart, args, o){
+      if(!o || !o.color) return;
+      const ctx = chart.ctx;
+      ctx.save(); ctx.globalCompositeOperation = 'destination-over';
+      ctx.fillStyle = o.color; ctx.fillRect(0,0,chart.width,chart.height);
+      ctx.restore();
+    }
+  });
+})();
+
+// ---------- Upgrade of the existing trend chart (wraps renderChart) ----------
+function ctEnhanceTrendChart(){
+  if(!chartInstance) return;
+  const opts = chartInstance.options;
+  const dsets = chartInstance.data.datasets;
+  if(selectedChartParties.size===0 && dsets.length===1){
+    const ds = dsets[0];
+    const vals = ds.data.filter(v=> v!==null && v!==undefined);
+    if(!vals.length) return;
+    const many = ds.data.length > 60;
+    ds.pointBackgroundColor = ds.data.map(v=> v>=THRESHOLD ? CT_GOOD : CT_BAD);
+    ds.pointBorderColor = ds.pointBackgroundColor;
+    ds.pointRadius = many ? 1.8 : 2.8;
+    ds.pointHoverRadius = 5;
+    ds.fill = {target:{value:THRESHOLD}, above:'rgba(31,138,87,0.12)', below:'rgba(193,72,59,0.10)'};
+    const lo = Math.min(...vals, THRESHOLD), hi = Math.max(...vals, THRESHOLD);
+    opts.scales.y.beginAtZero = false;
+    opts.scales.y.min = Math.floor(lo) - 3;
+    opts.scales.y.max = Math.ceil(hi) + 3;
+    opts.plugins.ctThreshold = {value:THRESHOLD, label:'רוב (61)', color:CT_INK};
+  }else{
+    opts.plugins.ctThreshold = {value:ELECTION_THRESHOLD_SEATS, label:'אחוז החסימה (4)', color:'#5A6479'};
+  }
+  chartInstance.stop();          // cancel the entry animation, which still targets the old 0-based scale
+  chartInstance.update('none');
+}
+const __ctOrigRenderChart = renderChart;
+renderChart = function(filtered){
+  __ctOrigRenderChart(filtered);
+  try{ ctEnhanceTrendChart(); }catch(e){ console.warn('CT: trend chart enhance', e); }
+};
+
+// ---------- Time studio state ----------
+const CT = {
+  ready:false, metric:'__coal', mode:'dots', range:'6m', from:null, to:null,
+  win:14, band:true, avgType:'rolling', outlets:new Set(), chart:null, model:null, firstSeen:{}
+};
+const CT_MODES  = [['dots','כל הסקרים וממוצע'],['outlets','לפי כלי תקשורת'],['week','ממוצע שבועי'],['month','ממוצע חודשי']];
+const CT_RANGES = [['1m','חודש'],['3m','3 חודשים'],['6m','חצי שנה'],['1y','שנה'],['all','הכל']];
+
+function ctIsCoal(){ return CT.metric==='__coal'; }
+function ctMetricLabel(){ return ctIsCoal() ? 'סך הקואליציה' : CT.metric; }
+function ctTitleText(){ return ctIsCoal() ? 'מנדטי הקואליציה לאורך זמן' : `המנדטים של ${CT.metric} לאורך זמן`; }
+function ctRef(){
+  return ctIsCoal()
+    ? {value:THRESHOLD, label:'רוב (61)'}
+    : {value:ELECTION_THRESHOLD_SEATS, label:'אחוז החסימה (4)'};
+}
+function ctVal(s){ return ctIsCoal() ? coalitionTotal(s) : (s.parties[CT.metric]||0); }
+function ctColorFor(v){ if(!ctIsCoal()) return colorFor(CT.metric); return v>=THRESHOLD ? CT_GOOD : CT_BAD; }
+function ctLineColor(){ return ctIsCoal() ? CT_BLUE : colorFor(CT.metric); }
+function ctModeLabel(){ const m = CT_MODES.find(x=>x[0]===CT.mode); return m ? m[1] : ''; }
+function ctShortDate(d, long){
+  return d.toLocaleDateString('he-IL', long ? {month:'2-digit', year:'2-digit'} : {day:'2-digit', month:'2-digit'});
+}
+function ctToInput(d){
+  const p = n=> String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+}
+function ctFromInput(str){
+  if(!str) return null;
+  const [y,m,d] = str.split('-').map(x=>parseInt(x,10));
+  if(!y||!m||!d) return null;
+  return new Date(y, m-1, d);
+}
+function ctOutletScope(){
+  if(CT.outlets.size === allOutletsList.length) return 'כל כלי התקשורת';
+  const list = allOutletsList.filter(o=>CT.outlets.has(o));
+  if(list.length <= 3) return list.join(' · ');
+  return `${list.length} כלי תקשורת`;
+}
+
+function ctBounds(){
+  const maxDate = allSurveys[allSurveys.length-1].dateObj;
+  const minDate = allSurveys[0].dateObj;
+  let start, end = new Date(maxDate);
+  if(CT.range==='custom'){
+    start = CT.from || minDate;
+    end = CT.to || maxDate;
+  }else if(CT.range==='all'){
+    start = new Date(minDate);
+  }else{
+    const months = {'1m':1,'3m':3,'6m':6,'1y':12}[CT.range] || 6;
+    start = new Date(maxDate);
+    start.setMonth(start.getMonth()-months);
+  }
+  if(start > end){ const t = start; start = end; end = t; }
+  start = new Date(start); start.setHours(0,0,0,0);
+  end = new Date(end); end.setHours(23,59,59,999);
+  return {start, end};
+}
+
+function ctComputeFirstSeen(){
+  CT.firstSeen = {};
+  allSurveys.forEach(s=> Object.keys(s.parties).forEach(p=>{
+    if(!CT.firstSeen[p] || s.dateObj < CT.firstSeen[p]) CT.firstSeen[p] = s.dateObj;
+  }));
+}
+
+// Poll average: for each survey date, the latest survey of every selected
+// outlet within the preceding window, averaged — so a daily tracker doesn't
+// outweigh a weekly pollster.
+function ctModel(){
+  const {start, end} = ctBounds();
+  const fs = ctIsCoal() ? null : CT.firstSeen[CT.metric];
+  const all = allSurveys
+    .filter(s=> CT.outlets.has(s.outlet) && (!fs || s.dateObj >= fs))
+    .map(s=> ({s, t:s.dateObj.getTime(), v:ctVal(s)}));
+  const t0 = start.getTime(), t1 = end.getTime();
+  const pts = all.filter(p=> p.t >= t0 && p.t <= t1);
+
+  const winMs = CT.win * 86400000;
+  const dates = Array.from(new Set(pts.map(p=>p.t)));
+  const avg = [];
+  dates.forEach(d=>{
+    const latest = {};
+    for(const p of all){
+      if(p.t > d) break;
+      if(p.t > d - winMs) latest[p.s.outlet] = p.v;
+    }
+    const vals = Object.values(latest);
+    if(vals.length){
+      avg.push({t:d, v:vals.reduce((a,b)=>a+b,0)/vals.length, min:Math.min(...vals), max:Math.max(...vals), n:vals.length});
+    }
+  });
+
+  // CT-UPGRADE v3: period average = simple mean of all surveys in the period;
+  // per-outlet means are kept for the tooltip and the band
+  const byOutlet = {};
+  pts.forEach(p=>{ (byOutlet[p.s.outlet] = byOutlet[p.s.outlet] || []).push(p.v); });
+  const outletAvgs = Object.entries(byOutlet)
+    .map(([o,v])=>({outlet:o, n:v.length, v:v.reduce((a,b)=>a+b,0)/v.length}))
+    .sort((a,b)=> b.v - a.v);
+  const periodAvg = outletAvgs.length ? {
+    v: pts.reduce((a,p)=>a+p.v,0)/pts.length,
+    min: Math.min(...outletAvgs.map(o=>o.v)),
+    max: Math.max(...outletAvgs.map(o=>o.v)),
+    outlets: outletAvgs
+  } : null;
+
+  const ref = ctRef().value;
+  let peak = null, low = null, sum = 0, above = 0;
+  pts.forEach(p=>{
+    sum += p.v;
+    if(p.v >= ref) above++;
+    if(!peak || p.v > peak.v || (p.v===peak.v && p.t > peak.t)) peak = p;
+    if(!low  || p.v < low.v  || (p.v===low.v  && p.t > low.t))  low  = p;
+  });
+  return {
+    start, end, all, pts, avg, peak, low, above, ref,
+    mean: pts.length ? sum/pts.length : null,
+    latestAvg: avg.length ? avg[avg.length-1] : null,
+    firstAvg: avg.length ? avg[0] : null,
+    periodAvg
+  };
+}
+
+function ctGroups(m, mode){
+  const map = new Map();
+  m.pts.forEach(p=>{
+    const d = p.s.dateObj;
+    let key, label, first;
+    if(mode==='week'){
+      first = weekRange(d).start;
+      key = first.getTime();
+      label = ctShortDate(first);
+    }else{
+      first = new Date(d.getFullYear(), d.getMonth(), 1);
+      key = first.getTime();
+      label = first.toLocaleDateString('he-IL', {month:'short', year:'2-digit'});
+    }
+    if(!map.has(key)) map.set(key, {key, label, first, vals:[]});
+    map.get(key).vals.push(p.v);
+  });
+  return Array.from(map.values()).sort((a,b)=>a.key-b.key).map(g=>({
+    ...g, n:g.vals.length,
+    avg: g.vals.reduce((a,b)=>a+b,0)/g.vals.length,
+    min: Math.min(...g.vals), max: Math.max(...g.vals)
+  }));
+}
+
+function ctKpis(m){
+  const coal = ctIsCoal();
+  const cls = v=> coal ? (v>=THRESHOLD ? 'good' : 'bad') : '';
+  const out = {};
+  const la = m.latestAvg;
+  out.latest = {label:'ממוצע הסקרים העדכני', val: la ? ctFmt1(la.v) : '—', cls: la ? cls(la.v) : '',
+                sub: la ? `נכון ל-${fmtDate(new Date(la.t))}` : ''};
+  if(m.firstAvg && la){
+    const ch = la.v - m.firstAvg.v;
+    const txt = Math.abs(ch) < 0.05 ? '0.0' : (ch>0 ? '▲ +' : '▼ ') + ctFmt1(ch).replace('-','−');
+    out.change = {label:'שינוי בממוצע בתקופה', val: txt, cls: ch>0.05 ? 'good' : ch<-0.05 ? 'bad' : '',
+                  sub:`מ-${ctFmt1(m.firstAvg.v)} ל-${ctFmt1(la.v)}`};
+  }else{
+    out.change = {label:'שינוי בממוצע בתקופה', val:'—', cls:'', sub:''};
+  }
+  out.peak = m.peak ? {label:'שיא', val:String(m.peak.v), cls:cls(m.peak.v), sub:`${m.peak.s.outlet} · ${fmtDate(m.peak.s.dateObj)}`}
+                    : {label:'שיא', val:'—', cls:'', sub:''};
+  out.low  = m.low  ? {label:'שפל', val:String(m.low.v),  cls:cls(m.low.v),  sub:`${m.low.s.outlet} · ${fmtDate(m.low.s.dateObj)}`}
+                    : {label:'שפל', val:'—', cls:'', sub:''};
+  const n = m.pts.length;
+  out.pct = {label: coal ? 'סקרים עם רוב' : 'סקרים מעל אחוז החסימה',
+             val: n ? Math.round(m.above/n*100) + '%' : '—', cls:'',
+             sub: n ? `${m.above} מתוך ${n}` : ''};
+  out.mean = {label:'ממוצע התקופה', val: m.periodAvg ? ctFmt1(m.periodAvg.v) : '—', cls: m.periodAvg ? cls(m.periodAvg.v) : '',
+              sub:`${n} סקרים`};
+  return out;
+}
+function ctKpiHtml(list, prefix){
+  return list.map(x=>`
+    <div class="${prefix}-kpi">
+      <div class="${prefix}-kpi-label">${x.label}</div>
+      <div class="${prefix}-kpi-val ${x.cls||''}">${x.val}</div>
+      <div class="${prefix}-kpi-sub">${x.sub||''}</div>
+    </div>`).join('');
+}
+
+function ctNoteText(){
+  const coal = ctIsCoal();
+  const colorNote = coal ? ' ירוק = 61 מנדטים ומעלה, אדום = פחות מ-61.' : '';
+  if(ctPeriodMode()){
+    const pa = CT.model && CT.model.periodAvg;
+    const lead = CT.mode==='dots' ? `כל נקודה היא סקר בודד.${colorNote} ` : 'קו לכל כלי תקשורת שנבחר. ';
+    const ex = pa ? ` הממוצע לפי ערוץ: ${pa.outlets.map(o=>`${o.outlet} ${ctFmt1(o.v)}`).join(', ')}.` : '';
+    return lead + `הקו האופקי הוא ממוצע התקופה: הממוצע של כל ${CT.model ? CT.model.pts.length : ''} הסקרים בתקופה שנבחרה.` + ex +
+           (CT.mode==='dots' && CT.band ? ' הרצועה המוצללת: מהערוץ הנמוך לגבוה.' : '');
+  }
+  if(CT.mode==='dots'){
+    return `כל נקודה היא סקר בודד.${colorNote} הקו הוא ממוצע הסקרים: לכל תאריך נלקח הסקר האחרון של כל כלי תקשורת מ-${CT.win} הימים שקדמו לו, ומחושב ביניהם ממוצע — כך כלי שסוקר כל יום לא מקבל משקל יתר.` +
+           (CT.band ? ' הרצועה המוצללת היא הפער בין כלי התקשורת (הנמוך עד הגבוה) באותו חלון.' : '');
+  }
+  if(CT.mode==='outlets'){
+    return `קו לכל כלי תקשורת שנבחר, מוחלק כממוצע של 3 הסקרים האחרונים שלו (הערך המקורי של כל סקר מופיע במעבר עם העכבר). הקו המקווקו הוא ממוצע הסקרים על פני ${CT.win} ימים.`;
+  }
+  const unit = CT.mode==='week' ? 'שבוע (ראשון עד שבת)' : 'חודש';
+  return `לכל ${unit}: הנקודה היא ממוצע כל הסקרים שפורסמו בו, והעמודה מראה את הטווח בין הסקר הנמוך לגבוה.${colorNote}`;
+}
+
+// Single config builder used by both the on-page chart and the exported image
+function ctBuildConfig(m, opt){
+  const k = (opt && opt.scale) || 1, share = !!(opt && opt.share);
+  const coal = ctIsCoal(), ref = ctRef(), lineColor = ctLineColor();
+  const f = (sz, w)=>({family:"'Assistant', sans-serif", size: sz*k, weight: w || '600'});
+
+  const vals = m.pts.map(p=>p.v);
+  let yMin, yMax, step;
+  if(coal){
+    yMin = Math.min(...vals, THRESHOLD) - 3;
+    yMax = Math.max(...vals, THRESHOLD) + 3;
+    step = (yMax - yMin) > 24 ? 5 : 2;
+    yMin = Math.floor(yMin/step)*step;
+    yMax = Math.ceil(yMax/step)*step;
+  }else{
+    yMin = 0;
+    yMax = Math.ceil(Math.max(...vals, ELECTION_THRESHOLD_SEATS) + 2);
+    step = yMax > 24 ? 5 : (yMax > 10 ? 2 : 1);
+    yMax = Math.ceil(yMax/step)*step;
+  }
+  const long = (m.end - m.start) > 200*86400000;
+
+  const plugins = {
+    legend:{
+      position:'bottom', rtl:true,
+      labels:{ font:f(11.5,'600'), boxWidth:9*k, boxHeight:9*k, usePointStyle:true, padding:14*k, color:CT_INK,
+               filter: it=> !String(it.text).startsWith('_'),
+               generateLabels: chart=>{
+                 const items = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                 items.forEach(it=>{
+                   const ds = chart.data.datasets[it.datasetIndex];
+                   if(ds && ds.ctLegendColor){ it.fillStyle = ds.ctLegendColor; it.strokeStyle = ds.ctLegendColor; }
+                 });
+                 return items;
+               } }
+    },
+    tooltip:{ enabled: !share, rtl:true, titleAlign:'right', bodyAlign:'right',
+              filter: it=> !String(it.dataset.label).startsWith('_'), callbacks:{} },
+    ctThreshold:{ value:ref.value, label:ref.label, scale:k, color:CT_INK },
+    ctEndLabel:{ scale:k },
+    ctPointValues:{ scale:k },
+    ctBg:{ color: share ? '#FFFFFF' : null }
+  };
+  const yScale = {
+    min:yMin, max:yMax,
+    ticks:{ font:f(11), stepSize:step, precision:0, color:'#5A6479' },
+    grid:{ color:'#EEEBE2' }, border:{ display:false }
+  };
+  const base = {
+    responsive: !share, maintainAspectRatio:false,
+    animation: (share || CT_REDUCED_MOTION) ? false : {duration:350},
+    layout:{ padding:{ right:58*k, left:4*k, top:10*k } },
+    plugins
+  };
+  if(share) base.devicePixelRatio = 3;
+
+  if(CT.mode==='dots' || CT.mode==='outlets'){
+    const datasets = [];
+    const pa = (CT.avgType==='period') ? m.periodAvg : null;
+    const tFirst = m.pts[0].t, tLast = m.pts[m.pts.length-1].t;
+    const avgData = pa
+      ? Array.from(new Set(m.pts.map(p=>p.t))).map(t=>({x:t, y:pa.v, period:true}))   // a point per survey date, so hover works along the whole line
+      : m.avg.map(a=>({x:a.t, y:a.v, n:a.n, min:a.min, max:a.max}));
+    const avgLabel = pa ? 'ממוצע התקופה' : `ממוצע נע (${CT.win} ימים)`;
+    const bandSrc = pa ? [{t:tFirst, min:pa.min, max:pa.max}, {t:tLast, min:pa.min, max:pa.max}] : m.avg;
+    if(CT.mode==='dots'){
+      if(CT.band && bandSrc.length > 1){
+        const bandCol = coal ? 'rgba(36,86,166,0.11)' : ctAlpha(lineColor, 0.13);
+        datasets.push({label:'_hi', data:bandSrc.map(a=>({x:a.t, y:a.max})), showLine:true, pointRadius:0, pointHitRadius:0,
+                       borderWidth:0, fill:'+1', backgroundColor:bandCol, cubicInterpolationMode:'monotone', order:4});
+        datasets.push({label:'_lo', data:bandSrc.map(a=>({x:a.t, y:a.min})), showLine:true, pointRadius:0, pointHitRadius:0,
+                       borderWidth:0, fill:false, cubicInterpolationMode:'monotone', order:4});
+      }
+      const r = (m.pts.length > 250 ? 2.6 : 3.6) * k;
+      datasets.push({
+        label:'סקר בודד',
+        data: m.pts.map(p=>({x:p.t, y:p.v, outlet:p.s.outlet, pollster:p.s.pollster})),
+        showLine:false, pointRadius:r, pointHoverRadius:6*k, pointBorderWidth:1*k,
+        pointBackgroundColor: m.pts.map(p=> ctAlpha(ctColorFor(p.v), 0.45)),
+        pointBorderColor:     m.pts.map(p=> ctAlpha(ctColorFor(p.v), 0.9)),
+        ctLegendColor: coal ? 'rgba(90,100,121,0.55)' : ctAlpha(lineColor, 0.55),
+        order:2
+      });
+      datasets.push({label:avgLabel, data:avgData, showLine:true, borderColor:lineColor, backgroundColor:lineColor,
+                     borderWidth:3.4*k, pointRadius:0, pointHoverRadius:5*k, cubicInterpolationMode:'monotone', ctEndLabel:true, order:1});
+    }else{
+      allOutletsList.filter(o=> CT.outlets.has(o)).forEach(o=>{
+        const hist = m.all.filter(p=>p.s.outlet===o);
+        const d = [];
+        hist.forEach((p,i)=>{
+          if(p.t < m.start.getTime() || p.t > m.end.getTime()) return;
+          const last = hist.slice(Math.max(0,i-2), i+1).map(q=>q.v);
+          d.push({x:p.t, y:last.reduce((a,b)=>a+b,0)/last.length, raw:p.v, outlet:o, pollster:p.s.pollster});
+        });
+        if(!d.length) return;
+        const c = outletColorFor(o);
+        datasets.push({label:o, data:d, showLine:true, borderColor:c, backgroundColor:c, borderWidth:2*k,
+                       pointRadius:2.4*k, pointHoverRadius:5*k, cubicInterpolationMode:'monotone', order:2});
+      });
+      datasets.push({label:avgLabel, data:avgData, showLine:true, borderColor:CT_INK, backgroundColor:CT_INK,
+                     borderDash:[7*k,4*k], borderWidth:2.8*k, pointRadius:0, pointHoverRadius:5*k, cubicInterpolationMode:'monotone',
+                     ctEndLabel:true, ctEndColor:CT_INK, order:1});
+    }
+    plugins.tooltip.callbacks = {
+      title: items=> !items.length ? '' : (items[0].raw.period ? `${fmtDate(m.start)} – ${fmtDate(m.end)}` : fmtDate(new Date(items[0].raw.x))),
+      label: c=>{
+        const r = c.raw;
+        if(r.outlet && r.raw!==undefined) return ` ${r.outlet}: ${r.raw}  ·  ממוצע 3 אחרונים ${ctFmt1(r.y)}`;
+        if(r.outlet) return ` ${r.outlet}${r.pollster && r.pollster!==r.outlet ? ' (' + r.pollster + ')' : ''}: ${r.y}`;
+        if(r.period && m.periodAvg){
+          return [` ממוצע התקופה: ${ctFmt1(r.y)}`].concat(
+            m.periodAvg.outlets.map(o=> `   ${o.outlet}: ${ctFmt1(o.v)} (${o.n} סקרים)`));
+        }
+        if(r.n) return ` ${c.dataset.label}: ${ctFmt1(r.y)}  ·  ${r.n} כלים, ${r.min}–${r.max}`;
+        return ` ${c.dataset.label}: ${ctFmt1(r.y)}`;
+      }
+    };
+    return {
+      type:'scatter',
+      data:{datasets},
+      options:{ ...base,
+        interaction:{mode:'nearest', intersect:false},
+        scales:{
+          x:{ type:'linear', min:m.start.getTime(), max:m.end.getTime(),
+              ticks:{ font:f(10.5), color:'#5A6479', maxTicksLimit: share ? 7 : 10, maxRotation:0,
+                      callback: v=> ctShortDate(new Date(v), long) },
+              grid:{ display:false }, border:{ color:'#DDE2EA' } },
+          y: yScale
+        }
+      }
+    };
+  }
+
+  // weekly / monthly
+  const groups = ctGroups(m, CT.mode);
+  const barCol = coal ? 'rgba(36,86,166,0.17)' : ctAlpha(lineColor, 0.2);
+  const datasets = [
+    { type:'line', label:'ממוצע', data:groups.map(g=>g.avg),
+      borderColor:lineColor, backgroundColor:lineColor, borderWidth:2.4*k, cubicInterpolationMode:'monotone',
+      pointRadius:5*k, pointHoverRadius:7*k, pointBorderColor:'#fff', pointBorderWidth:2*k,
+      pointBackgroundColor: groups.map(g=> ctColorFor(g.avg)), ctPointValues:true, ctLegendColor:lineColor, order:1 },
+    { type:'bar', label:'טווח הסקרים (הנמוך עד הגבוה)',
+      data: groups.map(g=> g.min===g.max ? [g.min-0.25, g.max+0.25] : [g.min, g.max]),
+      backgroundColor:barCol, borderWidth:0, borderRadius:4*k, borderSkipped:false,
+      barPercentage:0.62, categoryPercentage:0.9, order:2 }
+  ];
+  plugins.tooltip.callbacks = {
+    title: items=>{
+      if(!items.length) return '';
+      const g = groups[items[0].dataIndex];
+      if(CT.mode==='week'){ const e = new Date(g.first); e.setDate(e.getDate()+6); return `${fmtDate(g.first)} – ${fmtDate(e)}`; }
+      return g.first.toLocaleDateString('he-IL', {month:'long', year:'numeric'});
+    },
+    label: c=>{
+      const g = groups[c.dataIndex];
+      if(c.dataset.type==='line') return ` ממוצע: ${ctFmt1(g.avg)}  ·  ${g.n} סקרים`;
+      return ` טווח: ${g.min}–${g.max}`;
+    }
+  };
+  return {
+    type:'bar',
+    data:{ labels:groups.map(g=>g.label), datasets },
+    options:{ ...base,
+      interaction:{mode:'index', intersect:false},
+      scales:{
+        x:{ ticks:{ font:f(10.5), color:'#5A6479', maxRotation:0, autoSkip:true, maxTicksLimit: share ? 10 : 16 },
+            grid:{ display:false }, border:{ color:'#DDE2EA' } },
+        y: yScale
+      }
+    }
+  };
+}
+
+// ---------- Studio controls ----------
+function ctRenderModes(){
+  const el = document.getElementById('ctModes');
+  el.innerHTML = '';
+  CT_MODES.forEach(([key,label])=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = label;
+    b.className = key===CT.mode ? 'active' : '';
+    b.setAttribute('aria-pressed', key===CT.mode ? 'true' : 'false');
+    b.onclick = ()=>{ CT.mode = key; ctRenderModes(); ctRender(); };
+    el.appendChild(b);
+  });
+}
+function ctRenderRanges(){
+  const el = document.getElementById('ctRanges');
+  el.innerHTML = '';
+  CT_RANGES.forEach(([key,label])=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'pill' + (key===CT.range ? ' active' : '');
+    b.textContent = label;
+    b.onclick = ()=>{ CT.range = key; CT.from = null; CT.to = null; ctRenderRanges(); ctRender(); };
+    el.appendChild(b);
+  });
+}
+function ctRenderOutletPills(){
+  const bar = document.getElementById('ctOutlets');
+  bar.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'outlet-action';
+  allBtn.textContent = '✓ סמן הכל';
+  allBtn.onclick = ()=>{ CT.outlets = new Set(allOutletsList); ctRenderOutletPills(); ctRender(); };
+  bar.appendChild(allBtn);
+  const clrBtn = document.createElement('button');
+  clrBtn.className = 'outlet-action';
+  clrBtn.textContent = '✗ נקה סימון';
+  clrBtn.onclick = ()=>{
+    CT.outlets = new Set(allSurveys.length ? [allSurveys[allSurveys.length-1].outlet] : allOutletsList.slice(0,1));
+    ctRenderOutletPills(); ctRender();
+  };
+  bar.appendChild(clrBtn);
+  allOutletsList.forEach(o=>{
+    const on = CT.outlets.has(o);
+    const b = document.createElement('button');
+    b.className = 'outlet-pill' + (on ? ' active' : '');
+    b.innerHTML = (on ? '✓ ' : '') + o;
+    b.onclick = ()=>{
+      if(CT.outlets.has(o)){ if(CT.outlets.size > 1) CT.outlets.delete(o); }
+      else CT.outlets.add(o);
+      ctRenderOutletPills(); ctRender();
+    };
+    bar.appendChild(b);
+  });
+}
+
+function ctInit(){
+  if(!allSurveys.length || !document.getElementById('ctMetric')) return;
+  ctComputeFirstSeen();
+  CT.outlets = new Set(allOutletsList);
+
+  const sel = document.getElementById('ctMetric');
+  sel.innerHTML = '';
+  const o0 = document.createElement('option');
+  o0.value = '__coal'; o0.textContent = '★ סך הקואליציה';
+  sel.appendChild(o0);
+  allPartiesList.forEach(p=>{
+    const o = document.createElement('option');
+    o.value = p; o.textContent = p;
+    sel.appendChild(o);
+  });
+  sel.value = CT.metric;
+  sel.onchange = ()=>{ CT.metric = sel.value; ctRender(); };
+
+  document.getElementById('ctWin').onchange = e=>{ CT.win = parseInt(e.target.value,10) || 14; ctRender(); };
+  document.getElementById('ctBand').onchange = e=>{ CT.band = e.target.checked; ctRender(); };
+  const onDate = ()=>{
+    CT.from = ctFromInput(document.getElementById('ctFrom').value);
+    CT.to = ctFromInput(document.getElementById('ctTo').value);
+    CT.range = 'custom';
+    ctRenderRanges(); ctRender();
+  };
+  document.getElementById('ctFrom').onchange = onDate;
+  document.getElementById('ctTo').onchange = onDate;
+
+  ctRenderModes(); ctRenderRanges(); ctRenderOutletPills(); ctRenderAvgType();
+  CT.ready = true;
+  ctRender();
+  if(document.fonts && document.fonts.ready){
+    document.fonts.ready.then(()=>{ if(CT.chart) CT.chart.update('none'); });
+  }
+}
+
+function ctRender(){
+  if(!CT.ready) return;
+  const m = ctModel();
+  CT.model = m;
+
+  const minD = allSurveys[0].dateObj, maxD = allSurveys[allSurveys.length-1].dateObj;
+  const fromEl = document.getElementById('ctFrom'), toEl = document.getElementById('ctTo');
+  fromEl.min = toEl.min = ctToInput(minD);
+  fromEl.max = toEl.max = ctToInput(maxD);
+  fromEl.value = ctToInput(m.start);
+  toEl.value = ctToInput(m.end);
+
+  document.getElementById('ctTitle').textContent = ctTitleText();
+  const ctLineModes = (CT.mode==='dots' || CT.mode==='outlets');
+  document.getElementById('ctAvgTypeWrap').style.display = ctLineModes ? '' : 'none';
+  document.getElementById('ctSmoothWrap').style.display = (ctLineModes && CT.avgType==='rolling') ? '' : 'none';
+  document.getElementById('ctBandWrap').style.display = CT.mode==='dots' ? '' : 'none';
+
+  const k = ctKpis(m);
+  document.getElementById('ctKpis').innerHTML = ctKpiHtml([k.mean, k.change, k.peak, k.low, k.pct], 'ct');
+  document.getElementById('ctNote').textContent = ctNoteText();
+
+  if(CT.chart){ CT.chart.destroy(); CT.chart = null; }
+  const empty = document.getElementById('ctEmpty');
+  const canvas = document.getElementById('ctCanvas');
+  if(!m.pts.length){
+    empty.style.display = 'flex';
+    canvas.style.visibility = 'hidden';
+    return;
+  }
+  empty.style.display = 'none';
+  canvas.style.visibility = 'visible';
+  CT.chart = new Chart(canvas.getContext('2d'), ctBuildConfig(m, {scale:1, share:false}));
+}
+
+// CT-UPGRADE v2
+const CT_AVG_TYPES = [['rolling','ממוצע נע'],['period','ממוצע התקופה']];
+function ctRenderAvgType(){
+  const el = document.getElementById('ctAvgType');
+  if(!el) return;
+  el.innerHTML = '';
+  CT_AVG_TYPES.forEach(([key,label])=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = label;
+    b.className = key===CT.avgType ? 'active' : '';
+    b.setAttribute('aria-pressed', key===CT.avgType ? 'true' : 'false');
+    b.onclick = ()=>{ CT.avgType = key; ctRenderAvgType(); ctRender(); };
+    el.appendChild(b);
+  });
+}
+function ctPeriodMode(){ return CT.avgType==='period' && (CT.mode==='dots' || CT.mode==='outlets'); }
+
+function ctScrollTo(){
+  const el = document.getElementById('ctSection');
+  if(el) el.scrollIntoView({behavior: CT_REDUCED_MOTION ? 'auto' : 'smooth', block:'start'});
+}
+
+// ---------- CSV ----------
+function ctDownloadCsv(){
+  const m = CT.model;
+  if(!m || !m.pts.length) return;
+  const avgMap = new Map(m.avg.map(a=>[a.t, a.v]));
+  const rows = [['תאריך','כלי תקשורת','עורך משאלים','מספר הסקר','משיבים', ctMetricLabel(), ctPeriodMode() ? 'ממוצע התקופה' : `ממוצע נע (${CT.win} ימים)`]];
+  m.pts.forEach(p=> rows.push([
+    p.s.dateStr, p.s.outlet, p.s.pollster, p.s.num, p.s.respondents ?? '', p.v,
+    (ctPeriodMode() && m.periodAvg) ? ctFmt1(m.periodAvg.v) : (avgMap.has(p.t) ? ctFmt1(avgMap.get(p.t)) : '')
+  ]));
+  const esc = c=>{ const s = String(c ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; };
+  const csv = '\ufeff' + rows.map(r=> r.map(esc).join(',')).join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (ctIsCoal() ? 'coalition' : 'party') + '-over-time-' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=> URL.revokeObjectURL(a.href), 2000);
+}
+
+// ---------- Share image (reuses the existing modal) ----------
+async function ctChartImage(m, w, h, k){
+  const holder = document.createElement('div');
+  holder.style.cssText = `position:fixed;left:-99999px;top:0;width:${w}px;height:${h}px;`;
+  const cv = document.createElement('canvas');
+  cv.width = w; cv.height = h;
+  cv.style.width = w + 'px'; cv.style.height = h + 'px';
+  holder.appendChild(cv);
+  document.body.appendChild(holder);
+  let url = '';
+  try{
+    const ch = new Chart(cv.getContext('2d'), ctBuildConfig(m, {scale:k, share:true}));
+    url = ch.toBase64Image('image/png', 1);
+    ch.destroy();
+  }finally{
+    holder.remove();
+  }
+  return url;
+}
+function ctImgLoaded(img){
+  return new Promise(res=>{
+    if(img.complete && img.naturalWidth) return res();
+    img.onload = ()=>res(); img.onerror = ()=>res();
+  });
+}
+async function ctRenderShare(format){
+  currentShareFormat = format;
+  const postBtn = document.getElementById('formatPostBtn');
+  const storyBtn = document.getElementById('formatStoryBtn');
+  if(postBtn) postBtn.classList.toggle('active', format==='post');
+  if(storyBtn) storyBtn.classList.toggle('active', format==='story');
+
+  const m = CT.model;
+  const story = format==='story';
+  const tpl = document.getElementById('ctShareTemplate');
+  tpl.classList.toggle('story', story);
+  document.getElementById('ctsLogo').src = LOGO_DATA_URI;
+  document.getElementById('ctsTitle').textContent = ctTitleText();
+  document.getElementById('ctsSub').textContent =
+    `${fmtDate(m.start)} – ${fmtDate(m.end)} · ${m.pts.length} סקרים · ${ctOutletScope()}`;
+  const k = ctKpis(m);
+  document.getElementById('ctsKpis').innerHTML = ctKpiHtml([k.mean, k.peak, k.low, k.pct], 'cts');
+
+  const img = document.getElementById('ctsChartImg');
+  img.src = story ? await ctChartImage(m, 924, 980, 1.9) : await ctChartImage(m, 1036, 560, 1.55);
+  await ctImgLoaded(img);
+
+  const canvas = await html2canvas(tpl, { scale:3, backgroundColor:'#F2F4F8', useCORS:true });
+  summaryDataUrl = canvas.toDataURL('image/png');
+  document.getElementById('summaryImg').src = summaryDataUrl;
+  document.getElementById('summaryModal').classList.add('open');
+  refreshShareButtonVisibility();
+}
+async function ctPrepareShare(){
+  if(!CT.ready || !CT.model || !CT.model.pts.length) return;
+  currentShareKind = 'coalTime';
+  summaryFilenamePrefix = ctIsCoal() ? 'coalition-over-time' : 'party-over-time';
+  const btn = document.getElementById('ctShareBtn');
+  btn.disabled = true;
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = 'מכין תמונה...';
+  try{
+    document.getElementById('modalFormatToggle').style.display = 'flex';
+    document.getElementById('modalCompareToggle').style.display = 'none';
+    await ctRenderShare('post');
+  }catch(err){
+    console.error(err);
+    alert('לא הצלחנו להכין את התמונה. נסו שוב.');
+  }finally{
+    btn.disabled = false;
+    btn.innerHTML = origHtml;
+  }
+}
+function ctShareText(){
+  const m = CT.model;
+  if(!m) return DASHBOARD_URL;
+  const head = ctIsCoal() ? 'מנדטי הקואליציה' : `המנדטים של ${CT.metric}`;
+  let t = `📈 ${head} לאורך זמן (${fmtDate(m.start)} – ${fmtDate(m.end)})\n`;
+  if(m.periodAvg) t += `🏛️ ממוצע התקופה: ${ctFmt1(m.periodAvg.v)}\n`;
+  if(m.peak) t += `⬆️ שיא: ${m.peak.v} (${m.peak.s.outlet}, ${fmtDate(m.peak.s.dateObj)})\n`;
+  if(m.low)  t += `⬇️ שפל: ${m.low.v} (${m.low.s.outlet}, ${fmtDate(m.low.s.dateObj)})\n`;
+  if(ctIsCoal() && m.pts.length) t += `✅ סקרים עם רוב: ${Math.round(m.above/m.pts.length*100)}% (${m.above} מתוך ${m.pts.length})\n`;
+  t += `\n🔗 לדשבורד המלא: ${DASHBOARD_URL}`;
+  return t;
+}
+
+// ---------- Hooks into existing functions (wrapped, never replaced) ----------
+const __ctOrigSwitchShareFormat = switchShareFormat;
+switchShareFormat = function(format){
+  if(currentShareKind !== 'coalTime') return __ctOrigSwitchShareFormat(format);
+  if(format === currentShareFormat) return;
+  const btns = document.querySelectorAll('.format-pill');
+  btns.forEach(b=> b.disabled = true);
+  ctRenderShare(format).catch(err=>{
+    console.error(err);
+    alert('לא הצלחנו להכין את התמונה. נסו שוב.');
+  }).finally(()=> btns.forEach(b=> b.disabled = false));
+};
+const __ctOrigCurrentShareText = currentShareText;
+currentShareText = function(){
+  return currentShareKind === 'coalTime' ? ctShareText() : __ctOrigCurrentShareText();
+};
+const __ctOrigInitDashboard = initDashboard;
+initDashboard = function(){
+  __ctOrigInitDashboard.apply(this, arguments);
+  try{ ctInit(); }catch(e){ console.error('CT: init failed', e); }
+};
+// ===================== /CT-UPGRADE v1 =====================
 </script>
 </body>
 </html>
