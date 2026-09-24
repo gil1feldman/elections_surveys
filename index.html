@@ -259,6 +259,15 @@
     font-family:var(--mono);font-size:8px;font-weight:700;color:var(--gold);border:1px solid var(--gold);
     padding:0px 5px;border-radius:4px;white-space:nowrap;
   }
+  /* CT-UPGRADE v4 */
+  .breakdown-card .opp-tag{
+    font-family:var(--mono);font-size:8px;font-weight:700;color:#5A7FA6;border:1px solid #9FB6CC;
+    padding:0px 5px;border-radius:4px;white-space:nowrap;
+  }
+  table.st-party-table .opp-tag{
+    font-family:var(--mono);font-size:14px;font-weight:700;color:#5A7FA6;border:1px solid #9FB6CC;
+    padding:3px 9px;border-radius:6px;white-space:nowrap;
+  }
 
   /* ---------- Outlet compare cards ---------- */
   .outlet-compare-grid{
@@ -864,7 +873,7 @@
           <div class="movers" id="moversBox"></div>
         </div>
         <div class="streak-card" id="streakCard">
-          <div class="eyebrow">מצב הרוב הקואליציוני</div>
+          <div class="eyebrow">מצב הרוב של גוש נתניהו</div>
           <div class="streak-stats">
             <div class="stat-block">
               <div class="stat-label">רצף ללא רוב</div>
@@ -901,7 +910,7 @@
     <div class="section-head">
       <div>
         <div class="eyebrow">מגמה לאורך זמן</div>
-        <h2>סך הקואליציה או מפלגות נבחרות</h2>
+        <h2>סך גוש נתניהו או מפלגות נבחרות</h2>
       </div>
       <div class="filter-group">
         <span class="glabel">טווח תאריכים:</span>
@@ -917,7 +926,7 @@
     <div class="section-head" id="ctSection">
       <div>
         <div class="eyebrow">לאורך זמן</div>
-        <h2 id="ctTitle">מנדטי הקואליציה לאורך זמן</h2>
+        <h2 id="ctTitle">מנדטי גוש נתניהו לאורך זמן</h2>
         <p>בחרו מה להציג, תקופה וכלי תקשורת. הגרף, המספרים והתמונה לשיתוף מתעדכנים יחד.</p>
       </div>
       <div class="ct-actions">
@@ -946,12 +955,12 @@
         <div class="ct-field" id="ctAvgTypeWrap"><span class="glabel">סוג ממוצע:</span><div class="ct-seg" id="ctAvgType"></div></div>
         <label class="ct-field" id="ctSmoothWrap"><span class="glabel">ממוצע על פני:</span>
           <select id="ctWin" class="ct-select">
-            <option value="7">7 ימים</option>
-            <option value="14" selected>14 ימים</option>
-            <option value="30">30 ימים</option>
+            <option value="5">5 סקרים</option>
+            <option value="10" selected>10 סקרים</option>
+            <option value="20">20 סקרים</option>
           </select>
         </label>
-        <label class="ct-field ct-check" id="ctBandWrap"><input type="checkbox" id="ctBand" checked> הצג פער בין כלי התקשורת</label>
+        <label class="ct-field ct-check" id="ctBandWrap"><input type="checkbox" id="ctBand" checked> הצג טווח בין הסקרים</label>
       </div>
       <div class="ct-outlets-row">
         <div class="filter-group"><span class="glabel">כלי תקשורת:</span><div class="pillbar" id="ctOutlets"></div></div>
@@ -964,6 +973,7 @@
       <div class="ct-note" id="ctNote"></div>
     </div>
 
+    <!-- CT-UPGRADE v4 -->
     <!-- ADVANCED ANALYSIS TOGGLE -->
     <button class="advanced-toggle-bar" id="advancedToggleBar" onclick="toggleAdvanced()">
       <span class="advanced-toggle-label">
@@ -979,8 +989,8 @@
     <div class="section-head">
       <div>
         <div class="eyebrow">השוואת ערוצים</div>
-        <h2>מנדטי הקואליציה בסקר האחרון של כל כלי תקשורת</h2>
-        <p>מציג תמיד את מנדטי הקואליציה בלבד (לא את שאר המפלגות), לפי כלי התקשורת שנבחרו למעלה — בלי קשר לטווח התאריכים. לכל כלי תקשורת: הסקר האחרון שלו, השינוי מול הסקר הקודם שלו, ומתי לאחרונה היה לקואליציה רוב לפי הסקרים שלו.</p>
+        <h2>מנדטי גוש נתניהו בסקר האחרון של כל כלי תקשורת</h2>
+        <p>מציג תמיד את מנדטי גוש נתניהו בלבד (לא את שאר המפלגות), לפי כלי התקשורת שנבחרו למעלה — בלי קשר לטווח התאריכים. לכל כלי תקשורת: הסקר האחרון שלו, השינוי מול הסקר הקודם שלו, ומתי לאחרונה היה לגוש נתניהו רוב לפי הסקרים שלו.</p>
       </div>
       <button class="summary-btn small" id="outletSummaryBtn" onclick="prepareOutletSummary()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>
@@ -1122,7 +1132,7 @@
       </div>
 
       <div class="st-mini-card st-streak-mini" id="stStreakMini">
-        <div class="st-mini-eyebrow">מצב הרוב הקואליציוני</div>
+        <div class="st-mini-eyebrow">מצב הרוב של גוש נתניהו</div>
         <div class="st-streak-stats">
           <div class="stat-block">
             <div class="st-stat-label">רצף ללא רוב</div>
@@ -1487,7 +1497,7 @@ function renderHouseEffect(){
   const coalTr = document.createElement('tr');
   coalTr.className = "coal-row";
   coalTr.innerHTML = `
-    <td class="pname-cell">★ סך הקואליציה</td>
+    <td class="pname-cell">★ סך גוש נתניהו</td>
     <td class="he-ref">${crossCoalAvg!==null ? crossCoalAvg.toFixed(1) : '—'}</td>
     ${outlets.map(o=>{
       const d = outletData[o];
@@ -1849,17 +1859,17 @@ function render(){
   const coalSeats = coalitionTotal(latest);
   drawGaugeCanvas('gaugeCanvas', coalSeats);
   document.getElementById('gaugeSentence').innerHTML =
-    `לקואליציה (ש״ס · הציונות הדתית · עוצמה יהודית · הליכוד · יהדות התורה · עמך ישראל) <b>${coalSeats} מנדטים</b>`;
+    `לגוש נתניהו (ש״ס · הציונות הדתית · עוצמה יהודית · הליכוד · יהדות התורה · עמך ישראל) <b>${coalSeats} מנדטים</b>`;
   
   const diff = coalSeats - THRESHOLD;
   const statusEl = document.getElementById('gaugeStatus');
   let statusText, statusClass;
   if(coalSeats >= THRESHOLD){
     statusClass = "pass";
-    statusText = `לקואליציה יש רוב — ${diff} מנדטים מעל הדרוש`;
+    statusText = `לגוש נתניהו יש רוב — ${diff} מנדטים מעל הדרוש`;
   }else{
     statusClass = "fail";
-    statusText = `לקואליציה אין רוב — חסרים לה ${Math.abs(diff)} מנדטים ל-61`;
+    statusText = `לגוש נתניהו אין רוב — חסרים לה ${Math.abs(diff)} מנדטים ל-61`;
   }
   statusEl.className = "gauge-status " + statusClass;
   statusEl.textContent = statusText;
@@ -1914,7 +1924,7 @@ function render(){
   const chyronText = document.getElementById('chyronText');
   chyronTag.textContent = coalSeats >= THRESHOLD ? "יש רוב" : "אין רוב";
   chyronTag.style.background = coalSeats >= THRESHOLD ? "var(--good)" : "var(--alert)";
-  let chyronMsg = `לקואליציה <b>${coalSeats} מנדטים</b> בסקר ${latest.outlet} מ-${fmtDate(latest.dateObj)}`;
+  let chyronMsg = `לגוש נתניהו <b>${coalSeats} מנדטים</b> בסקר ${latest.outlet} מ-${fmtDate(latest.dateObj)}`;
   if(coalTrend && coalTrend.diff !== 0){
     chyronMsg += ` · ${coalTrend.arrow} ${coalTrend.txt} מהסקר הקודם`;
   }
@@ -1930,9 +1940,9 @@ function render(){
 // name the coalition explicitly in the text.
 function trendParts(latestVal, prevVal){
   const d = latestVal - prevVal;
-  if(d > 0) return {cls:"up", arrow:"▲", txt:`עלייה של ${d} מנדטים לקואליציה`, diff:d};
-  if(d < 0) return {cls:"down", arrow:"▼", txt:`ירידה של ${Math.abs(d)} מנדטים לקואליציה`, diff:d};
-  return {cls:"flat", arrow:"●", txt:"ללא שינוי בקואליציה", diff:0};
+  if(d > 0) return {cls:"up", arrow:"▲", txt:`עלייה של ${d} מנדטים לגוש נתניהו`, diff:d};
+  if(d < 0) return {cls:"down", arrow:"▼", txt:`ירידה של ${Math.abs(d)} מנדטים לגוש נתניהו`, diff:d};
+  return {cls:"flat", arrow:"●", txt:"ללא שינוי בגוש נתניהו", diff:0};
 }
 
 // Always all outlets, regardless of the top selectedOutlets/date filters —
@@ -1974,7 +1984,7 @@ function renderOutletCompare(){
         <span class="outlet-card-name">${r.outlet}</span>
         <span class="outlet-card-date">${fmtDate(r.latest.dateObj)}</span>
       </div>
-      <div class="outlet-card-num ${r.numClass}">${r.coalLatest}<small> מנדטים לקואליציה</small></div>
+      <div class="outlet-card-num ${r.numClass}">${r.coalLatest}<small> מנדטים לגוש נתניהו</small></div>
       <div class="outlet-card-trend ${r.trend ? r.trend.cls : 'flat'}">${r.trend ? `${r.trend.arrow} ${r.trend.txt} מהסקר הקודם` : 'אין סקר קודם להשוואה'}</div>
       <div class="outlet-card-maj">רוב אחרון: <b>${r.lastMajDate ? fmtDate(r.lastMajDate) : 'מעולם לא'}</b></div>
     `;
@@ -2048,7 +2058,7 @@ function renderLatestCompare(){
   // threshold filter above (it's a bloc total, not an individual party)
   const coalTr = document.createElement('tr');
   coalTr.className = "coal-row";
-  coalTr.innerHTML = `<td class="pname-cell">★ סך הקואליציה (+עמך ישראל)</td>` + outlets.map(o=>{
+  coalTr.innerHTML = `<td class="pname-cell">★ סך גוש נתניהו (+עמך ישראל)</td>` + outlets.map(o=>{
     const s = outletData[o];
     const val = s ? coalitionTotal(s) : null;
     return `<td class="he-avg">${val!==null ? val : '—'}</td>`;
@@ -2075,7 +2085,7 @@ function computeStreakInfo(){
     return {
       empty:false, streak:0, numText:"0", numClass:"good",
       lastMajText: fmtDate(pool[pool.length-1].dateObj),
-      subText: `יש רוב קואליציוני בסקר האחרון ${scopeText}`, emphasis:false
+      subText: `יש רוב לגוש נתניהו בסקר האחרון ${scopeText}`, emphasis:false
     };
   }
   if(streak < pool.length){
@@ -2088,7 +2098,7 @@ function computeStreakInfo(){
   return {
     empty:false, streak, numText:String(streak), numClass:"bad",
     lastMajText: "—",
-    subText: `הקואליציה לא הגיעה ל-61 מנדטים באף סקר מאז תחילת המדידה אחרי הקמת הממשלה.`, emphasis:true
+    subText: `גוש נתניהו לא הגיע ל-61 מנדטים באף סקר מאז תחילת המדידה אחרי הקמת הממשלה.`, emphasis:true
   };
 }
 
@@ -2150,7 +2160,7 @@ function renderTrendCard(coalTrend, rows, prevSurvey, latest, prevSurveyStale){
 
   bigEl.className = "trend-big " + coalTrend.cls;
   bigEl.textContent = `${coalTrend.arrow} ${coalTrend.txt}`;
-  subEl.textContent = `סך הקואליציה לעומת הסקר הקודם של ${latest.outlet} (${fmtDate(prevSurvey.dateObj)})`;
+  subEl.textContent = `סך גוש נתניהו לעומת הסקר הקודם של ${latest.outlet} (${fmtDate(prevSurvey.dateObj)})`;
 
   const {risers, fallers} = computeRisersFallers(rows);
   moversEl.innerHTML = buildMoversHtml(risers, fallers, "movers-row", "movers-col", "movers-col-title", "movers-empty");
@@ -2170,7 +2180,7 @@ function renderBreakdownTable(rows){
     const tr = document.createElement('tr');
     if(isCoalition(r.party)) tr.className = "coal-row";
     tr.innerHTML = `
-      <td class="pname-cell"><span class="pdot" style="background:${colorFor(r.party)}"></span>${r.party} ${isCoalition(r.party) ? '<span class="coal-tag">קואליציה</span>' : ''}</td>
+      <td class="pname-cell"><span class="pdot" style="background:${colorFor(r.party)}"></span>${r.party} ${isCoalition(r.party) ? '<span class="coal-tag">גוש נתניהו</span>' : '<span class="opp-tag">גוש השינוי</span>'}</td>
       <td class="num"><span style="display:inline-flex;align-items:center;gap:6px;">${r.latestVal} ${d.cls!=='flat' ? `<span class="delta ${d.cls}" style="font-family:'Assistant';font-size:0.75em;font-weight:700;">${d.arrow}</span>` : ''}</span></td>
       <td class="avg">${r.baseAvg!==null ? r.baseAvg.toFixed(1) : '—'}</td>
       <td><span class="delta ${d.cls}">${d.arrow} ${d.txt}</span></td>
@@ -2301,7 +2311,7 @@ function renderChartControls(filtered){
 
   const coalBtn = document.createElement('button');
   coalBtn.className = "chart-pill coalition-pill" + (selectedChartParties.size===0 ? " active" : "");
-  coalBtn.textContent = "★ סך הקואליציה";
+  coalBtn.textContent = "★ סך גוש נתניהו";
   coalBtn.onclick = ()=>{
     selectedChartParties.clear();
     renderChartControls(filtered);
@@ -2334,7 +2344,7 @@ function renderChart(filtered){
   let datasets;
   if(selectedChartParties.size === 0){
     datasets = [{
-      label: "סך הקואליציה",
+      label: "סך גוש נתניהו",
       data: filtered.map(s=> coalitionTotal(s)),
       borderColor: "#C9972C",
       backgroundColor: "#C9972C",
@@ -2444,7 +2454,7 @@ function buildMainShareText(){
   const { latest, coalSeats, moverRows } = lastState;
   const dl = relativeDateLabel(latest.dateObj);
   const dateClause = dl.relative ? `מ${dl.text}` : `מתאריך ${dl.text}`;
-  let text = `🗳️ הנה תמונת המנדטים בסקר של ${latest.outlet} ${dateClause}.\n🏛️ לקואליציה יש ${coalSeats} מנדטים.\n`;
+  let text = `🗳️ הנה תמונת המנדטים בסקר של ${latest.outlet} ${dateClause}.\n🏛️ לגוש נתניהו יש ${coalSeats} מנדטים.\n`;
   const {risers, fallers} = computeRisersFallers(moverRows);
   if(risers.length || fallers.length){
     text += `\n📊 השינויים מהסקר הקודם:\n`;
@@ -2459,7 +2469,7 @@ function buildMainShareText(){
 }
 
 function buildOutletShareText(){
-  return `📊 תמונת מצב במנדטי הקואליציה, לפי כלי התקשורת.\n\n🔗 לדשבורד המלא: ${DASHBOARD_URL}`;
+  return `📊 תמונת מצב במנדטי גוש נתניהו, לפי כלי התקשורת.\n\n🔗 לדשבורד המלא: ${DASHBOARD_URL}`;
 }
 
 function buildLatestCompareShareText(){
@@ -2499,7 +2509,7 @@ function buildWeeklyShareText(){
   const data = computeWeeklySummaryData();
   let text = `📅 סיכום שבועי — סקרי מנדטים (${fmtDate(data.start)} — ${fmtDate(data.end)})\n`;
   if(data.weekAvg !== null){
-    text += `🏛️ ממוצע מנדטים לקואליציה השבוע: ${data.weekAvg.toFixed(1)}\n`;
+    text += `🏛️ ממוצע מנדטים לגוש נתניהו השבוע: ${data.weekAvg.toFixed(1)}\n`;
   }else{
     text += `🏛️ לא בוצעו סקרים השבוע.\n`;
   }
@@ -2528,8 +2538,8 @@ function populateWeeklyShare(){
     avgEl.textContent = data.weekAvg.toFixed(1);
     const diff = data.weekAvg - THRESHOLD;
     capEl.textContent = diff>=0
-      ? `מנדטים לקואליציה בממוצע — ${diff.toFixed(1)} מעל ה-61 הדרושים`
-      : `מנדטים לקואליציה בממוצע — חסרים ${Math.abs(diff).toFixed(1)} ל-61`;
+      ? `מנדטים לגוש נתניהו בממוצע — ${diff.toFixed(1)} מעל ה-61 הדרושים`
+      : `מנדטים לגוש נתניהו בממוצע — חסרים ${Math.abs(diff).toFixed(1)} ל-61`;
   }else{
     avgEl.style.color = "var(--ink-soft)";
     avgEl.textContent = "—";
@@ -2659,7 +2669,7 @@ function populateHorizontalShare(){
   document.getElementById('stGaugeMeta').innerHTML =
     `<span><b>${latest.outlet}</b></span><span><b>${fmtDate(latest.dateObj)}</b></span>`;
   document.getElementById('stGaugeSentence').innerHTML =
-    `לקואליציה (ש״ס · הציונות הדתית · עוצמה יהודית · הליכוד · יהדות התורה · עמך ישראל) <b>${coalSeats} מנדטים</b>`;
+    `לגוש נתניהו (ש״ס · הציונות הדתית · עוצמה יהודית · הליכוד · יהדות התורה · עמך ישראל) <b>${coalSeats} מנדטים</b>`;
   drawGaugeCanvas('stGaugeCanvas', coalSeats);
   document.getElementById('stGaugeCaption').textContent = captionText;
   const stStatus = document.getElementById('stStatus');
@@ -2678,7 +2688,7 @@ function populateHorizontalShare(){
     if(coalTrend){
       stTrendBig.className = "st-trend-big " + coalTrend.cls;
       stTrendBig.textContent = `${coalTrend.arrow} ${coalTrend.txt}`;
-      stTrendSub.textContent = `סך הקואליציה לעומת הסקר הקודם של ${latest.outlet} (${fmtDate(prevSurvey.dateObj)})`;
+      stTrendSub.textContent = `סך גוש נתניהו לעומת הסקר הקודם של ${latest.outlet} (${fmtDate(prevSurvey.dateObj)})`;
       const {risers, fallers} = computeRisersFallers(moverRows);
       stMovers.innerHTML = buildMoversHtml(risers, fallers, "st-movers-row", "st-movers-col", "st-movers-title", "st-movers-empty");
     }else{
@@ -2716,7 +2726,7 @@ function populateHorizontalShare(){
       const tr = document.createElement('tr');
       if(isCoalition(r.party)) tr.className = "coal-row";
       tr.innerHTML = `
-        <td class="pname-cell"><span class="pdot" style="background:${colorFor(r.party)}"></span>${r.party} ${isCoalition(r.party) ? '<span class="coal-tag">קואליציה</span>' : ''}</td>
+        <td class="pname-cell"><span class="pdot" style="background:${colorFor(r.party)}"></span>${r.party} ${isCoalition(r.party) ? '<span class="coal-tag">גוש נתניהו</span>' : '<span class="opp-tag">גוש השינוי</span>'}</td>
         <td class="num">${r.latestVal}</td>
       `;
       tbody.appendChild(tr);
@@ -2728,7 +2738,7 @@ function populateHorizontalShare(){
       const tr = document.createElement('tr');
       if(isCoalition(r.party)) tr.className = "coal-row";
       tr.innerHTML = `
-        <td class="pname-cell"><span class="pdot" style="background:${colorFor(r.party)}"></span>${r.party} ${isCoalition(r.party) ? '<span class="coal-tag">קואליציה</span>' : ''}</td>
+        <td class="pname-cell"><span class="pdot" style="background:${colorFor(r.party)}"></span>${r.party} ${isCoalition(r.party) ? '<span class="coal-tag">גוש נתניהו</span>' : '<span class="opp-tag">גוש השינוי</span>'}</td>
         <td class="num">${r.latestVal}</td>
         <td class="avg">${r.baseAvg!==null ? r.baseAvg.toFixed(1) : '—'}</td>
         <td><span class="delta ${d.cls}">${d.arrow} ${d.txt}</span></td>
@@ -2933,7 +2943,7 @@ async function prepareOutletSummary(){
           <span class="ost-card-name">${r.outlet}</span>
           <span class="ost-card-date">${fmtDate(r.latest.dateObj)}</span>
         </div>
-        <div class="ost-card-num ${r.numClass}">${r.coalLatest}<small> מנדטים לקואליציה</small></div>
+        <div class="ost-card-num ${r.numClass}">${r.coalLatest}<small> מנדטים לגוש נתניהו</small></div>
         <div class="ost-card-trend ${r.trend ? r.trend.cls : 'flat'}">${r.trend ? `${r.trend.arrow} ${r.trend.txt} מהסקר הקודם` : 'אין סקר קודם להשוואה'}</div>
         <div class="ost-card-maj">רוב אחרון: <b>${r.lastMajDate ? fmtDate(r.lastMajDate) : 'מעולם לא'}</b></div>
       `;
@@ -2998,7 +3008,7 @@ function populateLatestCompareShare(){
 
   const coalTr = document.createElement('tr');
   coalTr.className = "coal-row";
-  coalTr.innerHTML = `<td>★ סך הקואליציה (+עמך ישראל)</td>` + outlets.map(o=>{
+  coalTr.innerHTML = `<td>★ סך גוש נתניהו (+עמך ישראל)</td>` + outlets.map(o=>{
     const s = outletData[o];
     const val = s ? coalitionTotal(s) : null;
     return `<td class="lc-num">${val!==null ? val : '—'}</td>`;
@@ -3251,14 +3261,14 @@ renderChart = function(filtered){
 // ---------- Time studio state ----------
 const CT = {
   ready:false, metric:'__coal', mode:'dots', range:'6m', from:null, to:null,
-  win:14, band:true, avgType:'rolling', outlets:new Set(), chart:null, model:null, firstSeen:{}
+  win:10, band:true, avgType:'rolling',   /* CT-UPGRADE v4: N polls, not days */ outlets:new Set(), chart:null, model:null, firstSeen:{}
 };
 const CT_MODES  = [['dots','כל הסקרים וממוצע'],['outlets','לפי כלי תקשורת'],['week','ממוצע שבועי'],['month','ממוצע חודשי']];
 const CT_RANGES = [['1m','חודש'],['3m','3 חודשים'],['6m','חצי שנה'],['1y','שנה'],['all','הכל']];
 
 function ctIsCoal(){ return CT.metric==='__coal'; }
-function ctMetricLabel(){ return ctIsCoal() ? 'סך הקואליציה' : CT.metric; }
-function ctTitleText(){ return ctIsCoal() ? 'מנדטי הקואליציה לאורך זמן' : `המנדטים של ${CT.metric} לאורך זמן`; }
+function ctMetricLabel(){ return ctIsCoal() ? 'סך גוש נתניהו' : CT.metric; }
+function ctTitleText(){ return ctIsCoal() ? 'מנדטי גוש נתניהו לאורך זמן' : `המנדטים של ${CT.metric} לאורך זמן`; }
 function ctRef(){
   return ctIsCoal()
     ? {value:THRESHOLD, label:'רוב (61)'}
@@ -3327,19 +3337,24 @@ function ctModel(){
   const t0 = start.getTime(), t1 = end.getTime();
   const pts = all.filter(p=> p.t >= t0 && p.t <= t1);
 
-  const winMs = CT.win * 86400000;
-  const dates = Array.from(new Set(pts.map(p=>p.t)));
+  // CT-UPGRADE v4: the average is counted in POLLS, not days. A fixed day
+  // window holds two polls one week and eight the next, which made the line
+  // jumpy exactly where publication was sparse.
+  const dates = Array.from(new Set(pts.map(p=>p.t))).sort((a,b)=>a-b);
   const avg = [];
   dates.forEach(d=>{
-    const latest = {};
-    for(const p of all){
-      if(p.t > d) break;
-      if(p.t > d - winMs) latest[p.s.outlet] = p.v;
+    const pool = [];
+    for(let i=all.length-1; i>=0 && pool.length<CT.win; i--){
+      if(all[i].t <= d) pool.push(all[i]);
     }
-    const vals = Object.values(latest);
-    if(vals.length){
-      avg.push({t:d, v:vals.reduce((a,b)=>a+b,0)/vals.length, min:Math.min(...vals), max:Math.max(...vals), n:vals.length});
-    }
+    if(!pool.length) return;
+    const vals = pool.map(p=>p.v);
+    avg.push({
+      t:d, v: vals.reduce((a,b)=>a+b,0)/vals.length,
+      min: Math.min(...vals), max: Math.max(...vals), n: pool.length,
+      from: pool[pool.length-1].s.dateObj, to: pool[0].s.dateObj,
+      parts: pool.map(p=>({outlet:p.s.outlet, v:p.v, date:p.s.dateObj}))
+    });
   });
 
   // CT-UPGRADE v3: period average = simple mean of all surveys in the period;
@@ -3402,7 +3417,7 @@ function ctKpis(m){
   const cls = v=> coal ? (v>=THRESHOLD ? 'good' : 'bad') : '';
   const out = {};
   const la = m.latestAvg;
-  out.latest = {label:'ממוצע הסקרים העדכני', val: la ? ctFmt1(la.v) : '—', cls: la ? cls(la.v) : '',
+  out.latest = {label:`ממוצע ${CT.win} הסקרים האחרונים`, val: la ? ctFmt1(la.v) : '—', cls: la ? cls(la.v) : '',
                 sub: la ? `נכון ל-${fmtDate(new Date(la.t))}` : ''};
   if(m.firstAvg && la){
     const ch = la.v - m.firstAvg.v;
@@ -3421,7 +3436,22 @@ function ctKpis(m){
              val: n ? Math.round(m.above/n*100) + '%' : '—', cls:'',
              sub: n ? `${m.above} מתוך ${n}` : ''};
   out.mean = {label:'ממוצע התקופה', val: m.periodAvg ? ctFmt1(m.periodAvg.v) : '—', cls: m.periodAvg ? cls(m.periodAvg.v) : '',
-              sub:`${n} סקרים`};
+              sub:`${n} סקרים · ${fmtDate(m.start)} – ${fmtDate(m.end)}`};
+  out.count = {label:'סקרים בתקופה', val:String(n), cls:'',
+               sub:`${fmtDate(m.start)} – ${fmtDate(m.end)}`};
+  return out;
+}
+
+// CT-UPGRADE v4: the headline number always matches the line drawn on the
+// chart, so the two definitions of "ממוצע" can never appear side by side.
+// "אחוז הסקרים מעל אחוז החסימה" is gone; only the bloc keeps a majority share.
+function ctKpiList(m){
+  const k = ctKpis(m), out = [];
+  if(ctPeriodMode())      out.push(k.mean);
+  else                    out.push(k.latest, k.change);
+  out.push(k.peak, k.low);
+  if(ctIsCoal())          out.push(k.pct);
+  else if(ctPeriodMode()) out.push(k.count);
   return out;
 }
 function ctKpiHtml(list, prefix){
@@ -3444,11 +3474,11 @@ function ctNoteText(){
            (CT.mode==='dots' && CT.band ? ' הרצועה המוצללת: מהערוץ הנמוך לגבוה.' : '');
   }
   if(CT.mode==='dots'){
-    return `כל נקודה היא סקר בודד.${colorNote} הקו הוא ממוצע הסקרים: לכל תאריך נלקח הסקר האחרון של כל כלי תקשורת מ-${CT.win} הימים שקדמו לו, ומחושב ביניהם ממוצע — כך כלי שסוקר כל יום לא מקבל משקל יתר.` +
-           (CT.band ? ' הרצועה המוצללת היא הפער בין כלי התקשורת (הנמוך עד הגבוה) באותו חלון.' : '');
+    return `כל נקודה היא סקר בודד.${colorNote} הקו הוא ממוצע ${CT.win} הסקרים האחרונים: בכל תאריך מחושב הממוצע של ${CT.win} הסקרים שפורסמו עד אותו יום, כך שסקר חריג בודד לא מזיז את הקו.` +
+           (CT.band ? ` הרצועה המוצללת: מהנמוך לגבוה מבין אותם ${CT.win} סקרים.` : '');
   }
   if(CT.mode==='outlets'){
-    return `קו לכל כלי תקשורת שנבחר, מוחלק כממוצע של 3 הסקרים האחרונים שלו (הערך המקורי של כל סקר מופיע במעבר עם העכבר). הקו המקווקו הוא ממוצע הסקרים על פני ${CT.win} ימים.`;
+    return `קו לכל כלי תקשורת שנבחר, מוחלק כממוצע של 3 הסקרים האחרונים שלו (הערך המקורי של כל סקר מופיע במעבר עם העכבר). הקו המקווקו הוא ממוצע ${CT.win} הסקרים האחרונים מכל הכלים שנבחרו.`;
   }
   const unit = CT.mode==='week' ? 'שבוע (ראשון עד שבת)' : 'חודש';
   return `לכל ${unit}: הנקודה היא ממוצע כל הסקרים שפורסמו בו, והעמודה מראה את הטווח בין הסקר הנמוך לגבוה.${colorNote}`;
@@ -3517,7 +3547,7 @@ function ctBuildConfig(m, opt){
     const avgData = pa
       ? Array.from(new Set(m.pts.map(p=>p.t))).map(t=>({x:t, y:pa.v, period:true}))   // a point per survey date, so hover works along the whole line
       : m.avg.map(a=>({x:a.t, y:a.v, n:a.n, min:a.min, max:a.max}));
-    const avgLabel = pa ? 'ממוצע התקופה' : `ממוצע נע (${CT.win} ימים)`;
+    const avgLabel = pa ? 'ממוצע התקופה' : `ממוצע ${CT.win} הסקרים האחרונים`;
     const bandSrc = pa ? [{t:tFirst, min:pa.min, max:pa.max}, {t:tLast, min:pa.min, max:pa.max}] : m.avg;
     if(CT.mode==='dots'){
       if(CT.band && bandSrc.length > 1){
@@ -3567,7 +3597,7 @@ function ctBuildConfig(m, opt){
           return [` ממוצע התקופה: ${ctFmt1(r.y)}`].concat(
             m.periodAvg.outlets.map(o=> `   ${o.outlet}: ${ctFmt1(o.v)} (${o.n} סקרים)`));
         }
-        if(r.n) return ` ${c.dataset.label}: ${ctFmt1(r.y)}  ·  ${r.n} כלים, ${r.min}–${r.max}`;
+        if(r.n) return ` ${c.dataset.label}: ${ctFmt1(r.y)}  ·  ${r.n} סקרים, ${r.min}–${r.max}`;
         return ` ${c.dataset.label}: ${ctFmt1(r.y)}`;
       }
     };
@@ -3691,7 +3721,7 @@ function ctInit(){
   const sel = document.getElementById('ctMetric');
   sel.innerHTML = '';
   const o0 = document.createElement('option');
-  o0.value = '__coal'; o0.textContent = '★ סך הקואליציה';
+  o0.value = '__coal'; o0.textContent = '★ סך גוש נתניהו';
   sel.appendChild(o0);
   allPartiesList.forEach(p=>{
     const o = document.createElement('option');
@@ -3701,7 +3731,7 @@ function ctInit(){
   sel.value = CT.metric;
   sel.onchange = ()=>{ CT.metric = sel.value; ctRender(); };
 
-  document.getElementById('ctWin').onchange = e=>{ CT.win = parseInt(e.target.value,10) || 14; ctRender(); };
+  document.getElementById('ctWin').onchange = e=>{ CT.win = parseInt(e.target.value,10) || 10; ctRender(); };
   document.getElementById('ctBand').onchange = e=>{ CT.band = e.target.checked; ctRender(); };
   const onDate = ()=>{
     CT.from = ctFromInput(document.getElementById('ctFrom').value);
@@ -3738,8 +3768,7 @@ function ctRender(){
   document.getElementById('ctSmoothWrap').style.display = (ctLineModes && CT.avgType==='rolling') ? '' : 'none';
   document.getElementById('ctBandWrap').style.display = CT.mode==='dots' ? '' : 'none';
 
-  const k = ctKpis(m);
-  document.getElementById('ctKpis').innerHTML = ctKpiHtml([k.mean, k.change, k.peak, k.low, k.pct], 'ct');
+  document.getElementById('ctKpis').innerHTML = ctKpiHtml(ctKpiList(m), 'ct');
   document.getElementById('ctNote').textContent = ctNoteText();
 
   if(CT.chart){ CT.chart.destroy(); CT.chart = null; }
@@ -3783,7 +3812,7 @@ function ctDownloadCsv(){
   const m = CT.model;
   if(!m || !m.pts.length) return;
   const avgMap = new Map(m.avg.map(a=>[a.t, a.v]));
-  const rows = [['תאריך','כלי תקשורת','עורך משאלים','מספר הסקר','משיבים', ctMetricLabel(), ctPeriodMode() ? 'ממוצע התקופה' : `ממוצע נע (${CT.win} ימים)`]];
+  const rows = [['תאריך','כלי תקשורת','עורך משאלים','מספר הסקר','משיבים', ctMetricLabel(), ctPeriodMode() ? 'ממוצע התקופה' : `ממוצע ${CT.win} הסקרים האחרונים`]];
   m.pts.forEach(p=> rows.push([
     p.s.dateStr, p.s.outlet, p.s.pollster, p.s.num, p.s.respondents ?? '', p.v,
     (ctPeriodMode() && m.periodAvg) ? ctFmt1(m.periodAvg.v) : (avgMap.has(p.t) ? ctFmt1(avgMap.get(p.t)) : '')
@@ -3838,8 +3867,7 @@ async function ctRenderShare(format){
   document.getElementById('ctsTitle').textContent = ctTitleText();
   document.getElementById('ctsSub').textContent =
     `${fmtDate(m.start)} – ${fmtDate(m.end)} · ${m.pts.length} סקרים · ${ctOutletScope()}`;
-  const k = ctKpis(m);
-  document.getElementById('ctsKpis').innerHTML = ctKpiHtml([k.mean, k.peak, k.low, k.pct], 'cts');
+  document.getElementById('ctsKpis').innerHTML = ctKpiHtml(ctKpiList(m).slice(0,4), 'cts');
 
   const img = document.getElementById('ctsChartImg');
   img.src = story ? await ctChartImage(m, 924, 980, 1.9) : await ctChartImage(m, 1036, 560, 1.55);
@@ -3874,9 +3902,10 @@ async function ctPrepareShare(){
 function ctShareText(){
   const m = CT.model;
   if(!m) return DASHBOARD_URL;
-  const head = ctIsCoal() ? 'מנדטי הקואליציה' : `המנדטים של ${CT.metric}`;
+  const head = ctIsCoal() ? 'מנדטי גוש נתניהו' : `המנדטים של ${CT.metric}`;
   let t = `📈 ${head} לאורך זמן (${fmtDate(m.start)} – ${fmtDate(m.end)})\n`;
-  if(m.periodAvg) t += `🏛️ ממוצע התקופה: ${ctFmt1(m.periodAvg.v)}\n`;
+  if(ctPeriodMode() && m.periodAvg) t += `🏛️ ממוצע התקופה: ${ctFmt1(m.periodAvg.v)}\n`;
+  else if(m.latestAvg) t += `🏛️ ממוצע ${CT.win} הסקרים האחרונים: ${ctFmt1(m.latestAvg.v)}\n`;
   if(m.peak) t += `⬆️ שיא: ${m.peak.v} (${m.peak.s.outlet}, ${fmtDate(m.peak.s.dateObj)})\n`;
   if(m.low)  t += `⬇️ שפל: ${m.low.v} (${m.low.s.outlet}, ${fmtDate(m.low.s.dateObj)})\n`;
   if(ctIsCoal() && m.pts.length) t += `✅ סקרים עם רוב: ${Math.round(m.above/m.pts.length*100)}% (${m.above} מתוך ${m.pts.length})\n`;
