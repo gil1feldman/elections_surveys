@@ -386,6 +386,35 @@
   }
   .summary-btn.small:hover{background:var(--gold);border-color:var(--gold);color:#fff;}
 
+  /* ---------- Header actions menu (unified) ---------- */
+  .header-menu{position:relative;}
+  .header-menu-btn{
+    display:inline-flex;align-items:center;gap:7px;
+    border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);
+    padding:7px 16px;border-radius:6px;font-family:var(--mono);
+    font-weight:600;font-size:11.5px;letter-spacing:0.02em;cursor:pointer;transition:all .15s ease;
+  }
+  .header-menu-btn:hover{background:var(--gold);border-color:var(--gold);color:#fff;}
+  .header-menu-btn .chev{transition:transform .15s ease;}
+  .header-menu-btn.open .chev{transform:rotate(180deg);}
+  .header-menu-list{
+    display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:200;
+    background:var(--paper-raised);border:1.5px solid var(--line);border-radius:10px;
+    box-shadow:0 8px 24px rgba(27,36,64,0.14);min-width:220px;padding:6px;
+  }
+  .header-menu-list.open{display:block;}
+  .header-menu-item{
+    display:flex;align-items:center;gap:9px;width:100%;text-align:right;
+    border:none;background:transparent;color:var(--ink);padding:9px 10px;border-radius:7px;
+    font-family:'Assistant',sans-serif;font-weight:700;font-size:13px;cursor:pointer;
+  }
+  .header-menu-item:hover{background:var(--gold-soft);}
+  .header-menu-item svg{flex:none;color:var(--gold);}
+  .header-menu-item .sub{
+    display:block;font-family:'Assistant',sans-serif;font-weight:500;font-size:11px;color:var(--ink-soft);margin-top:1px;
+  }
+  .header-menu-item-text{display:flex;flex-direction:column;align-items:flex-start;gap:0;}
+
   /* ---------- Advanced-analysis collapse toggle ---------- */
   .advanced-toggle-bar{
     width:100%;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;
@@ -803,18 +832,36 @@
       <h1 id="pageTitle">מעקב נתוני סקרים</h1>
     </div>
     <div class="header-right">
-      <button class="summary-btn small" id="ctJumpBtn" onclick="ctScrollTo()">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><line x1="3" y1="21" x2="21" y2="21"/></svg>
-        לאורך זמן
-      </button>
-      <button class="summary-btn small" id="weeklySummaryBtn" onclick="openWeeklyPicker()">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
-        סיכום שבועי
-      </button>
-      <button class="summary-btn" id="summaryBtn" onclick="prepareSummary()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>
-        הכן סיכום לפרסום
-      </button>
+      <div class="header-menu" id="headerMenu">
+        <button class="header-menu-btn" id="headerMenuBtn" onclick="toggleHeaderMenu()" aria-haspopup="true" aria-expanded="false">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>
+          שיתוף וניווט
+          <svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="header-menu-list" id="headerMenuList" role="menu">
+          <button class="header-menu-item" role="menuitem" onclick="closeHeaderMenu(); prepareSummary();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>
+            <span class="header-menu-item-text">
+              הכן סיכום לפרסום
+              <span class="sub">תמונה של הסקר האחרון לשיתוף</span>
+            </span>
+          </button>
+          <button class="header-menu-item" role="menuitem" onclick="closeHeaderMenu(); openWeeklyPicker();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+            <span class="header-menu-item-text">
+              סיכום שבועי
+              <span class="sub">תמונת ממוצע לפי כלי תקשורת</span>
+            </span>
+          </button>
+          <button class="header-menu-item" role="menuitem" onclick="closeHeaderMenu(); ctScrollTo();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><line x1="3" y1="21" x2="21" y2="21"/></svg>
+            <span class="header-menu-item-text">
+              לאורך זמן
+              <span class="sub">קפיצה לגרף המגמה המתקדם</span>
+            </span>
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -906,8 +953,8 @@
       </table>
     </div>
 
-    <!-- TREND CHART -->
-    <div class="section-head">
+    <!-- TREND CHART — hidden: superseded by the "לאורך זמן" Time Studio below -->
+    <div class="section-head" style="display:none;">
       <div>
         <div class="eyebrow">מגמה לאורך זמן</div>
         <h2>סך גוש נתניהו או מפלגות נבחרות</h2>
@@ -917,7 +964,7 @@
         <div class="pillbar" id="rangebar"></div>
       </div>
     </div>
-    <div class="chart-card">
+    <div class="chart-card" style="display:none;">
       <div class="chart-controls" id="chartControls"></div>
       <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
     </div>
@@ -980,7 +1027,7 @@
         <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         ניתוח מתקדם
       </span>
-      <span class="advanced-toggle-sub">השוואת ערוצים · הטיית סוקרים · מבט על מפלגה</span>
+      <span class="advanced-toggle-sub">השוואת ערוצים · מבט על מפלגה</span>
     </button>
 
     <div class="advanced-content" id="advancedContent">
@@ -1018,15 +1065,15 @@
       </table>
     </div>
 
-    <!-- HOUSE EFFECT -->
-    <div class="section-head">
+    <!-- HOUSE EFFECT — hidden: not relevant for this audience -->
+    <div class="section-head" style="display:none;">
       <div>
         <div class="eyebrow">הטיית סוקרים</div>
         <h2>ממוצע 5 הסקרים האחרונים של כל כלי תקשורת מול הממוצע החוצה-כלים</h2>
         <p>לכל כלי תקשורת פעיל (לפחות 5 סקרים ב-6 השבועות האחרונים): ממוצע 5 הסקרים האחרונים שלו (בלי קשר לפילטרים למעלה), מול ממוצע משוקלל של כלל כלי התקשורת. הפרש חיובי = כלי התקשורת נותן למפלגה יותר מהממוצע.</p>
       </div>
     </div>
-    <div class="breakdown-card house-effect-wrap">
+    <div class="breakdown-card house-effect-wrap" style="display:none;">
       <table class="breakdown house-effect" id="houseEffectTable">
         <thead><tr id="houseEffectHead"></tr></thead>
         <tbody id="houseEffectBody"></tbody>
@@ -3934,6 +3981,27 @@ initDashboard = function(){
   __ctOrigInitDashboard.apply(this, arguments);
   try{ ctInit(); }catch(e){ console.error('CT: init failed', e); }
 };
+// ---------- Unified header menu ----------
+function toggleHeaderMenu(){
+  const list = document.getElementById('headerMenuList');
+  const btn = document.getElementById('headerMenuBtn');
+  const isOpen = list.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
+  btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+function closeHeaderMenu(){
+  document.getElementById('headerMenuList').classList.remove('open');
+  document.getElementById('headerMenuBtn').classList.remove('open');
+  document.getElementById('headerMenuBtn').setAttribute('aria-expanded', 'false');
+}
+document.addEventListener('click', (e)=>{
+  const menu = document.getElementById('headerMenu');
+  if(menu && !menu.contains(e.target)) closeHeaderMenu();
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape') closeHeaderMenu();
+});
+
 // ===================== /CT-UPGRADE v1 =====================
 </script>
 </body>
