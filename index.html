@@ -2685,10 +2685,9 @@ async function prepareSummary(){
   currentShareKind = 'main';
   summaryFilenamePrefix = "coalition-summary";
   if(!lastState){ return; }
-  const btn = document.getElementById('summaryBtn');
-  btn.disabled = true;
-  const origHtml = btn.innerHTML;
-  btn.innerHTML = "מכין תמונה...";
+  const btn = document.getElementById('summaryBtn'); // may be null — button now lives in the unified header menu
+  const origHtml = btn ? btn.innerHTML : null;
+  if(btn){ btn.disabled = true; btn.innerHTML = "מכין תמונה..."; }
 
   try{
     document.getElementById('modalFormatToggle').style.display = 'flex';
@@ -2701,8 +2700,7 @@ async function prepareSummary(){
     console.error(err);
     alert("לא הצלחנו להכין את התמונה. נסו שוב.");
   }finally{
-    btn.disabled = false;
-    btn.innerHTML = origHtml;
+    if(btn){ btn.disabled = false; btn.innerHTML = origHtml; }
   }
 }
 
