@@ -1916,7 +1916,7 @@ function render(){
     statusText = `לגוש נתניהו יש רוב — ${diff} מנדטים מעל הדרוש`;
   }else{
     statusClass = "fail";
-    statusText = `לגוש נתניהו אין רוב — חסרים לה ${Math.abs(diff)} מנדטים ל-61`;
+    statusText = `לגוש נתניהו אין רוב — חסרים לו ${Math.abs(diff)} מנדטים ל-61`;
   }
   statusEl.className = "gauge-status " + statusClass;
   statusEl.textContent = statusText;
